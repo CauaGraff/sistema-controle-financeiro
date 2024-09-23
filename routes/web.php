@@ -13,5 +13,5 @@ Route::prefix('login')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/', function () {
         return view(view: 'welcome');
-    })->name("home"); 
+    })->name("home");
 });
