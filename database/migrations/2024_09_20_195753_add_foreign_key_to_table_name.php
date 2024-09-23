@@ -15,7 +15,7 @@ return new class extends Migration {
                 $table->unsignedBigInteger('id_typeuser')->nullable();
                 $table->boolean('active');
             });
-            $table->foreign('id_typeuser')->references('id')->on('typeusers');
+            $table->foreign(columns: 'id_typeuser')->references('id')->on('typeusers');
         });
     }
 
@@ -24,9 +24,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('id_typeuser');
-            $table->dropForeign(['id_typeuser']);
-        });
+        Schema::dropIfExists('users');
     }
 };

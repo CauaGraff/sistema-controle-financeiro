@@ -1,1 +1,8 @@
-@import url("./bootstrap.min.css");
+:root {
+    --primary: #0F1426;
+}
+
+.bg-primary,
+.btn-primary {
+    background-color: var(--primary) !important;
+}
