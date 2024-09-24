@@ -19,7 +19,7 @@ class LoginController extends Controller
      */
     public function authenticate(Request $request): RedirectResponse
     {
-      $credentials = $request->validate([
+        $credentials = $request->validate([
             'email' => 'required',
             'password' => 'required|min:8'
         ], [
@@ -30,7 +30,11 @@ class LoginController extends Controller
 
         if (Auth::attempt(['email' => $credentials["email"], 'password' => $credentials["password"], 'active' => 1])) {
             $request->session()->regenerate();
-            return redirect()->intended('home');
+            if (Auth::user()->isAdmim()) {
+                return redirect()->route(route: 'home.adm');
+            } else {
+                return redirect()->route(route: 'home');
+            }
         }
     }
 

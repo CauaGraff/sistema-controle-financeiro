@@ -44,4 +44,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function isAdmim(): bool
+    {
+        return in_array($this->id_typeuser, ['1', '2']);
+    }
 }

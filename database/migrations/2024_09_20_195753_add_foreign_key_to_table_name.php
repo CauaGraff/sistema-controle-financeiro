@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             $table->after('password', function (Blueprint $table) {
-                $table->unsignedBigInteger('id_typeuser')->nullable();
+                $table->unsignedBigInteger('id_typeuser');
                 $table->boolean('active');
             });
             $table->foreign(columns: 'id_typeuser')->references('id')->on('typeusers');
