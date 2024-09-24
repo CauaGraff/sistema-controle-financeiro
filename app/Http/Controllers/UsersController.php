@@ -7,15 +7,16 @@ use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
-
     public function index(string $type)
     {
-
-
         if ($type != "cliente") {
             dd("usrs ad");
         } else {
-            dd(User::where());
+            dd(User::where("id_typeuser", 3));
         }
+    }
+    public function formUser(string $type)
+    {
+        return view('admin.usuarios.formcreate');
     }
 }

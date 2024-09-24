@@ -16,12 +16,12 @@ Route::prefix('login')->group(function () {
 Route::middleware(['auth', AdminIS::class])->group(function () {
     Route::prefix('adm')->group(function () {
         Route::get('/', function () {
-            return view(view: 'admin.pages.home');
+            return view(view: 'admin.home');
         })->name("home.adm");
         /**USUARIOS */
         Route::prefix('/usuarios')->group(function () {
-            Route::get('/{type}', [UsersController::class, 'index'])->name("usuarios.adm");
-
+            Route::get('/{type}', [UsersController::class, 'index'])->name("adm.usuarios");
+            Route::get('/{type}/cadastrar', [UsersController::class, 'formUser'])->name("adm.cadastro.usuarios");
         });
 
     });

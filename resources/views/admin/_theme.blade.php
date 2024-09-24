@@ -32,7 +32,7 @@
               </a>
               <ul class="dropdown-menu dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
                 <li><a class="dropdown-item" href="#">Escritorio</a></li>
-                <li><a class="dropdown-item" href="{{route("usuarios.adm", ["cliente"])}}">Clientes</a></li>
+                <li><a class="dropdown-item" href="{{route("adm.usuarios", ["cliente"])}}">Clientes</a></li>
               </ul>
             </li>
             <li class="nav-item">
