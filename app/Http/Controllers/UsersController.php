@@ -9,14 +9,14 @@ class UsersController extends Controller
 {
     public function index(string $type)
     {
-        if ($type != "cliente") {
-            dd("usrs ad");
-        } else {
-            dd(User::where("id_typeuser", 3));
-        }
+        // if ($type != "cliente") {
+        //     return dd("usrs ad");
+        // } else {
+        //     return dd(User::where("id_typeuser", 3));
+        // }
     }
-    public function formUser(string $type)
+    public function formUser()
     {
-        return view('admin.usuarios.formcreate');
+        return view('admin.users.formcreate');
     }
 }

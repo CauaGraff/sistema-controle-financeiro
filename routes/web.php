@@ -21,9 +21,8 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
         /**USUARIOS */
         Route::prefix('/usuarios')->group(function () {
             Route::get('/{type}', [UsersController::class, 'index'])->name("adm.usuarios");
-            Route::get('/{type}/cadastrar', [UsersController::class, 'formUser'])->name("adm.cadastro.usuarios");
+            Route::get('/cadastrar', [UsersController::class, 'formUser'])->name("adm.cadastro.usuarios");
         });
-
     });
 });
 
