@@ -4,19 +4,54 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
 {
     public function index(string $type)
     {
-        // if ($type != "cliente") {
-        //     return dd("usrs ad");
-        // } else {
-        //     return dd(User::where("id_typeuser", 3));
-        // }
+        if ($type != "cliente") {
+            return dd("usrs ad");
+        } else {
+            $users = User::where("id_typeuser", 3)->get();
+            return view('admin.users.index', compact('users'));
+        }
     }
-    public function formUser()
+    public function formUser(string $type)
     {
-        return view('admin.users.formcreate');
+        if ($type == "cliente") {
+            $typeuser = 3;
+        } else {
+            $typeuser = 2;
+        }
+        return view('admin.users.formcreate', compact('typeuser'));
+    }
+
+    public function save(Request $request)
+    {
+        // Validação dos dados
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|'
+        ]);
+
+        // Criação do usuário
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'id_typeuser' => $request->typeuser,
+            'active' => 1
+        ]);
+
+        if ($request->typeuser == 3) {
+            $a = "clientes";
+        } else {
+            $a = "escritorio";
+        }
+
+        // Redireciona para uma página ou exibe uma mensagem
+        return redirect()->route('home.adm', ['type' => $a])->with('success', 'Usuário cadastrado com sucesso!');
     }
 }

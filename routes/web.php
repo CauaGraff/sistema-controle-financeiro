@@ -23,6 +23,7 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
         Route::prefix('/usuarios')->group(function () {
             Route::get('/{type}', [UsersController::class, 'index'])->name("adm.usuarios");
             Route::get('/{type}/cadastrar', [UsersController::class, 'formUser'])->name("adm.cadastro.usuarios");
+            Route::post("/cadastrar/register", [UsersController::class, 'save'])->name('adm.cadastro.usuarios.post');
         });
     });
 });

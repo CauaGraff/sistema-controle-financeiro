@@ -31,9 +31,9 @@ class LoginController extends Controller
         if (Auth::attempt(['email' => $credentials["email"], 'password' => $credentials["password"], 'active' => 1])) {
             $request->session()->regenerate();
             if (Auth::user()->isAdmim()) {
-                return redirect()->route(route: 'home.adm');
+                return redirect()->route('home.adm');
             } else {
-                return redirect()->route(route: 'home');
+                return redirect()->route('home');
             }
         }
     }
