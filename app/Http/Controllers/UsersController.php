@@ -56,4 +56,48 @@ class UsersController extends Controller
         // Redireciona para uma página ou exibe uma mensagem
         return redirect()->route('home.adm', ['type' => $a])->with('success', 'Usuário cadastrado com sucesso!');
     }
+
+    public function edit(int $id)
+    {
+        $user = User::find($id);
+        if ($user) {
+            return view("admin.users.formupdate", compact('user'));
+        }
+        return dd("nãoa");
+    }
+
+    public function update(Request $request, int $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255',
+        ]);
+        $user = User::findOrFail($id);
+
+        if ($request->password == "") {
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'active' => $request->active
+            ]);
+            if ($user) {
+                return dd("atualizado");
+            }
+        }
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'active' => $request->active
+        ]);
+
+    }
+
+    public function delete(int $id)
+    {
+        if (User::where('id', $id)->delete()) {
+            return redirect()->route("home.adm");
+        }
+        return dd("nafoi possivel");
+    }
 }

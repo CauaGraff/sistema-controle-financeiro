@@ -23,8 +23,15 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
         Route::prefix('/usuarios')->group(function () {
             Route::get('/{type}', [UsersController::class, 'index'])->name("adm.usuarios");
             Route::get('/{type}/cadastrar', [UsersController::class, 'formUser'])->name("adm.cadastro.usuarios");
-            Route::post("/cadastrar/register", [UsersController::class, 'save'])->name('adm.cadastro.usuarios.post');
+            Route::post('/cadastrar/register', [UsersController::class, 'save'])->name('adm.cadastro.usuarios.post');
+            Route::get('/{id}/edit', [UsersController::class, 'edit'])->name("adm.usuarios.edit");
+            Route::put('/{id}/update', [UsersController::class, 'update'])->name("adm.usuarios.update");
+            Route::get('/{id}/delete', [UsersController::class, "delete"])->name('adm.usuarios.delete');
         });
+
+        // Route::prefix('/empresas')->group(function () {
+        //     Route::get('/', [EmpresasController::class, 'index'])->name("adm.empresas");
+        // });
     });
 });
 

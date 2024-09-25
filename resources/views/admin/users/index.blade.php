@@ -33,8 +33,10 @@
                         <td>{{ $user->active }}</td>
                         <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
                         <td>
-                            <a href="" class="btn"><i class="fa-solid fa-pen-to-square"></i></a>
-                            <a href="" class="btn"><i class="fa-solid fa-trash"></i></a>
+                            <a href="{{route("adm.usuarios.edit", [$user->id])}}" class="btn"><i
+                                    class="fa-solid fa-pen-to-square"></i></a>
+                            <a href="{{route("adm.usuarios.delete", [$user->id])}}" class="btn"><i
+                                    class="fa-solid fa-trash"></i></a>
                             <a href="" class="btn"><i class="fa-solid fa-eye"></i></a>
                         </td>
                     </tr>
