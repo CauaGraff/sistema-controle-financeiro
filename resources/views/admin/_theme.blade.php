@@ -9,6 +9,7 @@
   <link href="{{asset("css/bootstrap.min.css")}}" rel="stylesheet" id="bootstrap-css">
   <link href="{{asset("css/app.css")}}" rel="stylesheet">
   <link href="{{asset("fontawesome/css/all.min.css")}}" rel="stylesheet">
+  @yield("css")
 </head>
 
 <body class="bg-light">
@@ -23,7 +24,7 @@
         <div class=" collapse navbar-collapse" id="navbarNavDropdown">
           <ul class="navbar-nav ms-auto ">
             <li class="nav-item">
-              <a class="nav-link mx-2 active" aria-current="page" href="#">Home</a>
+              <a class="nav-link mx-2 active" aria-current="page" href="{{route("home.adm")}}">Home</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="" id="navbarDarkDropdownMenuLink" role="button"
@@ -31,7 +32,7 @@
                 Usuarios
               </a>
               <ul class="dropdown-menu dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
-                <li><a class="dropdown-item" href="#">Escritorio</a></li>
+                <li><a class="dropdown-item" href="{{route("adm.usuarios", ["escritorio"])}}">Escritorio</a></li>
                 <li><a class="dropdown-item" href="{{route("adm.usuarios", ["cliente"])}}">Clientes</a></li>
               </ul>
             </li>
@@ -70,6 +71,7 @@
   <script src="{{asset("js/bootstrap.min.js")}}"></script>
   <script src="{{asset("js/jquery-3.7.1.min.js")}}"></script>
   <script src="{{asset("js/bootstrap.bundle.min.js")}}"></script>
+  @yield("js")
 
 </body>
 

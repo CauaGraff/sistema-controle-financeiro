@@ -10,12 +10,14 @@ class UsersController extends Controller
 {
     public function index(string $type)
     {
-        if ($type != "cliente") {
-            return dd("usrs ad");
+        if ($type != "cliente" && $type == "escritorio") {
+            $users = User::where("id_typeuser", 2)->get();
+            $type = "escritorio";
         } else {
             $users = User::where("id_typeuser", 3)->get();
-            return view('admin.users.index', compact('users'));
+            $type = "cliente";
         }
+        return view('admin.users.index', compact('users', 'type'));
     }
     public function formUser(string $type)
     {
