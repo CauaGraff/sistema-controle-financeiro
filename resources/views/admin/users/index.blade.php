@@ -3,7 +3,7 @@
 @section("title", "Usuarios")
 
 @section("css")
-<link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.css" />
+<link rel="stylesheet" href="{{asset("dataTables.css")}}" />
 @endsection
 @section('content')
 <div class="container mt-5">
@@ -48,7 +48,7 @@
 @endsection
 
 @section(section: 'js')
-<script src="https://cdn.datatables.net/2.1.7/js/dataTables.js"></script>
+<script src="{{asset("js/dataTables.js")}}"></script>
 <script>
     $(".table").DataTable();
 </script>
