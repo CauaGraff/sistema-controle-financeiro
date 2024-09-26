@@ -48,13 +48,13 @@ class UsersController extends Controller
         ]);
 
         if ($request->typeuser == 3) {
-            $a = "clientes";
+            $usuario = "clientes";
         } else {
-            $a = "escritorio";
+            $usuario = "escritorio";
         }
 
         // Redireciona para uma página ou exibe uma mensagem
-        return redirect()->route('home.adm', ['type' => $a])->with('success', 'Usuário cadastrado com sucesso!');
+        return redirect()->route('adm.usuarios', ['type' => $usuario])->with('toast', 'Usuário cadastrado com sucesso!');
     }
 
     public function edit(int $id)
