@@ -38,7 +38,7 @@
               </ul>
             </li>
             <li class="nav-item">
-              <a class="nav-link mx-2" href="#">Pricing</a>
+              <a class="nav-link mx-2" href="#">Empresas</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="" id="navbarDarkDropdownMenuLink" role="button"

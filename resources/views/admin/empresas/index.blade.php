@@ -10,13 +10,13 @@
 
 
 <div class="container mt-5">
-    <h2 class="text-center">Lista de Usuários {{$type}}</h2>
+    <h2 class="text-center">Empresas</h2>
     <div class="text-end">
-    <a href="{{route("adm.cadastro.usuarios", [$type])}}" class="btn btn-primary ">+ Adcionar</a>
+    <a href="" class="btn btn-primary ">+ Adcionar</a>
 </div>  
     <!-- Verifica se existem usuários -->
-    @if ($users->isEmpty())
-        <p class="text-center">Nenhum usuário cadastrado.</p>
+    @if ($empresas->isEmpty())
+        <p class="text-center">Nenhuma empresa cadastrado.</p>
     @else
     <div class="table-responsive">
 
@@ -25,24 +25,24 @@
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
-                    <th>Email</th>
+                    <th>CNPJ</th>
                     <th>Status</th>
                     <th>Data de Cadastro</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($users as $user)
+                @foreach ($empresas as $empresa)
                     <tr>
-                        <td>{{ $user->id }}</td>
-                        <td>{{ $user->name }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>{{ $user->active ==1? "Ativo": "Desativado" }}</td>
-                        <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
+                        <td>{{ $empresa->id }}</td>
+                        <td>{{ $empresa->nome }}</td>
+                        <td>{{ $empresa->cnpj_cpf }}</td>
+                        <td>{{ $empresa->active ==1? "Ativo": "Desativado" }}</td>
+                        <td>{{ $empresa->created_at->format('d/m/Y H:i') }}</td>
                         <td>
-                            <a href="{{route("adm.usuarios.edit", [$user->id])}}" class="btn"><i
+                            <a href="{{route("adm.usuarios.edit", [$empresa->id])}}" class="btn"><i
                                     class="fa-solid fa-pen-to-square"></i></a>
-                            <a href="{{route("adm.usuarios.delete", [$user->id])}}" class="btn"><i
+                            <a href="{{route("adm.usuarios.delete", [$empresa->id])}}" class="btn"><i
                                     class="fa-solid fa-trash"></i></a>
                             <a href="" class="btn"><i class="fa-solid fa-eye"></i></a>
                         </td>

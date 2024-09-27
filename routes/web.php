@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\UsersController;
+use App\Http\Middleware\AdminIS;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
-use App\Http\Middleware\AdminIS;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\EmpresasController;
 
 /**ROTAS */
 
@@ -29,9 +30,14 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
             Route::get('/{id}/delete', [UsersController::class, "delete"])->name('adm.usuarios.delete');
         });
 
-        // Route::prefix('/empresas')->group(function () {
-        //     Route::get('/', [EmpresasController::class, 'index'])->name("adm.empresas");
-        // });
+        Route::prefix('/empresas')->group(function () {
+            Route::get('/', [EmpresasController::class, 'index'])->name("adm.empresas");
+            Route::get('/cadastrar', [EmpresasController::class, 'create'])->name("adm.cadastro.empresas");
+            Route::post('/cadastrar/register', [EmpresasController::class, 'save'])->name('adm.cadastro.empresas.post');
+            Route::get('/{id}/edit', [EmpresasController::class, 'edit'])->name("adm.empresas.edit");
+            Route::put('/{id}/update', [EmpresasController::class, 'update'])->name("adm.empresas.update");
+            Route::get('/{id}/delete', [EmpresasController::class, "delete"])->name('adm.empresas.delete');
+        });
     });
 });
 

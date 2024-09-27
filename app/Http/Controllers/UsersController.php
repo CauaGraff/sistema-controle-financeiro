@@ -54,7 +54,7 @@ class UsersController extends Controller
         }
 
         // Redireciona para uma página ou exibe uma mensagem
-        return redirect()->route('adm.usuarios', ['type' => $usuario])->with('toast', 'Usuário cadastrado com sucesso!');
+        return redirect()->route('adm.usuarios', ['type' => $usuario])->with('alert-success', 'Usuário cadastrado com sucesso!');
     }
 
     public function edit(int $id)
@@ -63,7 +63,8 @@ class UsersController extends Controller
         if ($user) {
             return view("admin.users.formupdate", compact('user'));
         }
-        return dd("nãoa");
+        return redirect()
+            ->back()->with('alert-danger', 'Erro!');
     }
 
     public function update(Request $request, int $id)
@@ -73,7 +74,7 @@ class UsersController extends Controller
             'email' => 'required|string|email|max:255',
         ]);
         $user = User::findOrFail($id);
-
+        $typeuser = $user->id_typeuser == 3 ? "cliente" : "escritorio";
         if ($request->password == "") {
             $user->update([
                 'name' => $request->name,
@@ -81,23 +82,28 @@ class UsersController extends Controller
                 'active' => $request->active
             ]);
             if ($user) {
-                return dd("atualizado");
+                return redirect()->route('adm.usuarios', ['type' => $typeuser])->with('alert-success', 'Usuário Atualizado com sucesso!');
             }
-        }
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'active' => $request->active
-        ]);
+        } else {
 
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'active' => $request->active
+            ]);
+            return redirect()->route('adm.usuarios', ['type' => $typeuser])->with('alert-success', 'Usuário Atualizado com sucesso!');
+        }
+        return redirect()->route('adm.usuarios', ['type' => $typeuser])->with('alert-danger', 'Usuário Atualizado com sucesso!');
     }
 
-    public function delete(int $id)
+    public function delete(int $id, Request $request)
     {
-        if (User::where('id', $id)->delete()) {
-            return redirect()->route("home.adm");
+        if (User::find($id)->delete()) {
+            return redirect()
+                ->back()->with('alert-success', 'Usuário Deletado com sucesso!');
         }
-        return dd("nafoi possivel");
+        return redirect()
+            ->back()->with('alert-danger', 'Erro ao deletar!');
     }
 }
