@@ -43,7 +43,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ route('adm.empresas.addUsuario', $empresa->id) }}" method="POST">
-
                     <div class="modal-body">
                         @csrf
                         <div class="form-group">

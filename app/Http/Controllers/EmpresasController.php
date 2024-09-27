@@ -56,7 +56,18 @@ class EmpresasController extends Controller
     {
         $empresa = Empresas::findOrFail($id);
         $usuarios = $empresa->usuarios; // Assumindo que a relação está configurada no modelo Empresa
-        $allUsers = User::where("id_typeuser", "=", 3)->get();
+        $allUsers = User::whereNotIn('id', $usuarios->pluck('id'))->get();
         return view('admin.empresas.view', compact('empresa', 'usuarios', 'allUsers'));
+    }
+    public function addUsuario(Request $request, $id)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $empresa = Empresas::findOrFail($id);
+        $empresa->usuarios()->attach($request->user_id); // Adiciona o usuário à empresa
+
+        return redirect()->route('adm.empresas.show', $id)->with('success', 'Usuário adicionado com sucesso!');
     }
 }

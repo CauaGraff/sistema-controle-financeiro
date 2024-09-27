@@ -21,6 +21,6 @@ class Empresas extends Model
 
     public function usuarios()
     {
-        return $this->belongsToMany(User::class, 'users_empresas', 'id_empresas', 'id_user');
+        return $this->belongsToMany(User::class, 'users_empresas', 'id_empresas', 'id_user')->withTimestamps();
     }
 }

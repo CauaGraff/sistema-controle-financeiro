@@ -3,9 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Empresas;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
@@ -54,7 +55,7 @@ class User extends Authenticatable
 
     public function empresas()
     {
-        return $this->belongsToMany(Empresa::class, 'users_empresas', 'id_user', 'id_empresas');
+        return $this->belongsToMany(Empresas::class, 'users_empresas', 'id_user', 'id_empresas')->withTimestamps();
     }
 
 }
