@@ -37,6 +37,9 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
             Route::get('/{id}/edit', [EmpresasController::class, 'edit'])->name("adm.empresas.edit");
             Route::put('/{id}/update', [EmpresasController::class, 'update'])->name("adm.empresas.update");
             Route::get('/{id}/delete', [EmpresasController::class, "delete"])->name('adm.empresas.delete');
+            Route::get('/{id}/show', [EmpresasController::class, 'show'])->name('adm.empresas.show');
+            Route::post('/{id}/add-usuario', [EmpresasController::class, 'addUsuario'])->name('adm.empresas.addUsuario');
+
         });
     });
 });

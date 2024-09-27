@@ -9,8 +9,8 @@
             <div class="card-body p-4">
                 <form method="POST" action="{{ route('adm.cadastro.empresas.post') }}">
                     @csrf
-                    <!-- Nome -->
                     <div class="row mb-3">
+                        <!-- Nome -->
                         <div class="col">
                             <label for="nome" class="form-label">Nome</label>
                             <input type="text" class="form-control @error('nome') is-invalid @enderror" id="nome"
@@ -21,14 +21,11 @@
                                 </div>
                             @enderror
                         </div>
-                    </div>
-
-                    <!-- CNPJ/CPF -->
-                    <div class="row mb-3">
+                        <!-- CNPJ/CPF -->
                         <div class="col">
                             <label for="cnpj_cpf" class="form-label">CNPJ/CPF</label>
-                            <input type="text" class="form-control @error('cnpj_cpf') is-invalid @enderror" id="cnpj_cpf"
-                                name="cnpj_cpf" value="{{ old('cnpj_cpf') }}" required>
+                            <input type="text" class="form-control @error('cnpj_cpf') is-invalid @enderror"
+                                id="cnpj_cpf" name="cnpj_cpf" value="{{ old('cnpj_cpf') }}" required>
                             @error('cnpj_cpf')
                                 <div class="invalid-feedback">
                                     {{ $message }}
@@ -36,7 +33,6 @@
                             @enderror
                         </div>
                     </div>
-
                     <!-- CEP -->
                     <div class="row mb-3">
                         <div class="col">
@@ -50,9 +46,8 @@
                             @enderror
                         </div>
                     </div>
-
-                    <!-- Cidade -->
                     <div class="row mb-3">
+                        <!-- Cidade -->
                         <div class="col">
                             <label for="cidade" class="form-label">Cidade</label>
                             <input type="text" class="form-control @error('cidade') is-invalid @enderror" id="cidade"
@@ -63,10 +58,7 @@
                                 </div>
                             @enderror
                         </div>
-                    </div>
-
-                    <!-- Bairro -->
-                    <div class="row mb-3">
+                        <!-- Bairro -->
                         <div class="col">
                             <label for="bairro" class="form-label">Bairro</label>
                             <input type="text" class="form-control @error('bairro') is-invalid @enderror" id="bairro"
@@ -77,10 +69,6 @@
                                 </div>
                             @enderror
                         </div>
-                    </div>
-
-                    <!-- Rua -->
-                    <div class="row mb-3">
                         <div class="col">
                             <label for="rua" class="form-label">Rua</label>
                             <input type="text" class="form-control @error('rua') is-invalid @enderror" id="rua"
@@ -92,7 +80,6 @@
                             @enderror
                         </div>
                     </div>
-
                     <!-- Botão de Cadastro -->
                     <button type="submit" class="btn btn-primary">Cadastrar Empresa</button>
                 </form>

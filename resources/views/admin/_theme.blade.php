@@ -38,7 +38,7 @@
               </ul>
             </li>
             <li class="nav-item">
-              <a class="nav-link mx-2" href="#">Empresas</a>
+              <a class="nav-link mx-2" href="{{route("adm.empresas")}}">Empresas</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="" id="navbarDarkDropdownMenuLink" role="button"
@@ -72,6 +72,38 @@
   <script src="{{asset("js/bootstrap.min.js")}}"></script>
   <script src="{{asset("js/jquery-3.7.1.min.js")}}"></script>
   <script src="{{asset("js/bootstrap.bundle.min.js")}}"></script>
+  <script src="{{asset("js/toastr.min.js")}}"></script>
+
+  <script>
+    toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": true,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "3000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+    @if(Session::has('alert-success'))
+    toastr.success("{{ Session::get('alert-success') }} ")
+
+
+  @elseif (Session::has('alert-warning'))
+  toastr.warning("{{ Session::get('alert-success') }} ")
+
+
+@elseif (Session::has('alert-danger'))
+  toastr.error("{{ Session::get('alert-success') }} ")
+@endif
+  </script>
   @yield("js")
 
 </body>

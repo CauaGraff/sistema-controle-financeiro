@@ -51,4 +51,10 @@ class User extends Authenticatable
     {
         return in_array($this->id_typeuser, ['1', '2']);
     }
+
+    public function empresas()
+    {
+        return $this->belongsToMany(Empresa::class, 'users_empresas', 'id_user', 'id_empresas');
+    }
+
 }
