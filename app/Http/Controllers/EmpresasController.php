@@ -19,7 +19,6 @@ class EmpresasController extends Controller
         return view('admin.empresas.formcreate');
     }
 
-
     public function save(Request $request)
     {
 

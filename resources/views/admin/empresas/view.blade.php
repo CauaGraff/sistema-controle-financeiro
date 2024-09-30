@@ -12,10 +12,8 @@
     <p>CNPJ/CPF: {{ $empresa->cnpj_cpf }}</p>
     <p>Endereço: {{ $empresa->rua }}, {{ $empresa->bairro }}, {{ $empresa->cidade }} - {{ $empresa->cep }}</p>
     <div class="container row">
-        <div class="col">
-            <h2>Usuários com acesso</h2>
-        </div>
-        <div class="col">
+        <h2 class="text-center">Usuários com acesso</h2>
+        <div class="text-end">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 + Adcionar
             </button>
@@ -34,19 +32,19 @@
             </thead>
             <tbody>
                 @foreach ($usuarios as $usuario)
-                <tr>
-                    <td>{{ $usuario->id }}</td>
-                    <td>{{ $usuario->name }}</td>
-                    <td>{{ $usuario->email }}</td>
-                    <td>
-                        <a href="{{route("adm.usuarios.edit", [$usuario->id])}}" class="btn"><i
-                                class="fa-solid fa-pen-to-square"></i></a>
-                        <a href="{{route("adm.empresas.removeUsuario", ['idEmpresa'=>$empresa->id,'idUser'=>$usuario->id])}}" class="btn"><i
-                                class="fa-solid fa-trash"></i></a>
-                        <a href="{{route("adm.usuarios.edit", [$usuario->id])}}" class="btn"><i
-                                class="fa-solid fa-eye"></i></a>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>{{ $usuario->id }}</td>
+                        <td>{{ $usuario->name }}</td>
+                        <td>{{ $usuario->email }}</td>
+                        <td>
+                            <a href="{{route("adm.usuarios.edit", [$usuario->id])}}" class="btn"><i
+                                    class="fa-solid fa-pen-to-square"></i></a>
+                            <a href="{{route("adm.empresas.removeUsuario", ['idEmpresa' => $empresa->id, 'idUser' => $usuario->id])}}"
+                                class="btn"><i class="fa-solid fa-trash"></i></a>
+                            <a href="{{route("adm.usuarios.edit", [$usuario->id])}}" class="btn"><i
+                                    class="fa-solid fa-eye"></i></a>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
@@ -66,7 +64,7 @@
                             <select name="user_id" id="user_id" class="form-control" data-live-search="true" required>
                                 <option value="">Selecione um usuário</option>
                                 @foreach ($allUsers as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->email }}</option>
+                                    <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->email }}</option>
                                 @endforeach
                             </select>
                         </div>

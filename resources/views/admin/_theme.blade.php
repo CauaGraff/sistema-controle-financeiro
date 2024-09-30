@@ -14,7 +14,6 @@
 </head>
 
 <body class="bg-light">
-
   <header class="border-bottom" style="background-color: #fff;">
     <nav class="navbar navbar-expand-sm navbar-light p-3">
       <div class="container-fluid">
@@ -23,42 +22,39 @@
           aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class=" collapse navbar-collapse" id="navbarNavDropdown">
-          <ul class="navbar-nav ms-auto ">
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link mx-2 active" aria-current="page" href="{{route("home.adm")}}">Home</a>
+              <a class="nav-link mx-2 active" aria-current="page" href="{{route('home.adm')}}">Home</a>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="" id="navbarDarkDropdownMenuLink" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link dropdown-toggle" href="#" id="usuariosDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
                 Usuarios
               </a>
-              <ul class="dropdown-menu dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
-                <li><a class="dropdown-item" href="{{route("adm.usuarios", ["escritorio"])}}">Escritorio</a></li>
-                <li><a class="dropdown-item" href="{{route("adm.usuarios", ["cliente"])}}">Clientes</a></li>
+              <ul class="dropdown-menu" aria-labelledby="usuariosDropdown">
+                <li><a class="dropdown-item" href="{{route('adm.usuarios', ['escritorio'])}}">Escritorio</a></li>
+                <li><a class="dropdown-item" href="{{route('adm.usuarios', ['cliente'])}}">Clientes</a></li>
               </ul>
             </li>
             <li class="nav-item">
-              <a class="nav-link mx-2" href="{{route("adm.empresas")}}">Empresas</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="" id="navbarDarkDropdownMenuLink" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                Dropdown
-              </a>
-              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-                <li><a class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li><a class="dropdown-item" href="#">Something else here</a></li>
-              </ul>
+              <a class="nav-link mx-2" href="{{route('adm.empresas')}}">Empresas</a>
             </li>
           </ul>
           <ul class="navbar-nav ms-auto d-none d-lg-inline-flex">
             <li class="nav-item mx-2">
-              <a class="nav-link text-dark h5" href="" target="blank"></a>
+              <span class="nav-link">{{auth()->user()->name}}</span>
             </li>
-            <li class="nav-item mx-2">
-              <a class="nav-link text-dark h5" href="" target="blank"></a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <i class="fa-solid fa-user"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item" href="#">Action</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+              </ul>
             </li>
           </ul>
         </div>
@@ -97,13 +93,13 @@
     toastr.success("{{ Session::get('alert-success') }} ")
 
 
-    @elseif(Session::has('alert-warning'))
-    toastr.warning("{{ Session::get('alert-warning') }} ")
+  @elseif(Session::has('alert-warning'))
+  toastr.warning("{{ Session::get('alert-warning') }} ")
 
 
-    @elseif(Session::has('alert-danger'))
-    toastr.error("{{ Session::get('alert-danger') }} ")
-    @endif
+@elseif(Session::has('alert-danger'))
+  toastr.error("{{ Session::get('alert-danger') }} ")
+@endif
   </script>
   @yield("js")
 
