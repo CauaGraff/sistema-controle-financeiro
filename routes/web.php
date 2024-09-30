@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdmController;
 use App\Http\Middleware\AdminIS;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
@@ -17,9 +18,7 @@ Route::prefix('login')->group(function () {
 /**ADM */
 Route::middleware(['auth', AdminIS::class])->group(function () {
     Route::prefix('adm')->group(function () {
-        Route::get('/', function () {
-            return view(view: 'admin.home');
-        })->name("home.adm");
+        Route::get('/', [AdmController::class, 'index'])->name("home.adm");
         /**USUARIOS */
         Route::prefix('/usuarios')->group(function () {
             Route::get('/{type}', [UsersController::class, 'index'])->name("adm.usuarios");
@@ -38,8 +37,8 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
             Route::put('/{id}/update', [EmpresasController::class, 'update'])->name("adm.empresas.update");
             Route::get('/{id}/delete', [EmpresasController::class, "delete"])->name('adm.empresas.delete');
             Route::get('/{id}/show', [EmpresasController::class, 'show'])->name('adm.empresas.show');
-            Route::post('/{id}/add-usuario', [EmpresasController::class, 'addUsuario'])->name('adm.empresas.addUsuario');
-
+            Route::post('/add-usuario/{id}', [EmpresasController::class, 'addUsuario'])->name('adm.empresas.addUsuario');
+            Route::get('{idEmpresa}/remove-usuario/{idUser}', [EmpresasController::class, 'removeUsuario'])->name('adm.empresas.removeUsuario');
         });
     });
 });

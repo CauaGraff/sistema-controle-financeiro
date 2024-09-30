@@ -70,4 +70,22 @@ class EmpresasController extends Controller
 
         return redirect()->route('adm.empresas.show', $id)->with('success', 'Usuário adicionado com sucesso!');
     }
+    public function removeUsuario($idEmpersa, $idUser)
+    {
+        $empresa = Empresas::findOrFail($idEmpersa);
+
+        // Verificar se o usuário tem relação com a empresa
+        if (!$empresa->usuarios->contains($idUser)) {
+            return redirect()
+                ->back()
+                ->with('alert-danger', 'Este usuário não está cadastrado nesta empresa!');
+        }
+
+        // Remove o usuário da empresa
+        $empresa->usuarios()->detach($idUser);
+
+        return redirect()
+            ->back()
+            ->with('alert-success', 'Usuário removido com sucesso!');
+    }
 }

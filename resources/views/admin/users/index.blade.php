@@ -16,41 +16,41 @@
     </div>
     <!-- Verifica se existem usuários -->
     @if ($users->isEmpty())
-        <p class="text-center">Nenhum usuário cadastrado.</p>
+    <p class="text-center">Nenhum usuário cadastrado.</p>
     @else
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Data de Cadastro</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($users as $user)
-                        <tr>
-                            <td>{{ $user->id }}</td>
-                            <td>{{ $user->name }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td>{{ $user->active == 1 ? "Ativo" : "Desativado" }}</td>
-                            <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
-                            <td>
-                                <a href="{{route("adm.usuarios.edit", [$user->id])}}" class="btn"><i
-                                        class="fa-solid fa-pen-to-square"></i></a>
-                                <a href="{{route("adm.usuarios.delete", [$user->id])}}" class="btn"><i
-                                        class="fa-solid fa-trash"></i></a>
-                                <a href="{{route("adm.usuarios.edit", [$user->id])}}" class="btn"><i
-                                        class="fa-solid fa-eye"></i></a>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Data de Cadastro</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($users as $user)
+                <tr>
+                    <td>{{ $user->id }}</td>
+                    <td>{{ $user->name }}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->active == 1 ? "Ativo" : "Desativado" }}</td>
+                    <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
+                    <td>
+                        <a href="{{route("adm.usuarios.edit", [$user->id])}}" class="btn"><i
+                                class="fa-solid fa-pen-to-square"></i></a>
+                        <a href="{{route("adm.usuarios.delete", [$user->id])}}" class="btn"><i
+                                class="fa-solid fa-trash"></i></a>
+                        <a href="{{route("adm.usuarios.edit", [$user->id])}}" class="btn"><i
+                                class="fa-solid fa-eye"></i></a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
     @endif
 </div>
 @endsection
@@ -62,37 +62,9 @@
 
 <script>
     $(".table").DataTable({
-        responsive: true
+        language: {
+            url: '{{asset("js/json/data_Table_pt_br.json")}}'
+        }
     });
-    toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "newestOnTop": false,
-        "progressBar": true,
-        "positionClass": "toast-top-right",
-        "preventDuplicates": false,
-        "onclick": null,
-        "showDuration": "300",
-        "hideDuration": "1000",
-        "timeOut": "3000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-    }
-    @if(Session::has('alert-success'))
-        toastr.success("{{ Session::get('alert-success') }} ")
-
-
-    @elseif (Session::has('alert-warning'))
-        toastr.warning("{{ Session::get('alert-success') }} ")
-
-
-    @elseif (Session::has('alert-danger'))
-        toastr.error("{{ Session::get('alert-success') }} ")
-
-
-    @endif
 </script>
 @endsection

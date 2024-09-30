@@ -9,6 +9,7 @@
   <link href="{{asset("css/bootstrap.min.css")}}" rel="stylesheet" id="bootstrap-css">
   <link href="{{asset("css/app.css")}}" rel="stylesheet">
   <link href="{{asset("fontawesome/css/all.min.css")}}" rel="stylesheet">
+  <link rel="stylesheet" href="{{asset("css/toastr.min.css")}}" />
   @yield("css")
 </head>
 
@@ -73,7 +74,6 @@
   <script src="{{asset("js/jquery-3.7.1.min.js")}}"></script>
   <script src="{{asset("js/bootstrap.bundle.min.js")}}"></script>
   <script src="{{asset("js/toastr.min.js")}}"></script>
-
   <script>
     toastr.options = {
       "closeButton": true,
@@ -92,17 +92,18 @@
       "showMethod": "fadeIn",
       "hideMethod": "fadeOut"
     }
+
     @if(Session::has('alert-success'))
     toastr.success("{{ Session::get('alert-success') }} ")
 
 
-  @elseif (Session::has('alert-warning'))
-  toastr.warning("{{ Session::get('alert-success') }} ")
+    @elseif(Session::has('alert-warning'))
+    toastr.warning("{{ Session::get('alert-warning') }} ")
 
 
-@elseif (Session::has('alert-danger'))
-  toastr.error("{{ Session::get('alert-success') }} ")
-@endif
+    @elseif(Session::has('alert-danger'))
+    toastr.error("{{ Session::get('alert-danger') }} ")
+    @endif
   </script>
   @yield("js")
 
