@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Empresas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EmpresasController extends Controller
 {
@@ -86,5 +87,22 @@ class EmpresasController extends Controller
         return redirect()
             ->back()
             ->with('alert-success', 'Usuário removido com sucesso!');
+    }
+    public function detalhes($id)
+    {
+        // Certifique-se de que o usuário tenha acesso à empresa
+        $empresa = Auth::user()->empresas()->where('id', $id)->first();
+
+        if ($empresa) {
+
+
+            return response()->json([
+                'total_pagamentos' => '0',
+                'total_recebimentos' => '0',
+                'total_geral' => '0',
+            ]);
+        }
+
+        return response()->json(['error' => 'Empresa não encontrada ou acesso negado'], 404);
     }
 }

@@ -51,9 +51,7 @@
                 <i class="fa-solid fa-user"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end w-auto" aria-labelledby="userDropdown">
-                <li><a class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                <li><a class="dropdown-item" href="{{route("login.destroy")}}"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
               </ul>
             </li>
           </ul>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdmController;
+use App\Http\Controllers\HomeController;
 use App\Http\Middleware\AdminIS;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
@@ -44,7 +45,6 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', function () {
-        return view(view: 'welcome');
-    })->name("home");
+    Route::get('/', [HomeController::class, "index"])->name("home");
+    Route::get('/empresa/{id}/detalhes', [EmpresasController::class, 'detalhes'])->name('empresa.detalhes');
 });

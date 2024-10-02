@@ -35,3 +35,8 @@
     </div>
 </div>
 @endsection
+
+
+@section(section: 'js')
+<script src="{{asset("js/dataTables.js")}}"></script>
+<script src="{{asset("js/toastr.min.js")}}"></script>
