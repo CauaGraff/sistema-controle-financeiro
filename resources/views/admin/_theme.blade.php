@@ -5,19 +5,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Gerenciametno - @yield("title")</title>
-  <link href="{{asset("css/bootstrap.min.css")}}" rel="stylesheet" id="bootstrap-css">
-  <link href="{{asset("css/app.css")}}" rel="stylesheet">
-  <link href="{{asset("fontawesome/css/all.min.css")}}" rel="stylesheet">
-  <link rel="stylesheet" href="{{asset("css/toastr.min.css")}}" />
+  <title>Gerenciamento - @yield("title")</title>
+  <!-- Bootstrap CSS -->
+  <link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" id="bootstrap-css">
+  <link href="{{asset('css/app.css')}}" rel="stylesheet">
+  <link href="{{asset('fontawesome/css/all.min.css')}}" rel="stylesheet">
+  <link rel="stylesheet" href="{{asset('css/toastr.min.css')}}" />
   @yield("css")
 </head>
 
 <body class="bg-light">
   <header class="border-bottom" style="background-color: #fff;">
-    <nav class="navbar navbar-expand-sm navbar-light p-3">
+    <nav class="navbar navbar-expand-lg navbar-light p-3">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">logo</a>
+        <!-- Botão "hambúrguer" para telas menores -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
           aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -28,11 +30,10 @@
               <a class="nav-link mx-2 active" aria-current="page" href="{{route('home.adm')}}">Home</a>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="usuariosDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
+              <a class="nav-link dropdown-toggle" href="#" id="usuariosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Usuarios
               </a>
-              <ul class="dropdown-menu" aria-labelledby="usuariosDropdown">
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="usuariosDropdown">
                 <li><a class="dropdown-item" href="{{route('adm.usuarios', ['escritorio'])}}">Escritorio</a></li>
                 <li><a class="dropdown-item" href="{{route('adm.usuarios', ['cliente'])}}">Clientes</a></li>
               </ul>
@@ -41,16 +42,15 @@
               <a class="nav-link mx-2" href="{{route('adm.empresas')}}">Empresas</a>
             </li>
           </ul>
-          <ul class="navbar-nav ms-auto d-none d-lg-inline-flex">
+          <ul class="navbar-nav ms-auto d-lg-inline-flex">
             <li class="nav-item mx-2">
               <span class="nav-link">{{auth()->user()->name}}</span>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fa-solid fa-user"></i>
               </a>
-              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="userDropdown">
+              <ul class="dropdown-menu dropdown-menu-end w-auto" aria-labelledby="userDropdown">
                 <li><a class="dropdown-item" href="#">Action</a></li>
                 <li><a class="dropdown-item" href="#">Another action</a></li>
                 <li><a class="dropdown-item" href="#">Something else here</a></li>
@@ -61,15 +61,18 @@
       </div>
     </nav>
   </header>
+
   <main>
     <section class="container">
       @yield('content')
     </section>
   </main>
-  <script src="{{asset("js/bootstrap.min.js")}}"></script>
-  <script src="{{asset("js/jquery-3.7.1.min.js")}}"></script>
-  <script src="{{asset("js/bootstrap.bundle.min.js")}}"></script>
-  <script src="{{asset("js/toastr.min.js")}}"></script>
+
+  <!-- Scripts do Bootstrap -->
+  <script src="{{asset('js/bootstrap.bundle.min.js')}}"></script>
+  <!-- Remover o jQuery, pois não é necessário com Bootstrap 5 -->
+  <script src="{{asset('js/jquery-3.7.1.min.js')}}"></script> <!-- Remover esta linha -->
+  <script src="{{asset('js/toastr.min.js')}}"></script>
   <script>
     toastr.options = {
       "closeButton": true,
@@ -91,18 +94,14 @@
 
     @if(Session::has('alert-success'))
     toastr.success("{{ Session::get('alert-success') }} ")
-
-
-  @elseif(Session::has('alert-warning'))
-  toastr.warning("{{ Session::get('alert-warning') }} ")
-
-
-@elseif(Session::has('alert-danger'))
-  toastr.error("{{ Session::get('alert-danger') }} ")
-@endif
+    @elseif(Session::has('alert-warning'))
+    toastr.warning("{{ Session::get('alert-warning') }} ")
+    @elseif(Session::has('alert-danger'))
+    toastr.error("{{ Session::get('alert-danger') }} ")
+    @endif
   </script>
-  @yield("js")
 
+  @yield("js")
 </body>
 
 </html>
