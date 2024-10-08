@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('clientes', function (Blueprint $table) {
+        Schema::create('favorecido', function (Blueprint $table) {
             $table->id();
             $table->string("cnpj_cpf");
             $table->string("telefone");
@@ -22,8 +22,9 @@ return new class extends Migration
             $table->string("bairro");
             $table->string("rua");
             $table->text("complemento");
-            $table->unsignedBigInteger('id_palno_contas')->nullable();
-            $table->foreign(columns: 'id_palno_contas')->references('id')->on('plano_de_contas');
+            $table->enum('tipo', ['F', 'C']); // Crédito ou débito
+            $table->unsignedBigInteger('id_empresa');
+            $table->foreign('id_empresa')->references('id')->on('empresas');
             $table->timestamps();
         });
     }
@@ -33,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('clientes');
+        Schema::dropIfExists('fornecedores');
     }
 };

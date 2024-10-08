@@ -18,13 +18,14 @@ return new class extends Migration
             $table->enum('tipo', ['R', 'P']); // Crédito ou débito
             $table->date('data_venc');
             $table->string('anexo');
-            $table->unsignedBigInteger('id_plano_contas');
+            $table->unsignedBigInteger('id_categoria');
             $table->unsignedBigInteger('id_empresa');
+            $table->unsignedBigInteger('id_favorecido');
             $table->timestamps();
-            $table->foreign('id_plano_contas')->references('id')->on('plano_de_contas');
+            $table->foreign('id_categoria')->references('id')->on('categorias_de_contas');
             $table->foreign('id_empresa')->references('id')->on('empresas');
+            $table->foreign('id_favorecido')->references('id')->on('favorecido');
         });
-
     }
 
     /**

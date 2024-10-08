@@ -88,21 +88,27 @@ class EmpresasController extends Controller
             ->back()
             ->with('alert-success', 'Usuário removido com sucesso!');
     }
-    public function detalhes($id)
+
+    public function definirEmpresa($id)
     {
-        // Certifique-se de que o usuário tenha acesso à empresa
-        $empresa = Auth::user()->empresas()->where('id', $id)->first();
+        // Verificar se a empresa existe
+        $empresa = Empresas::findOrFail($id);
 
-        if ($empresa) {
+        // Verificar se o usuário autenticado tem permissão para acessar esta empresa
+        $empresaUsuario = auth()->user()->empresas()->where('empresas.id', $id)->first();
 
-
-            return response()->json([
-                'total_pagamentos' => '0',
-                'total_recebimentos' => '0',
-                'total_geral' => '0',
-            ]);
+        if (!$empresaUsuario) {
+            // Se o usuário não tem permissão, redirecione para uma página de erro ou home
+            return redirect()->route('empresa.selecionar')->withErrors('Você não tem permissão para acessar esta empresa.');
         }
 
-        return response()->json(['error' => 'Empresa não encontrada ou acesso negado'], 404);
+        // Se o usuário tem permissão, armazenar a empresa na sessão
+        session([
+            'empresa_id' => $empresa->id,
+            'empresa_nome' => $empresa->nome,
+        ]);
+
+        // Opcional: redirecionar para a página principal ou onde for necessário
+        return redirect()->route('home')->with('alert-success', 'Empresa definida com sucesso.');
     }
 }

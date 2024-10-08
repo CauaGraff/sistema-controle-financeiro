@@ -1,12 +1,13 @@
 <?php
 
-use App\Http\Controllers\AdmController;
-use App\Http\Controllers\HomeController;
 use App\Http\Middleware\AdminIS;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdmController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EmpresasController;
+use App\Http\Controllers\LancamentoController;
 
 /**ROTAS */
 
@@ -45,6 +46,17 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+
     Route::get('/', [HomeController::class, "index"])->name("home");
-    Route::get('/empresa/{id}/detalhes', [EmpresasController::class, 'detalhes'])->name('empresa.detalhes');
+
+    Route::prefix('/empresas')->group(function () {
+        Route::get('/selecionar/{id}', [EmpresasController::class, 'definirEmpresa'])->name('empresa.definir');
+    });
+
+    Route::prefix('/empresas')->group(function () {
+        Route::get('/selecionar/{id}', [EmpresasController::class, 'definirEmpresa'])->name('empresa.definir');
+    });
+
+    /**LANCAMENTOS CAIXA */
+    Route::resource('lancamento/{type}', LancamentoController::class);
 });

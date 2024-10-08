@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('plano_de_contas', function (Blueprint $table) {
+        Schema::create('categorias_de_contas', function (Blueprint $table) {
             $table->id();
             $table->string('descricao');
-            $table->enum('tipo', ['A', 'S']); // Analítico ou sintético
-            $table->string('agrupamento');
-            $table->unsignedBigInteger('id_empresa');
+            $table->unsignedBigInteger('id_empresa'); // Referência à empresa
+            $table->unsignedBigInteger('id_categoria_pai')->nullable(); // Referência à categoria pai (para grupos)
             $table->timestamps();
-            $table->foreign('id_empresa')->references('id')->on('empresas');
+            $table->foreign('id_empresa')->references('id')->on('empresas')->onDelete('cascade');
+            $table->foreign('id_categoria_pai')->references('id')->on('categorias_de_contas')->onDelete('cascade'); // Auto-referência para categoria pai
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('plano_de_contas');
+        Schema::dropIfExists('categorias_de_contas');
     }
 };

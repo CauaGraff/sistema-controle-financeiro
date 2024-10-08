@@ -38,16 +38,16 @@
         </ul>
         <ul class="navbar-nav ms-auto d-lg-inline-flex">
           @if(auth()->user()->empresas->count() === 1)
-          <li class="nav-item mx-2">{{ auth()->user()->empresas->first()->nome }}</li>
+          <li class="nav-item mx-2">{{session('empresa_nome') }}</li>
           @elseif(auth()->user()->empresas->count() > 1)
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="companyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              {{ auth()->user()->empresas->first()->nome }}
+              {{ session('empresa_nome') }} <!-- Exibe o nome da empresa ativa ou a primeira empresa -->
             </a>
             <ul class="dropdown-menu dropdown-menu-end w-auto" aria-labelledby="companyDropdown">
               @foreach(auth()->user()->empresas as $empresa)
               <li>
-                <a class="dropdown-item select-company" href="#" data-company-id="{{ $empresa->id }}">
+                <a class="dropdown-item select-company" href="{{route('empresa.definir', $empresa->id)}}">
                   {{ $empresa->nome }}
                 </a>
               </li>
