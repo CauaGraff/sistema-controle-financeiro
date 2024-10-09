@@ -58,5 +58,22 @@ Route::middleware(['auth'])->group(function () {
     });
 
     /**LANCAMENTOS CAIXA */
-    Route::resource('lancamento/{type}', LancamentoController::class);
+    Route::prefix('lancamentos')->group(function () {
+        Route::get('pagamentos', [LancamentoController::class, 'indexPagamentos'])->name('lancamentos.pagamentos.index');
+        Route::get('pagamentos/create', [LancamentoController::class, 'create'])->name('lancamentos.pagamentos.create');
+        Route::post('pagamentos', [LancamentoController::class, 'store'])->name('lancamentos.pagamentos.store');
+        Route::get('pagamentos/{lancamento}/edit', [LancamentoController::class, 'edit'])->name('lancamentos.pagamentos.edit');
+        Route::put('pagamentos/{lancamento}', [LancamentoController::class, 'update'])->name('lancamentos.pagamentos.update');
+        Route::delete('pagamentos/{lancamento}', [LancamentoController::class, 'destroy'])->name('lancamentos.pagamentos.destroy');
+        Route::post('pagamentos/{lancamento}/baixa', [LancamentoController::class, 'baixa'])->name('lancamentos.pagamentos.baixa');
+    });
+
+    // Rotas para recebimentos
+    Route::get('recebimentos', [LancamentoController::class, 'indexRecebimentos'])->name('lancamentos.recebimentos.index');
+    Route::get('recebimentos/create', [LancamentoController::class, 'create'])->name('lancamentos.recebimentos.create');
+    Route::post('recebimentos', [LancamentoController::class, 'store'])->name('lancamentos.recebimentos.store');
+    Route::get('recebimentos/{lancamento}/edit', [LancamentoController::class, 'edit'])->name('lancamentos.recebimentos.edit');
+    Route::put('recebimentos/{lancamento}', [LancamentoController::class, 'update'])->name('lancamentos.recebimentos.update');
+    Route::delete('recebimentos/{lancamento}', [LancamentoController::class, 'destroy'])->name('lancamentos.recebimentos.destroy');
+    Route::post('recebimentos/{lancamento}/baixa', [LancamentoController::class, 'baixa'])->name('lancamentos.recebimentos.baixa');
 });

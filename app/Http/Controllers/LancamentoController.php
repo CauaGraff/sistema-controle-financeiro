@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Lancamento; // Supondo que você tenha um modelo de Lancamento
-use App\Models\PlanoDeContas; // Modelo de Plano de Contas
+use App\Models\Favorecido;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\CategoriaContas; // Modelo de Plano de Contas
+use App\Models\Lancamento; // Supondo que você tenha um modelo de Lancamento
 
 class LancamentoController extends Controller
 {
@@ -14,9 +15,9 @@ class LancamentoController extends Controller
     {
         // Verifica se o usuário está autenticado e se tem permissão para acessar a empresa
         $empresaId = session('empresa_id');
-        $pagamentos = Lancamento::where('id_empresa', $empresaId)->where('tipo', 'P')->get();
+        $lancamentos = Lancamento::where('id_empresa', $empresaId)->where('tipo', 'P')->get();
 
-        return view('lancamentos.pagamentos.index', compact('pagamentos'));
+        return view('lancamentos.index', compact('lancamentos'));
     }
 
     // Método para listar todos os lançamentos (recebimentos)
@@ -31,9 +32,12 @@ class LancamentoController extends Controller
 
     public function create()
     {
+        $empresaId = session('empresa_id');
         // Obtém os dados necessários para o formulário
-        $planosDeContas = PlanoDeContas::all(); // Supondo que você tenha um modelo de PlanoDeContas
-        return view('lancamentos.create', compact('planosDeContas'));
+        $categorias = CategoriaContas::where("id_empresa", $empresaId)->get(); // Supondo que você tenha um modelo de CategoriaContas
+        $fornecedores = Favorecido::where("id_empresa", $empresaId)->get();
+        $clientes = Favorecido::where("id_empresa", $empresaId)->get();
+        return view('lancamentos.create', compact('categorias', 'fornecedores', 'clientes'));
     }
 
     public function store(Request $request)
@@ -64,7 +68,7 @@ class LancamentoController extends Controller
     public function edit(Lancamento $lancamento)
     {
         // Obtém os dados necessários para o formulário
-        $planosDeContas = PlanoDeContas::all(); // Supondo que você tenha um modelo de PlanoDeContas
+        $categorias = CategoriaContas::where("id_empresa", section())->get(); // Supondo que você tenha um modelo de CategoriaContas
         return view('lancamentos.edit', compact('lancamento', 'planosDeContas'));
     }
 

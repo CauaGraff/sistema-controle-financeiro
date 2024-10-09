@@ -6,8 +6,7 @@
         <h1>Fluxo de Caixa</h1>
     </div>
     <div class="col-md-6">
-        <a href="{{ route('lancamentos-caixa.create') }}" class="btn btn-primary float-md-end">Cadastrar Lançamento</a>
-        <a href="{{ route('parcelas.index') }}" class="btn btn-primary float-md-end">Gerar Parcelas</a>
+        <a href="{{ route('lancamentos.pagamentos.create') }}" class="btn btn-primary float-md-end">Cadastrar Lançamento</a>
     </div>
 </div>
 

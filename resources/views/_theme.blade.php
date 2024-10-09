@@ -27,7 +27,7 @@
             <a class="nav-link mx-2 active" aria-current="page" href="#">Inicio</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2" href="#">Pagamentos</a>
+            <a class="nav-link mx-2" href="{{route("lancamentos.pagamentos.index")}}">Pagamentos</a>
           </li>
           <li class="nav-item">
             <a class="nav-link mx-2" href="#">Recebimentos</a>
