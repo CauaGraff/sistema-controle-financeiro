@@ -35,9 +35,23 @@ class LancamentoController extends Controller
         $empresaId = session('empresa_id');
         // Obtém os dados necessários para o formulário
         $categorias = CategoriaContas::where("id_empresa", $empresaId)->get(); // Supondo que você tenha um modelo de CategoriaContas
+        // Agrupar categorias por pai
+        $categoriasAgrupadas = [];
+
+        // Primeiro, organize categorias em um array por ID
+        foreach ($categorias as $categoria) {
+            if ($categoria->id_categoria_pai) {
+                // Se a categoria tem um pai, adicione-a à lista do pai correspondente
+                $categoriasAgrupadas[$categoria->id_categoria_pai]['subcategorias'][] = $categoria;
+            } else {
+                // Se a categoria não tem pai, é uma categoria principal
+                $categoriasAgrupadas[$categoria->id]['categoria'] = $categoria;
+            }
+        }
+
         $fornecedores = Favorecido::where("id_empresa", $empresaId)->get();
         $clientes = Favorecido::where("id_empresa", $empresaId)->get();
-        return view('lancamentos.create', compact('categorias', 'fornecedores', 'clientes'));
+        return view('lancamentos.create', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
     }
 
     public function store(Request $request)

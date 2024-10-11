@@ -4,14 +4,16 @@
 <div class="container mt-5">
     <h1>Cadastrar Lançamento</h1>
     @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     @endif
 
     <form action="{{ route('lancamentos.pagamentos.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
+
+        <!-- Campo de Descrição -->
         <div class="row mb-3">
             <label for="descricao" class="col-sm-2 col-form-label">Descrição</label>
             <div class="col-sm-10">
@@ -19,6 +21,7 @@
             </div>
         </div>
 
+        <!-- Campo de Valor -->
         <div class="row mb-3">
             <label for="valor" class="col-sm-2 col-form-label">Valor</label>
             <div class="col-sm-10">
@@ -26,6 +29,7 @@
             </div>
         </div>
 
+        <!-- Campo de Data de Vencimento -->
         <div class="row mb-3">
             <label for="data_vencimento" class="col-sm-2 col-form-label">Data de Vencimento</label>
             <div class="col-sm-10">
@@ -33,37 +37,39 @@
             </div>
         </div>
 
+        <!-- Campo de Categoria -->
         <div class="row mb-3">
             <label for="categoria" class="col-sm-2 col-form-label">Categoria</label>
             <div class="col-sm-10">
                 <select class="form-select" id="categoria" name="categoria_id" required>
                     <option value="">Selecione uma categoria</option>
-                    @foreach ($categorias as $categoria)
-                    <option value="{{ $categoria->id }}">{{ $categoria->descricao }}</option>
+                    @foreach ($categoriasAgrupadas as $grupo)
+                        @if (isset($grupo['categoria']))
+                            <optgroup label="{{ $grupo['categoria']->descricao }}">
+                                @foreach ($grupo['subcategorias'] as $subcategoria)
+                                    <option value="{{ $subcategoria->id }}">{{ $subcategoria->descricao }}</option>
+                                @endforeach
+                            </optgroup>
+                        @endif
                     @endforeach
                 </select>
             </div>
         </div>
 
+
+        <!-- Campo de Favorecido -->
         <div class="row mb-3">
             <label for="favorecido" class="col-sm-2 col-form-label">Favorecido</label>
             <div class="col-sm-10">
                 <select class="form-select" id="favorecido" name="favorecido_id" required>
                     <option value="">Selecione o favorecido</option>
                     @foreach ($fornecedores as $fornecedor)
-                    <option value="{{ $fornecedor->id }}">{{ $fornecedor->nome }}</option>
+                        <option value="{{ $fornecedor->id }}">{{ $fornecedor->nome }}</option>
                     @endforeach
                     @foreach ($clientes as $cliente)
-                    <option value="{{ $cliente->id }}">{{ $cliente->nome }}</option>
+                        <option value="{{ $cliente->id }}">{{ $cliente->nome }}</option>
                     @endforeach
                 </select>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <label for="anexo" class="col-sm-2 col-form-label">Anexo</label>
-            <div class="col-sm-10">
-                <input type="file" class="form-control" id="anexo" name="anexo">
             </div>
         </div>
 
@@ -71,10 +77,7 @@
         <div class="row mb-3">
             <label for="recorrente" class="col-sm-2 col-form-label">Lançamento Recorrente?</label>
             <div class="col-sm-10">
-                <select class="form-select" id="recorrente" name="recorrente">
-                    <option value="0">Não</option>
-                    <option value="1">Sim</option>
-                </select>
+                <input id="recorrente" name="recorrente" type="checkbox" class="form-check-input">
             </div>
         </div>
 
@@ -108,13 +111,9 @@
 @section('js')
 <script>
     // Mostrar ou esconder campos de lançamento recorrente
-    document.getElementById('recorrente').addEventListener('change', function() {
+    document.getElementById('recorrente').addEventListener('change', function () {
         var recorrenteFields = document.getElementById('recorrenteFields');
-        if (this.value == '1') {
-            recorrenteFields.style.display = 'block';
-        } else {
-            recorrenteFields.style.display = 'none';
-        }
+        recorrenteFields.style.display = this.checked ? 'block' : 'none';
     });
 </script>
 @endsection
