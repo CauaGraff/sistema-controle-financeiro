@@ -22,4 +22,14 @@ class CategoriaContas extends Model
     {
         return $this->belongsTo(Empresas::class, 'id_empresa');
     }
+
+    public function subcategorias()
+    {
+        return $this->hasMany(CategoriaContas::class, 'id_categoria_pai');
+    }
+
+    public function categoriaPai()
+    {
+        return $this->belongsTo(CategoriaContas::class, 'id_categoria_pai');
+    }
 }

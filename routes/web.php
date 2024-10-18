@@ -7,7 +7,9 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EmpresasController;
+use App\Http\Controllers\FavorecidoController;
 use App\Http\Controllers\LancamentoController;
+use App\Http\Controllers\CategoriaContasController;
 
 /**ROTAS */
 
@@ -66,14 +68,21 @@ Route::middleware(['auth'])->group(function () {
         Route::put('pagamentos/{lancamento}', [LancamentoController::class, 'update'])->name('lancamentos.pagamentos.update');
         Route::delete('pagamentos/{lancamento}', [LancamentoController::class, 'destroy'])->name('lancamentos.pagamentos.destroy');
         Route::post('pagamentos/{lancamento}/baixa', [LancamentoController::class, 'baixa'])->name('lancamentos.pagamentos.baixa');
+
+        // Rotas para recebimentos
+        Route::get('recebimentos', [LancamentoController::class, 'indexRecebimentos'])->name('lancamentos.recebimentos.index');
+        Route::get('recebimentos/create', [LancamentoController::class, 'create'])->name('lancamentos.recebimentos.create');
+        Route::post('recebimentos', [LancamentoController::class, 'store'])->name('lancamentos.recebimentos.store');
+        Route::get('recebimentos/{lancamento}/edit', [LancamentoController::class, 'edit'])->name('lancamentos.recebimentos.edit');
+        Route::put('recebimentos/{lancamento}', [LancamentoController::class, 'update'])->name('lancamentos.recebimentos.update');
+        Route::delete('recebimentos/{lancamento}', [LancamentoController::class, 'destroy'])->name('lancamentos.recebimentos.destroy');
+        Route::post('recebimentos/{lancamento}/baixa', [LancamentoController::class, 'baixa'])->name('lancamentos.recebimentos.baixa');
     });
 
-    // Rotas para recebimentos
-    Route::get('recebimentos', [LancamentoController::class, 'indexRecebimentos'])->name('lancamentos.recebimentos.index');
-    Route::get('recebimentos/create', [LancamentoController::class, 'create'])->name('lancamentos.recebimentos.create');
-    Route::post('recebimentos', [LancamentoController::class, 'store'])->name('lancamentos.recebimentos.store');
-    Route::get('recebimentos/{lancamento}/edit', [LancamentoController::class, 'edit'])->name('lancamentos.recebimentos.edit');
-    Route::put('recebimentos/{lancamento}', [LancamentoController::class, 'update'])->name('lancamentos.recebimentos.update');
-    Route::delete('recebimentos/{lancamento}', [LancamentoController::class, 'destroy'])->name('lancamentos.recebimentos.destroy');
-    Route::post('recebimentos/{lancamento}/baixa', [LancamentoController::class, 'baixa'])->name('lancamentos.recebimentos.baixa');
+
+
+
+    Route::resource('categorias',  CategoriaContasController::class);
+
+    Route::resource('favorecidos', FavorecidoController::class);
 });

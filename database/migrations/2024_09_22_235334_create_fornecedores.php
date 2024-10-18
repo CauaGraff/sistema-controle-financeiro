@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string("bairro");
             $table->string("rua");
             $table->text("complemento");
-            $table->enum('tipo', ['F', 'C']); // Crédito ou débito
+            $table->enum('tipo', ['F', 'C']); // Forne ou Cliente
             $table->unsignedBigInteger('id_empresa');
             $table->foreign('id_empresa')->references('id')->on('empresas');
             $table->timestamps();

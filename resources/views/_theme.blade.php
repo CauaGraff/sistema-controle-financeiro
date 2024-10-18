@@ -24,16 +24,26 @@
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav ms-auto ">
           <li class="nav-item">
-            <a class="nav-link mx-2 active" aria-current="page" href="#">Inicio</a>
+            <a class="nav-link mx-2 active" aria-current="page" href="{{route('home')}}">Inicio</a>
           </li>
           <li class="nav-item">
             <a class="nav-link mx-2" href="{{route("lancamentos.pagamentos.index")}}">Pagamentos</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2" href="#">Recebimentos</a>
+            <a class="nav-link mx-2" href="{{route('lancamentos.recebimentos.index')}}">Recebimentos</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link mx-2" href="#"><i class="fa-solid fa-gear"></i></a>
+          <li class="nav-item dropdown">
+            <a class="nav-link mx-2 dropdown-toggle" href="#" id="dropdownMenuButton" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-solid fa-gear"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end w-auto" aria-labelledby="dropdownMenuButton">
+              <li>
+                <a class="dropdown-item select-company" href="{{route("categorias.index")}}">Categorias</a>
+              </li>
+              <li>
+                <a class="dropdown-item select-company" href="{{route("favorecidos.index")}}">Fornecedor/Clientes</a>
+              </li>
+            </ul>
           </li>
         </ul>
         <ul class="navbar-nav ms-auto d-lg-inline-flex">
