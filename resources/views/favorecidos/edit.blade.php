@@ -1,4 +1,4 @@
-@extends('admin._theme')
+@extends('_theme')
 
 @section('title', 'Editar Favorecido')
 

@@ -21,18 +21,7 @@ class FavorecidoController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'cnpj_cpf' => 'required|string|max:14',
-            'telefone' => 'nullable|string|max:15',
-            'email' => 'nullable|email|max:255',
-            'cep' => 'required|string|size:8',
-            'uf' => 'required|string|size:2',
-            'cidade' => 'required|string|max:100',
-            'bairro' => 'required|string|max:100',
-            'rua' => 'required|string|max:100',
-            'complemento' => 'nullable|string|max:255',
-            'tipo' => 'required|in:F,C', // 'F' para Fornecedor e 'C' para Cliente
-        ]);
+
 
         Favorecido::create(array_merge($request->all(), ['id_empresa' => session('empresa_id')]));
 
