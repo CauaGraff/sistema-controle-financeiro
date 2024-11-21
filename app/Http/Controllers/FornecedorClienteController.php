@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Favorecido;
+use App\Models\FornecedorCliente;
 use Illuminate\Http\Request;
 
-class FavorecidoController extends Controller
+class FornecedorClienteController extends Controller
 {
     public function index()
     {
         // Listar todos os favorecidos da empresa da sessão
-        $favorecidos = Favorecido::where('id_empresa', session('empresa_id'))->get();
+        $favorecidos = FornecedorCliente::where('id_empresa', session('empresa_id'))->get();
         return view('favorecidos.index', compact('favorecidos'));
     }
 
@@ -23,17 +24,17 @@ class FavorecidoController extends Controller
     {
 
 
-        Favorecido::create(array_merge($request->all(), ['id_empresa' => session('empresa_id')]));
+        FornecedorCliente::create(array_merge($request->all(), ['id_empresa' => session('empresa_id')]));
 
         return redirect()->route('favorecidos.index')->with('alert-success', 'Favorecido criado com sucesso!');
     }
 
-    public function edit(Favorecido $favorecido)
+    public function edit(FornecedorCliente $favorecido)
     {
         return view('favorecidos.edit', compact('favorecido'));
     }
 
-    public function update(Request $request, Favorecido $favorecido)
+    public function update(Request $request, FornecedorCliente $favorecido)
     {
         $request->validate([
             'cnpj_cpf' => 'required|string|max:14',
@@ -53,7 +54,7 @@ class FavorecidoController extends Controller
         return redirect()->route('favorecidos.index')->with('alert-success', 'Favorecido atualizado com sucesso!');
     }
 
-    public function destroy(Favorecido $favorecido)
+    public function destroy(FornecedorCliente $favorecido)
     {
         $favorecido->delete();
         return redirect()->route('favorecidos.index')->with('alert-success', 'Favorecido excluído com sucesso!');

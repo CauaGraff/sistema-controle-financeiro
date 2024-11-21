@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Favorecido;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CategoriaContas; // Modelo de Plano de Contas
 use App\Models\Lancamento; // Supondo que você tenha um modelo de Lancamento
+use App\Models\FornecedorCliente;
 
 class LancamentoController extends Controller
 {
@@ -49,34 +49,29 @@ class LancamentoController extends Controller
             }
         }
 
-        $fornecedores = Favorecido::where("id_empresa", $empresaId)->get();
-        $clientes = Favorecido::where("id_empresa", $empresaId)->get();
+        $fornecedores = FornecedorCliente::where("id_empresa", $empresaId)->get();
+        $clientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
         return view('lancamentos.create', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
     }
 
     public function store(Request $request)
     {
-        // Validação dos dados
-        $request->validate([
-            'descricao' => 'required|string|max:255',
-            'valor' => 'required|numeric',
-            'tipo' => 'required|in:R,P', // R = Recebimento, P = Pagamento
-            'data_venc' => 'required|date',
-            'id_plano_contas' => 'required|exists:plano_de_contas,id', // Ajuste conforme seu banco de dados
-        ]);
+        if ($request->path() == "lancamentos/pagamentos") {
+            if ($request->tipo == 0) {
+                // $validate = $request->validate([
+                //     'descricao' => 'required',
+                //     'valor' => 'required',
+                //     'data_vencimento' => 'required',
+                //     'categoria_id' => 'required',
+                //     'favorecido' => 'required'
+                // ]);
 
-        // Cria o lançamento
-        Lancamento::create([
-            'descricao' => $request->descricao,
-            'valor' => $request->valor,
-            'tipo' => $request->tipo,
-            'data_venc' => $request->data_venc,
-            'id_plano_contas' => $request->id_plano_contas,
-            'id_empresa' => session('empresa_id'), // Usa a empresa da sessão
-            // Se houver anexo, trate conforme necessário
-        ]);
-
-        return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento criado com sucesso!');
+                return dd(Lancamento::create([
+                    $request->all()
+                ]));
+            }
+        }
+        // return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento criado com sucesso!');
     }
 
     public function edit(Lancamento $lancamento)

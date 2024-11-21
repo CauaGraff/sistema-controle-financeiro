@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('lancamentos', function (Blueprint $table) {
             $table->id();
-            $table->string('descrição');
+            $table->string('descricao');
             $table->decimal('valor', 10, 2);
             $table->enum('tipo', ['R', 'P']); // Crédito ou débito
             $table->date('data_venc');
@@ -24,7 +23,7 @@ return new class extends Migration
             $table->timestamps();
             $table->foreign('id_categoria')->references('id')->on('categorias_de_contas');
             $table->foreign('id_empresa')->references('id')->on('empresas');
-            $table->foreign('id_favorecido')->references('id')->on('favorecido');
+            $table->foreign('id_favorecido')->references('id')->on('fornecedor_cliente');
         });
     }
 

@@ -7,12 +7,13 @@
 @endsection
 @section('content')
 <div class="container mt-4">
-    <h1>Favorecidos</h1>
-    <a href="{{ route('favorecidos.create') }}" class="btn btn-primary mb-3">Cadastrar Novo Favorecido</a>
+    <h1>Fornecedor/Clientes</h1>
+    <a href="{{ route('favorecidos.create') }}" class="btn btn-primary mb-3">Cadastrar Novo Fornecedor/Clientes</a>
     <table id="favorecidosTable" class="table ">
         <thead>
             <tr>
                 <th>#</th>
+                <th>Nome</th>
                 <th>CNPJ/CPF</th>
                 <th>Tipo</th>
                 <th>Cidade</th>
@@ -23,7 +24,8 @@
             @foreach ($favorecidos as $favorecido)
                 <tr>
                     <td>{{ $favorecido->id }}</td>
-                    <td>{{ $favorecido->cnpj_cpf }}</td>
+                    <td>{{ $favorecido->nome }}</td>
+                    <td>{{ $favorecido->formatarDocumento() }}</td>
                     <td>{{ $favorecido->tipo == 'F' ? 'Fornecedor' : 'Cliente' }}</td>
                     <td>{{ $favorecido->cidade }}</td>
                     <td>
@@ -46,6 +48,7 @@
 @section('js')
 <script src="{{asset("js/dataTables.js")}}"></script>
 <script src="{{asset("js/toastr.min.js")}}"></script>
+
 <script>
     $(".table").DataTable({
         language: {

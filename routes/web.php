@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FornecedorClienteController;
 use App\Http\Middleware\AdminIS;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdmController;
@@ -79,10 +80,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('recebimentos/{lancamento}/baixa', [LancamentoController::class, 'baixa'])->name('lancamentos.recebimentos.baixa');
     });
 
+    Route::resource('categorias', CategoriaContasController::class);
 
-
-
-    Route::resource('categorias',  CategoriaContasController::class);
-
-    Route::resource('favorecidos', FavorecidoController::class);
+    Route::resource('favorecidos', FornecedorClienteController::class);
 });
