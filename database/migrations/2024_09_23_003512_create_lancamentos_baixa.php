@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -18,7 +17,7 @@ return new class extends Migration
             $table->decimal('juros', 10, 2);
             $table->decimal('multa', 10, 2);
             $table->decimal('desconto', 10, 2);
-            $table->decimal('acrecimo', 10, 2);
+            $table->string('anexo');
             $table->timestamps();
             $table->foreign(columns: 'id_lancamento')->references('id')->on('lancamentos');
         });

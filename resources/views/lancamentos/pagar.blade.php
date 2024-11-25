@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-5">
-    <h1>Cadastrar Pagamentos</h1>
+    <h1>Cadastrar Lançamento</h1>
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -47,7 +47,8 @@
             </div>
             <!-- Campo de Data de Vencimento -->
             <div class="row mb-3">
-                <label for="data" class="col-sm-2 col-form-label" id="labelDataVenc">Data de Vencimento</label>
+                <label for="data_vencimento" class="col-sm-2 col-form-label" id="labelDataVenc">Data de
+                    Vencimento</label>
                 <div class="col-sm-10">
                     <input type="date" name="data" id="data" class="form-control">
                 </div>
@@ -78,10 +79,10 @@
             </div>
             <!-- Campo de Data de Vencimento -->
             <div class="row mb-3">
-                <label for="dataVencPar" class="col-sm-2 col-form-label" id="labelDataVenc">1º Data de
+                <label for="data" class="col-sm-2 col-form-label" id="labelDataVenc">1º Data de
                     Vencimento</label>
                 <div class="col-sm-10">
-                    <input type="date" name="dataVencPar" id="dataVencPar" class="form-control">
+                    <input type="date" name="data" id="data" class="form-control">
                 </div>
             </div>
             <!-- Campo de Entrada -->
@@ -157,8 +158,8 @@
                 $("#nenhumFields").hide()
                 $("#recorrenteFields").hide()
                 $("#parcelasFields").show()
-            } else if ($(this).val() == 2) {
-                $("#nenhumFields").show()
+            } else if ($(this).val() == 1) {
+                $("#nenhumFields").hide()
                 $("#recorrenteFields").show()
                 $("#parcelasFields").hide()
             }

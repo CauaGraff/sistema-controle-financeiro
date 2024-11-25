@@ -64,11 +64,12 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('lancamentos')->group(function () {
         Route::get('pagamentos', [LancamentoController::class, 'indexPagamentos'])->name('lancamentos.pagamentos.index');
         Route::get('pagamentos/create', [LancamentoController::class, 'create'])->name('lancamentos.pagamentos.create');
-        Route::post('pagamentos', [LancamentoController::class, 'store'])->name('lancamentos.pagamentos.store');
+        Route::post('pagamentos/store', [LancamentoController::class, 'store'])->name('lancamentos.pagamentos.store');
         Route::get('pagamentos/{lancamento}/edit', [LancamentoController::class, 'edit'])->name('lancamentos.pagamentos.edit');
         Route::put('pagamentos/{lancamento}', [LancamentoController::class, 'update'])->name('lancamentos.pagamentos.update');
-        Route::delete('pagamentos/{lancamento}', [LancamentoController::class, 'destroy'])->name('lancamentos.pagamentos.destroy');
-        Route::post('pagamentos/{lancamento}/baixa', [LancamentoController::class, 'baixa'])->name('lancamentos.pagamentos.baixa');
+        Route::delete('pagamentos/{lancamento}/delet', [LancamentoController::class, 'destroy'])->name('lancamentos.pagamentos.destroy');
+        Route::get('pagamentos/{lancamento}/pagar', [LancamentoController::class, 'formBaixa'])->name('lancamentos.pagamentos.baixa');
+        Route::post('pagamentos/{lancamento}/baixa', [LancamentoController::class, 'baixaStore'])->name('lancamentos.pagamentos.baixa.store');
 
         // Rotas para recebimentos
         Route::get('recebimentos', [LancamentoController::class, 'indexRecebimentos'])->name('lancamentos.recebimentos.index');

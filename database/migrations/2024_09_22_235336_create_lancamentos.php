@@ -14,16 +14,15 @@ return new class extends Migration {
             $table->id();
             $table->string('descricao');
             $table->decimal('valor', 10, 2);
-            $table->enum('tipo', ['R', 'P']); // Crédito ou débito
+            $table->enum('tipo', ['R', 'P']);
             $table->date('data_venc');
-            $table->string('anexo');
             $table->unsignedBigInteger('id_categoria');
             $table->unsignedBigInteger('id_empresa');
-            $table->unsignedBigInteger('id_favorecido');
+            $table->unsignedBigInteger('id_fornecedor_cliente');
             $table->timestamps();
             $table->foreign('id_categoria')->references('id')->on('categorias_de_contas');
             $table->foreign('id_empresa')->references('id')->on('empresas');
-            $table->foreign('id_favorecido')->references('id')->on('fornecedor_cliente');
+            $table->foreign('id_fornecedor_cliente')->references('id')->on('fornecedor_cliente');
         });
     }
 

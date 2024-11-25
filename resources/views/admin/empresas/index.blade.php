@@ -11,7 +11,7 @@
 
 <div class="container mt-5">
     <h2 class="text-center">Empresas</h2>
-    <div class="text-end">
+    <div class="d-flex justify-content-end align-items-center mb-3">
         <a href="{{route("adm.cadastro.empresas")}}" class="btn btn-primary ">+ Adcionar</a>
     </div>
     <!-- Verifica se existem usuários -->

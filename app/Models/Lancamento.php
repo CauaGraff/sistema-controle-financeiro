@@ -14,9 +14,9 @@ class Lancamento extends Model
         'valor',
         'tipo',
         'data_venc',
-        'anexo',
-        'id_plano_contas',
+        'id_categoria',
         'id_empresa',
+        'id_fornecedor_cliente'
     ];
 
     // Relacionamento com empresa
@@ -25,9 +25,9 @@ class Lancamento extends Model
         return $this->belongsTo(Empresas::class, 'id_empresa');
     }
 
-    // Relacionamento com o plano de contas
-    public function planoDeContas()
+    // Relacionamento categoria
+    public function CategoriaContas()
     {
-        // return $this->belongsTo(PlanoDeContas::class, 'id_plano_contas');
+        return $this->belongsTo(CategoriaContas::class, 'id_plano_contas');
     }
 }
