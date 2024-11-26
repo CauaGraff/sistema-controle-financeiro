@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{env("APP_LOCALE")}}">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>{{env("APP_NAME")}}</title>
+  <link rel="shortcut icon" href="{{asset("imgs/icon.png")}}" type="image/x-icon">
   <link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" id="bootstrap-css">
   <link href="{{asset('css/app.css')}}" rel="stylesheet">
   <link href="{{asset('fontawesome/css/all.min.css')}}" rel="stylesheet">
@@ -17,8 +18,9 @@
   <header class="border-bottom" style="background-color: #fff;">
     <nav class="navbar navbar-expand-lg navbar-light p-3">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">logo</a>
-        <!-- Botão "hambúrguer" para telas menores -->
+        <a class="navbar-brand" href="#">
+          <img src="{{asset("imgs/banner.png")}}" alt="Logo" style="width: 140px;">
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
           aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>

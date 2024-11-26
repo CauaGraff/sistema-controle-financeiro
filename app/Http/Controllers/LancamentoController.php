@@ -33,6 +33,7 @@ class LancamentoController extends Controller
 
     public function create(Request $request)
     {
+
         $empresaId = session('empresa_id');
         // Obtém os dados necessários para o formulário
         $categorias = CategoriaContas::where("id_empresa", $empresaId)->get(); // Supondo que você tenha um modelo de CategoriaContas
@@ -49,18 +50,28 @@ class LancamentoController extends Controller
                 $categoriasAgrupadas[$categoria->id]['categoria'] = $categoria;
             }
         }
-        $typeCadastro = $request->path() == "lancamentos/pagamentos/create" ? "P" : "R";
-
         $fornecedores = FornecedorCliente::where("id_empresa", $empresaId)->get();
         $clientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
 
-        return view('lancamentos.create', compact('categoriasAgrupadas', 'fornecedores', 'clientes', 'typeCadastro'));
+        if ($request->path() == "lancamentos/pagamentos/create") {
+            return view('lancamentos.createPagamentos', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
+        } else {
+            return view('lancamentos.createRecebimentos', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
+        }
     }
 
     public function store(Request $request)
     {
         $typeLancamento = $request->path() == "lancamentos/pagamentos/store" ? "P" : "R";
+        $validated = $request->validate([
+            'tipo' => 'required|in:0,1,2'
+        ]);
         if ($request->tipo == 0) {
+            $validated = $request->validate([
+                'descricao' => 'required',
+                'valor' => 'required',
+                'data' => 'required'
+            ]);
             Lancamento::create([
                 'descricao' => $request->descricao,
                 'valor' => str_replace(['.', ','], ['', '.'], $request->valor),  // Formatação do valor
@@ -70,7 +81,7 @@ class LancamentoController extends Controller
                 'id_empresa' => session('empresa_id'),
                 'id_fornecedor_cliente' => $request->fornecedor_cliente_id,
             ]);
-            return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento criado com sucesso!');
+            return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Cadastrado com sucesso!");
         }
 
         if ($request->tipo == 1) {
@@ -79,7 +90,7 @@ class LancamentoController extends Controller
                 'descricao' => $request->descricao . ' - Entrada',
                 'valor' => str_replace(['.', ','], ['', '.'], $request->valorEntrada),  // Formatação do valor
                 'tipo' => $typeLancamento,
-                'data_venc' => $request->dataVencPar,
+                'data_venc' => date("Y-m-d"),
                 'id_categoria' => $request->categoria_id,
                 'id_empresa' => session('empresa_id'),
                 'id_fornecedor_cliente' => $request->fornecedor_cliente_id,
@@ -106,7 +117,7 @@ class LancamentoController extends Controller
                         'id_fornecedor_cliente' => $request->fornecedor_cliente_id
                     ]);
                 }
-                return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento criado com sucesso!');
+                return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Cadastrado com sucesso!");
             }
             if ($request->tipo == 2) {
                 // Criação do lançamento inicial
@@ -124,9 +135,9 @@ class LancamentoController extends Controller
                     $this->criarLançamentosRecorrentes($lancamento);
                 }
 
-                return redirect()->route('lancamentos.pagamentos.index');
+                return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Cadastrado com sucesso!");
             }
-            return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento criado com sucesso!');
+            return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-danger', "Cadastrado com sucesso!");
         }
         // return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento criado com sucesso!');
 
@@ -195,7 +206,7 @@ class LancamentoController extends Controller
     {
         // Exclui o lançamento
         $lancamento->delete();
-        return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento excluído com sucesso!');
+        return redirect()->route($lancamento->tipo == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Excluido com sucesso!");
     }
 
     public function Formbaixa(Lancamento $lancamento)

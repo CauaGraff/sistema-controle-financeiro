@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Gerenciamento - @yield("title")</title>
-  <!-- Bootstrap CSS -->
+  <link rel="shortcut icon" href="{{asset("imgs/icon.png")}}" type="image/x-icon">
+
   <link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" id="bootstrap-css">
   <link href="{{asset('css/app.css')}}" rel="stylesheet">
   <link href="{{asset('fontawesome/css/all.min.css')}}" rel="stylesheet">
@@ -18,7 +19,7 @@
   <header class="border-bottom" style="background-color: #fff;">
     <nav class="navbar navbar-expand-lg navbar-light p-3">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">logo</a>
+        <img src="{{asset("imgs/banner.png")}}" alt="Logo" style="width: 140px;">
         <!-- Botão "hambúrguer" para telas menores -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
           aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,7 +31,8 @@
               <a class="nav-link mx-2 active" aria-current="page" href="{{route('home.adm')}}">Home</a>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="usuariosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link dropdown-toggle" href="#" id="usuariosDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
                 Usuarios
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="usuariosDropdown">
@@ -47,11 +49,13 @@
               <span class="nav-link">{{auth()->user()->name}}</span>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
                 <i class="fa-solid fa-user"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end w-auto" aria-labelledby="userDropdown">
-                <li><a class="dropdown-item" href="{{route("login.destroy")}}"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+                <li><a class="dropdown-item" href="{{route("login.destroy")}}"><i
+                      class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
               </ul>
             </li>
           </ul>
@@ -92,11 +96,11 @@
 
     @if(Session::has('alert-success'))
     toastr.success("{{ Session::get('alert-success') }} ")
-    @elseif(Session::has('alert-warning'))
-    toastr.warning("{{ Session::get('alert-warning') }} ")
-    @elseif(Session::has('alert-danger'))
-    toastr.error("{{ Session::get('alert-danger') }} ")
-    @endif
+  @elseif(Session::has('alert-warning'))
+  toastr.warning("{{ Session::get('alert-warning') }} ")
+@elseif(Session::has('alert-danger'))
+  toastr.error("{{ Session::get('alert-danger') }} ")
+@endif
   </script>
 
   @yield("js")
