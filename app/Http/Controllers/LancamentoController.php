@@ -63,14 +63,13 @@ class LancamentoController extends Controller
     public function store(Request $request)
     {
         $typeLancamento = $request->path() == "lancamentos/pagamentos/store" ? "P" : "R";
-        $validated = $request->validate([
-            'tipo' => 'required|in:0,1,2'
-        ]);
         if ($request->tipo == 0) {
             $validated = $request->validate([
                 'descricao' => 'required',
                 'valor' => 'required',
-                'data' => 'required'
+                'data' => 'required',
+                'categoria_id' => 'required',
+                'fornecedor_cliente_id' => 'required'
             ]);
             Lancamento::create([
                 'descricao' => $request->descricao,

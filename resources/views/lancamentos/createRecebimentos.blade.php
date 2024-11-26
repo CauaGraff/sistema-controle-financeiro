@@ -31,10 +31,10 @@
         <div class="row mb-3">
             <label for="tipo" class="col-sm-2 col-form-label">Tipo</label>
             <div class="col-sm-10">
-                <select class="form-select @error('descricao')is-invalid @enderror" id="tipo" name="tipo">
-                    <option value="0">Nenhum</option>
-                    <option value="1">Parcelas</option>
-                    <option value="2">Recorrente</option>
+                <select class="form-select @error('tipo')is-invalid @enderror" id="tipo" name="tipo">
+                    <option value="0" {{ old('tipo') == 0 ? 'selected' : '' }}>Nenhum</option>
+                    <option value="1" {{ old('tipo') == 1 ? 'selected' : '' }}>Parcelas</option>
+                    <option value="2" {{ old('tipo') == 2 ? 'selected' : '' }}>Recorrente</option>
                 </select>
                 @error('tipo')
                     <div class="invalid-feedback">
@@ -49,7 +49,8 @@
             <div class="row mb-3">
                 <label for="valor" class="col-sm-2 col-form-label" id="labelValor">Valor</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control @error('valor')is-invalid @enderror" id="valor" name="valor">
+                    <input type="text" class="form-control @error('valor')is-invalid @enderror" id="valor" name="valor"
+                        value="{{ old('valor') }}">
                 </div>
                 @error('valor')
                     <div class="invalid-feedback">
@@ -129,7 +130,9 @@
                         @if (isset($grupo['categoria']))
                             <optgroup label="{{ $grupo['categoria']->descricao }}">
                                 @foreach ($grupo['subcategorias'] as $subcategoria)
-                                    <option value="{{ $subcategoria->id }}">{{ $subcategoria->descricao }}</option>
+                                    <option value="{{ $subcategoria->id }}" {{ old('categoria_id') == $subcategoria->id ? 'selected' : '' }}>
+                                        {{ $subcategoria->descricao }}
+                                    </option>
                                 @endforeach
                             </optgroup>
                         @endif
