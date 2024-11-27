@@ -31,13 +31,14 @@
                         <td>{{ $favorecido->tipo == 'F' ? 'Fornecedor' : 'Cliente' }}</td>
                         <td>{{ $favorecido->cidade }}</td>
                         <td>
-                            <a href="{{ route('favorecidos.edit', $favorecido->id) }}"
-                                class="btn btn-warning btn-sm">Editar</a>
+                            <a href="{{ route('favorecidos.edit', $favorecido->id) }}" class="btn btn-warning btn-sm"><i
+                                    class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
                             <form action="{{ route('favorecidos.destroy', $favorecido->id) }}" method="POST"
                                 style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                                <button type="submit" class="btn btn-danger btn-sm"><i
+                                        class="fa-solid fa-trash"></i></button>
                             </form>
                         </td>
                     </tr>

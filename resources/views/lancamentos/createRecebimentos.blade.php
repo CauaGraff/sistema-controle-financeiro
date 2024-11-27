@@ -12,7 +12,6 @@
 
     <form action="{{ route('lancamentos.recebimentos.store') }}" method="POST">
         @csrf
-
         <!-- Campo de Descrição -->
         <div class="row mb-3">
             <label for="descricao" class="col-sm-2 col-form-label">Descrição</label>
@@ -25,7 +24,6 @@
                     </div>
                 @enderror
             </div>
-
         </div>
         <!-- Campo de tipo do cadastro -->
         <div class="row mb-3">
@@ -51,18 +49,19 @@
                 <div class="col-sm-10">
                     <input type="text" class="form-control @error('valor')is-invalid @enderror" id="valor" name="valor"
                         value="{{ old('valor') }}">
+                    @error('valor')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
-                @error('valor')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
-                @enderror
             </div>
             <!-- Campo de Data de Vencimento -->
             <div class="row mb-3">
                 <label for="data" class="col-sm-2 col-form-label" id="labelDataVenc">Data de Vencimento</label>
                 <div class="col-sm-10">
-                    <input type="date" name="data" id="data" class="form-control @error('data')is-invalid @enderror">
+                    <input type="date" name="data" id="data" class="form-control @error('data')is-invalid @enderror"
+                        value="{{ old('data') }}">
                     @error('data')
                         <div class="invalid-feedback">
                             {{ $message }}
@@ -73,7 +72,7 @@
         </div>
 
         <!-- Campos adicionais para lançamentos recorrentes -->
-        <div id="recorrenteFields" style="display: none;">
+        <!-- <div id="recorrenteFields" style="display: none;">
             <div class="row mb-3">
                 <label for="frequencia" class="col-sm-2 col-form-label">Frequência</label>
                 <div class="col-sm-10">
@@ -83,7 +82,7 @@
                     </select>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Campos adicionais para lançamentos Parcelas -->
         <div id="parcelasFields" style="display: none;">
@@ -91,7 +90,13 @@
             <div class="row mb-3">
                 <label for="valor" class="col-sm-2 col-form-label" id="labelValor">Valor Total</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="valorTotal" name="valorTotal">
+                    <input type="text" class="form-control @error('valorTotal')is-invalid @enderror" id="valorTotal"
+                        name="valorTotal" value="{{ old('valorTotal') }}">
+                    @error('valorTotal')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
             <!-- Campo de Data de Vencimento -->
@@ -99,26 +104,43 @@
                 <label for="dataVencPar" class="col-sm-2 col-form-label" id="labelDataVenc">1º Data de
                     Vencimento</label>
                 <div class="col-sm-10">
-                    <input type="date" name="dataVencPar" id="dataVencPar" class="form-control">
+                    <input type="date" name="dataVencPar" id="dataVencPar"
+                        class="form-control @error('dataVencPar')is-invalid @enderror" value="{{ old('dataVencPar') }}">
+                    @error('dataVencPar')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
             <!-- Campo de Entrada -->
-            <div class="row mb-3">
+            <div class=" row mb-3">
                 <label for="valorEntrada" class="col-sm-2 col-form-label" id="labelEntrada">Valor Entrada</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="valorEntrada" name="valorEntrada">
+                    <input type="text" class="form-control @error('valorEntrada')is-invalid @enderror" id="
+                        valorEntrada" name="valorEntrada" value="{{ old('valorEntrada') }}">
+                    @error('valorEntrada')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
-
             <!-- Campo de qtd parcelas -->
             <div class="row mb-3">
-                <label for="qtdParcelas" class="col-sm-2 col-form-label" id="labelDataVenc">Quantidade Parcelas</label>
+                <label for="qtdParcelas" class="col-sm-2 col-form-label" id="labelDataVenc">Quantidade
+                    Parcelas</label>
                 <div class="col-sm-10">
-                    <input type="number" class="form-control" id="qtdParcelas" name="qtdParcelas">
+                    <input type="number" class="form-control @error('valorEntrada')is-invalid @enderror"
+                        id="qtdParcelas" name="qtdParcelas" value="{{ old('qtdParcelas') }}">
+                    @error('qtdParcelas')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
         </div>
-
         <!-- Campo de Categoria -->
         <div class="row mb-3">
             <label for="categoria" class="col-sm-2 col-form-label">Categoria</label>
@@ -130,33 +152,31 @@
                         @if (isset($grupo['categoria']))
                             <optgroup label="{{ $grupo['categoria']->descricao }}">
                                 @foreach ($grupo['subcategorias'] as $subcategoria)
-                                    <option value="{{ $subcategoria->id }}" {{ old('categoria_id') == $subcategoria->id ? 'selected' : '' }}>
-                                        {{ $subcategoria->descricao }}
-                                    </option>
+                                    <option value="{{ $subcategoria->id }}" {{ old('categoria_id') == $subcategoria->id ? 'selected' : '' }}>{{ $subcategoria->descricao }}</option>
                                 @endforeach
                             </optgroup>
                         @endif
                     @endforeach
-                    @error('categoria_id')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
                 </select>
             </div>
+            @error('categoria_id')
+                <div class="invalid-feedback">
+                    {{ $message }}
+                </div>
+            @enderror
         </div>
-
         <!-- Campo de Favorecido -->
         <div class="row mb-3">
             <label for="fornecedor_cliente" class="col-sm-2 col-form-label">Fornecedor/Cleinte</label>
             <div class="col-sm-10">
-                <select class="form-select" id="fornecedor_cliente" name="fornecedor_cliente_id">
-                    <option value="">Selecione o favorecido</option>
+                <select class="form-select @error('fornecedor_cliente_id')is-invalid @enderror" id="fornecedor_cliente"
+                    name="fornecedor_cliente_id">
+                    <option value="">Selecione o Fornecedor/Cliente</option>
                     @foreach ($fornecedores as $fornecedor)
-                        <option value="{{ $fornecedor->id }}">{{ $fornecedor->nome }}</option>
+                        <option value="{{ $fornecedor->id }}" {{ old('fornecedor_cliente_id') == $fornecedor->id ? 'selected' : '' }}>{{ $fornecedor->nome }}</option>
                     @endforeach
                     @foreach ($clientes as $cliente)
-                        <option value="{{ $cliente->id }}">{{ $cliente->nome }}</option>
+                        <option value="{{ $cliente->id }}" {{ old('fornecedor_cliente_id') == $fornecedor->id ? 'selected' : '' }}>{{ $cliente->nome }}</option>
                     @endforeach
                 </select>
             </div>
@@ -169,27 +189,29 @@
 @section('js')
 <script src="{{asset("js/jquery.mask.min.js")}}"></script>
 <script>
-
     $(document).ready(function () {
-        $('#valor').mask('000.000.000.000.000,00', { reverse: true });
-        $('#valorTotal').mask('000.000.000.000.000,00', { reverse: true });
-        $('#valorEntrada').mask('000.000.000.000.000,00', { reverse: true });
-        $("#tipo").change(function () {
-            if ($(this).val() == 0) {
+        function selecionaCampos() {
+            if ($("#tipo").val() == 0) {
                 $("#nenhumFields").show()
                 $("#recorrenteFields").hide()
                 $("#parcelasFields").hide()
-            } else if ($(this).val() == 1) {
+            } else if ($("#tipo").val() == 1) {
                 $("#nenhumFields").hide()
                 $("#recorrenteFields").hide()
                 $("#parcelasFields").show()
-            } else if ($(this).val() == 2) {
+            } else if ($("#tipo").val() == 2) {
                 $("#nenhumFields").show()
                 $("#recorrenteFields").show()
                 $("#parcelasFields").hide()
             }
+        }
+        selecionaCampos();
+        $('#valor').mask('000.000.000.000.000,00', { reverse: true });
+        $('#valorTotal').mask('000.000.000.000.000,00', { reverse: true });
+        $('#valorEntrada').mask('000.000.000.000.000,00', { reverse: true });
+        $("#tipo").change(function () {
+            selecionaCampos();
         })
     })
-
 </script>
 @endsection

@@ -79,6 +79,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('recebimentos/{lancamento}', [LancamentoController::class, 'update'])->name('lancamentos.recebimentos.update');
         Route::delete('recebimentos/{lancamento}', [LancamentoController::class, 'destroy'])->name('lancamentos.recebimentos.destroy');
         Route::post('recebimentos/{lancamento}/baixa', [LancamentoController::class, 'baixa'])->name('lancamentos.recebimentos.baixa');
+
+
     });
 
     Route::resource('categorias', CategoriaContasController::class);

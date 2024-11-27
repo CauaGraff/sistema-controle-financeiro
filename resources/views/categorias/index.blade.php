@@ -30,12 +30,13 @@
                             <td><strong>{{ $numeroCategoriaPai }}</strong></td>
                             <td><strong>{{ $categoria->descricao }}</strong></td>
                             <td>
-                                <a href="{{ route('categorias.edit', $categoria->id) }}" class="btn btn-warning btn-sm">Editar</a>
+                                <a href="{{ route('categorias.edit', $categoria->id) }}" class="btn btn-warning btn-sm"><i
+                                        class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
                                 <form action="{{ route('categorias.destroy', $categoria->id) }}" method="POST"
                                     style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
                                 </form>
                             </td>
                         </tr>
@@ -51,13 +52,13 @@
                                         <td>{{ $numeroCategoriaPai }}.{{ $numeroSubcategoria }}</td>
                                         <td>-- {{ $subcategoria->descricao }}</td>
                                         <td>
-                                            <a href="{{ route('categorias.edit', $subcategoria->id) }}"
-                                                class="btn btn-warning btn-sm">Editar</a>
+                                            <a href="{{ route('categorias.edit', $subcategoria->id) }}" class="btn btn-warning btn-sm"><i
+                                                    class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
                                             <form action="{{ route('categorias.destroy', $subcategoria->id) }}" method="POST"
                                                 style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
                                             </form>
                                         </td>
                                     </tr>

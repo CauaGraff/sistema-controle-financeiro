@@ -33,13 +33,11 @@ class LancamentoController extends Controller
 
     public function create(Request $request)
     {
-
         $empresaId = session('empresa_id');
         // Obtém os dados necessários para o formulário
         $categorias = CategoriaContas::where("id_empresa", $empresaId)->get(); // Supondo que você tenha um modelo de CategoriaContas
         // Agrupar categorias por pai
         $categoriasAgrupadas = [];
-
         // Primeiro, organize categorias em um array por ID
         foreach ($categorias as $categoria) {
             if ($categoria->id_categoria_pai) {
@@ -64,13 +62,19 @@ class LancamentoController extends Controller
     {
         $typeLancamento = $request->path() == "lancamentos/pagamentos/store" ? "P" : "R";
         if ($request->tipo == 0) {
-            $validated = $request->validate([
-                'descricao' => 'required',
-                'valor' => 'required',
-                'data' => 'required',
-                'categoria_id' => 'required',
-                'fornecedor_cliente_id' => 'required'
-            ]);
+            $validated = $request->validate(
+                [
+                    'descricao' => 'required',
+                    'valor' => 'required',
+                    'data' => 'required',
+                    'categoria_id' => 'required',
+                ],
+                [
+                    'descricao.required' => 'Preencha a Descrição',
+                    'valor.required' => 'Preencha o valor',
+                    'data.required' => 'Preencha a Data de Vencimento',
+                ]
+            );
             Lancamento::create([
                 'descricao' => $request->descricao,
                 'valor' => str_replace(['.', ','], ['', '.'], $request->valor),  // Formatação do valor
@@ -82,9 +86,24 @@ class LancamentoController extends Controller
             ]);
             return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Cadastrado com sucesso!");
         }
-
         if ($request->tipo == 1) {
-
+            $validated = $request->validate(
+                [
+                    'descricao' => 'required',
+                    'dataVencPar' => 'required',
+                    'categoria_id' => 'required',
+                    'valorEntrada' => 'required',
+                    'qtdParcelas' => 'required',
+                    'valorTotal' => 'required'
+                ],
+                [
+                    'descricao.required' => 'Preencha a Descrição',
+                    'dataVencPar.required' => 'Preencha a 1º Data de Vencimento',
+                    'valorEntrada.required' => 'Preencha o Valor da Entrada',
+                    'qtdParcelas.required' => 'Preencha a Quantidade de Parcelas',
+                    'valorTotal.required' => 'Preencha o Valor da Entrada'
+                ]
+            );
             Lancamento::create([
                 'descricao' => $request->descricao . ' - Entrada',
                 'valor' => str_replace(['.', ','], ['', '.'], $request->valorEntrada),  // Formatação do valor
@@ -98,14 +117,9 @@ class LancamentoController extends Controller
                 $valorTotal = str_replace(['.', ','], ['', '.'], $request->valorTotal);
                 $valorEntrada = str_replace(['.', ','], ['', '.'], $request->valorEntrada);
                 $valorParcela = ($valorTotal - $valorEntrada) / $request->qtdParcelas;
-
-                // dd($valorTotal, $valorEntrada, $valorParcela);
-
                 $dataVencimento = Carbon::parse($request->dataVencPar);
-
                 for ($i = 1; $i <= $request->qtdParcelas; $i++) {
                     $novaDataVencimento = $dataVencimento->copy()->addMonths($i - 1);
-
                     Lancamento::create([
                         'descricao' => $request->descricao . ' - Parcela ' . $i,
                         'valor' => $valorParcela,
@@ -118,28 +132,25 @@ class LancamentoController extends Controller
                 }
                 return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Cadastrado com sucesso!");
             }
-            if ($request->tipo == 2) {
-                // Criação do lançamento inicial
-                $lancamento = Lancamento::create([
-                    'descricao' => $request->descricao,
-                    'valor' => $request->valor,
-                    'data_venc' => $request->data_venc,
-                    'recorrente' => $request->recorrente ?? false,
-                    'tipo_recorrencia' => $request->recorrente ? $request->tipo_recorrencia : null,
-                    'frequencia' => $request->recorrente ? $request->frequencia : null,
-                ]);
-
-                // Se for recorrente, criar os próximos lançamentos
-                if ($lancamento->recorrente) {
-                    $this->criarLançamentosRecorrentes($lancamento);
-                }
-
-                return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Cadastrado com sucesso!");
-            }
+            // if ($request->tipo == 2) {
+            //     // Criação do lançamento inicial
+            //     $lancamento = Lancamento::create([
+            //         'descricao' => $request->descricao,
+            //         'valor' => $request->valor,
+            //         'data_venc' => $request->data_venc,
+            //         'recorrente' => $request->recorrente ?? false,
+            //         'tipo_recorrencia' => $request->recorrente ? $request->tipo_recorrencia : null,
+            //         'frequencia' => $request->recorrente ? $request->frequencia : null,
+            //     ]);
+            //     // Se for recorrente, criar os próximos lançamentos
+            //     if ($lancamento->recorrente) {
+            //         $this->criarLançamentosRecorrentes($lancamento);
+            //     }
+            //     return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Cadastrado com sucesso!");
+            // }
             return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-danger', "Cadastrado com sucesso!");
         }
         // return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento criado com sucesso!');
-
     }
 
     private function criarLançamentosRecorrentes(Lancamento $lancamento)
@@ -210,13 +221,16 @@ class LancamentoController extends Controller
 
     public function Formbaixa(Lancamento $lancamento)
     {
-        dd($lancamento);
-
-        // return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Baixa realizada com sucesso!');
+        // Buscar o lançamento relacionado
+        $lancamento = Lancamento::findOrFail($lancamento->id);
+        return view('lancamentos.pagar', compact('lancamento'));
     }
 
-    public function baixaStore()
+    public function baixaStore(Request $request)
     {
-
+        if ($request->hasFile('anexo')) {
+            $anexoPath = $request->file('anexo')->store('anexos', 'public');
+            dd($anexoPath, $request);
+        }
     }
 }

@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->decimal('juros', 10, 2);
             $table->decimal('multa', 10, 2);
             $table->decimal('desconto', 10, 2);
-            $table->string('anexo');
+            $table->string('anexo')->nullable();
             $table->timestamps();
             $table->foreign(columns: 'id_lancamento')->references('id')->on('lancamentos');
         });
