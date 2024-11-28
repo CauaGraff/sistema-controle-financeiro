@@ -13,10 +13,10 @@ return new class extends Migration {
         Schema::create('lancamentos_baixa', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_lancamento');
-            $table->decimal('valor', 10, 2);
-            $table->decimal('juros', 10, 2);
-            $table->decimal('multa', 10, 2);
-            $table->decimal('desconto', 10, 2);
+            $table->decimal('valor_pago', 10, 2)->default('0.00');
+            $table->decimal('juros', 10, 2)->default('0.00');
+            $table->decimal('multa', 10, 2)->default('0.00');
+            $table->decimal('desconto', 10, 2)->default('0.00');
             $table->string('anexo')->nullable();
             $table->timestamps();
             $table->foreign(columns: 'id_lancamento')->references('id')->on('lancamentos');

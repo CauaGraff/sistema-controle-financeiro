@@ -14,14 +14,14 @@ return new class extends Migration {
             $table->id();
             $table->string("nome");
             $table->string("cnpj_cpf");
-            $table->string("telefone");
-            $table->string("email");
-            $table->char("cep", 8);
-            $table->char("uf");
-            $table->string("cidade");
-            $table->string("bairro");
-            $table->string("rua");
-            $table->text("complemento");
+            $table->string("telefone")->nullable();
+            $table->string("email")->nullable();
+            $table->char("cep", 8)->nullable();
+            $table->char("uf")->nullable();
+            $table->string("cidade")->nullable();
+            $table->string("bairro")->nullable();
+            $table->string("rua")->nullable();
+            $table->text("complemento")->nullable();
             $table->enum('tipo', ['F', 'C']); // Forne ou Cliente
             $table->unsignedBigInteger('id_empresa');
             $table->foreign('id_empresa')->references('id')->on('empresas');

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,13 +12,13 @@ return new class extends Migration
     {
         Schema::create('empresas', function (Blueprint $table) {
             $table->id();
-            $table->string("nome");
-            $table->string("cnpj_cpf");
-            $table->char("cep", 8);
-            $table->string("cidade");
-            $table->string("bairro");
-            $table->string("rua");
-            $table->boolean('active');
+            $table->string("nome")->nullable();
+            $table->string("cnpj_cpf")->nullable();
+            $table->char("cep", 8)->nullable();
+            $table->string("cidade")->nullable();
+            $table->string("bairro")->nullable();
+            $table->string("rua")->nullable();
+            $table->boolean('active')->nullable();
             $table->timestamps();
         });
     }

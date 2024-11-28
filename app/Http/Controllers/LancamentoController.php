@@ -52,9 +52,9 @@ class LancamentoController extends Controller
         $clientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
 
         if ($request->path() == "lancamentos/pagamentos/create") {
-            return view('lancamentos.createPagamentos', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
+            return view('lancamentos.formCreatePag', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
         } else {
-            return view('lancamentos.createRecebimentos', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
+            return view('lancamentos.formCreateRec', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
         }
     }
 
@@ -156,10 +156,8 @@ class LancamentoController extends Controller
     private function criarLançamentosRecorrentes(Lancamento $lancamento)
     {
         $proximoVencimento = Carbon::parse($lancamento->data_venc);
-
         // Por exemplo, criar 12 lançamentos futuros (1 para cada mês, por 1 ano)
         $quantidadeDeLançamentos = 12;  // Você pode ajustar esse número conforme a necessidade (ano inteiro, por exemplo)
-
         for ($i = 1; $i <= $quantidadeDeLançamentos; $i++) {
             switch ($lancamento->tipo_recorrencia) {
                 case 'diario':
@@ -175,7 +173,6 @@ class LancamentoController extends Controller
                     $proximoVencimento->addYear();
                     break;
             }
-
             // Cria o próximo lançamento com a data calculada
             Lancamento::create([
                 'descricao' => $lancamento->descricao,
@@ -191,8 +188,23 @@ class LancamentoController extends Controller
     public function edit(Lancamento $lancamento)
     {
         // Obtém os dados necessários para o formulário
-        $categorias = CategoriaContas::where("id_empresa", section())->get(); // Supondo que você tenha um modelo de CategoriaContas
-        return view('lancamentos.edit', compact('lancamento', 'planosDeContas'));
+        $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))->get();
+
+        // Agrupar categorias por pai
+        $categoriasAgrupadas = [];
+        // Primeiro, organize categorias em um array por ID
+        foreach ($categorias as $categoria) {
+            if ($categoria->id_categoria_pai) {
+                // Se a categoria tem um pai, adicione-a à lista do pai correspondente
+                $categoriasAgrupadas[$categoria->id_categoria_pai]['subcategorias'][] = $categoria;
+            } else {
+                // Se a categoria não tem pai, é uma categoria principal
+                $categoriasAgrupadas[$categoria->id]['categoria'] = $categoria;
+            }
+        }
+        $fornecedores = FornecedorCliente::where("id_empresa", session('empresa_id'))->get();
+        $clientes = FornecedorCliente::where("id_empresa", session('empresa_id'))->get();
+        return view('lancamentos.formEdit', compact('lancamento', 'categoriasAgrupadas', 'fornecedores', 'clientes'));
     }
 
     public function update(Request $request, Lancamento $lancamento)
@@ -208,7 +220,6 @@ class LancamentoController extends Controller
 
         // Atualiza o lançamento
         $lancamento->update($request->all());
-
         return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento atualizado com sucesso!');
     }
 
@@ -219,12 +230,44 @@ class LancamentoController extends Controller
         return redirect()->route($lancamento->tipo == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Excluido com sucesso!");
     }
 
-    public function Formbaixa(Lancamento $lancamento)
+    public function formbaixa(Lancamento $lancamento)
     {
-        // Buscar o lançamento relacionado
-        $lancamento = Lancamento::findOrFail($lancamento->id);
-        return view('lancamentos.pagar', compact('lancamento'));
+        // Recupera os parâmetros de cálculo
+        $parametros = \App\Models\ParametrosCalculo::all();
+
+        // Calcular valores de juros, multa e desconto
+        $juros = 0;
+        $multa = 0;
+        $desconto = 0;
+
+        // Define os parâmetros de juros, multa e desconto (exemplo)
+        $param_juros = $parametros->where('descricao', 'Juros')->first();  // exemplo: aplicação de juros
+        $param_multa = $parametros->where('descricao', 'Multa')->first();  // exemplo: aplicação de multa
+        $param_desconto = $parametros->where('descricao', 'Descontos')->first();  // exemplo: aplicação de desconto
+
+        // Verificar se a data de vencimento já passou para aplicar juros e multa
+        $data_vencimento = Carbon::parse($lancamento->data_venc);
+        $data_atual = Carbon::now();
+        $dias_em_atraso = $data_atual->diffInDays($data_vencimento, false);
+
+        if ($dias_em_atraso > 0) {
+            // Aplica juros e multa se houver atraso
+            $juros = ($lancamento->valor * $param_juros->indice / 100) * $dias_em_atraso;
+            $multa = ($lancamento->valor * $param_multa->indice / 100);
+        }
+
+        // Aplicar desconto se for dentro do prazo
+        if ($dias_em_atraso < 0) {
+            $desconto = $lancamento->valor * $param_desconto->indice / 100;
+        }
+
+        // Calcular valor total a ser pago
+        $valor_total = $lancamento->valor + $juros + $multa - $desconto;
+
+        // Passar os valores para a view
+        return view('lancamentos.pagar', compact('lancamento', 'juros', 'multa', 'desconto', 'valor_total'));
     }
+
 
     public function baixaStore(Request $request)
     {

@@ -53,23 +53,42 @@
                                     <td>{{ mb_strimwidth("$lancamento->descricao", 0, 25, "...") }}</td>
                                     <td>R$ {{ number_format($lancamento->valor, 2, ",", ".") }}</td>
                                     <td>{{ $lancamento->baixa ? date('d/m/Y', strtotime($lancamento->data_venc)) : '-' }}</td>
-                                    <td>
-                                        <a href="{{ route('lancamentos.pagamentos.update', $lancamento) }}"
-                                            class="btn btn-sm btn-warning"><i class="fa-solid fa-pen-to-square"
-                                                style="color: white;"></i></a>
-                                        <form action="{{ route('lancamentos.pagamentos.destroy', $lancamento) }}" method="POST"
-                                            style="display: inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger"
-                                                onclick="return confirm('Tem certeza que deseja excluir?')"><i
-                                                    class="fa-solid fa-trash"></i></button>
-                                        </form>
-                                        @if(!$lancamento->data_baixa)
-                                            <a href="{{ route('lancamentos.pagamentos.baixa', $lancamento) }}"
-                                                class="btn btn-sm btn-success"><i class="fa-solid fa-dollar-sign"></i></a>
-                                        @endif
-                                    </td>
+                                    @if ($route == "P")
+                                        <td>
+                                            <a href="{{ route('lancamentos.edit', $lancamento) }}" class="btn btn-sm btn-warning"><i
+                                                    class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
+                                            <form action="{{ route('lancamentos.pagamentos.destroy', $lancamento) }}" method="POST"
+                                                style="display: inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Tem certeza que deseja excluir?')"><i
+                                                        class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                            @if(!$lancamento->data_baixa)
+                                                <a href="{{ route('lancamentos.pagamentos.baixa', $lancamento) }}"
+                                                    class="btn btn-sm btn-success"><i class="fa-solid fa-dollar-sign"></i></a>
+                                            @endif
+                                        </td>
+                                    @else
+                                        <td>
+                                            <a href="{{ route('lancamentos.edit', $lancamento) }}" class="btn btn-sm btn-warning"><i
+                                                    class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
+                                            <form action="{{ route('lancamentos.recebimentos.destroy', $lancamento) }}" method="POST"
+                                                style="display: inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Tem certeza que deseja excluir?')"><i
+                                                        class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                            @if(!$lancamento->data_baixa)
+                                                <a href="{{ route('lancamentos.recebimentos.baixa', $lancamento) }}"
+                                                    class="btn btn-sm btn-success"><i class="fa-solid fa-dollar-sign"></i></a>
+                                            @endif
+                                        </td>
+                                    @endif
+
                                 </tr>
                     @endforeach
                 </tbody>
