@@ -189,7 +189,6 @@ class LancamentoController extends Controller
     {
         // Obtém os dados necessários para o formulário
         $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))->get();
-
         // Agrupar categorias por pai
         $categoriasAgrupadas = [];
         // Primeiro, organize categorias em um array por ID

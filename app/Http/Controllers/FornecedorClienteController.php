@@ -23,6 +23,19 @@ class FornecedorClienteController extends Controller
     public function store(Request $request)
     {
 
+        $validate = $request->validate([
+            'nome' => 'required',
+            'cnpj_cpf' => 'required|string|max:14',
+            'telefone' => 'nullable|string|max:15',
+            'email' => 'nullable|email|max:255',
+            'cep' => 'nullable|string|size:8',
+            'uf' => 'nullable|string|size:2',
+            'cidade' => 'nullable|string|max:100',
+            'bairro' => 'nullable|string|max:100',
+            'rua' => 'nullable|string|max:100',
+            'complemento' => 'nullable|string|max:255',
+            'tipo' => 'required|in:F,C', // 'F' para Fornecedor e 'C' para Cliente
+        ]);
 
         FornecedorCliente::create(array_merge($request->all(), ['id_empresa' => session('empresa_id')]));
 
