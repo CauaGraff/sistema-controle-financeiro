@@ -1,7 +1,11 @@
 @extends('_theme')
 
 @section('content')
-<h1>Cadastrar Recebimentos</h1>
+@if ($lancamento->tipo == "R")
+    <h1>Cadastrar Recebimentos</h1>
+@else
+    <h1>Cadastrar Pagamentos</h1>
+@endif
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
@@ -9,8 +13,9 @@
     </div>
 @endif
 
-<form action="{{ route('lancamentos.recebimentos.store') }}" method="POST">
+<form action="{{ route('lancamentos.update', $lancamento->id) }}">
     @csrf
+    @method('PUT')
     <!-- Campo de Descrição -->
     <div class="row mb-3">
         <label for="descricao" class="col-sm-2 col-form-label">Descrição</label>

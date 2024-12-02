@@ -52,7 +52,7 @@ class LancamentoController extends Controller
         $clientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
 
         if ($request->path() == "lancamentos/pagamentos/create") {
-            return view('lancamentos.formCreatePag', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
+            return view('lancamentos.createPagamentos', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
         } else {
             return view('lancamentos.formCreateRec', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
         }
@@ -218,8 +218,8 @@ class LancamentoController extends Controller
         ]);
 
         // Atualiza o lançamento
-        $lancamento->update($request->all());
-        return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento atualizado com sucesso!');
+        return dd($lancamento->update($request->all()));
+        // return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento atualizado com sucesso!');
     }
 
     public function destroy(Lancamento $lancamento)
@@ -247,26 +247,27 @@ class LancamentoController extends Controller
         // Verificar se a data de vencimento já passou para aplicar juros e multa
         $data_vencimento = Carbon::parse($lancamento->data_venc);
         $data_atual = Carbon::now();
-        $dias_em_atraso = $data_atual->diffInDays($data_vencimento, false);
 
+        // Garantir que a diferença de dias seja um valor inteiro
+        $dias_em_atraso = intval($data_vencimento->diffInDays($data_atual));
+
+        // Aplica juros e multa se houver atraso
         if ($dias_em_atraso > 0) {
-            // Aplica juros e multa se houver atraso
-            $juros = ($lancamento->valor * $param_juros->indice / 100) * $dias_em_atraso;
-            $multa = ($lancamento->valor * $param_multa->indice / 100);
+            $juros = round(($lancamento->valor * $param_juros->indice / 100) * $dias_em_atraso, 2); // arredondando para 2 casas decimais
+            $multa = round(($lancamento->valor * $param_multa->indice / 100), 2); // arredondando para 2 casas decimais
         }
 
         // Aplicar desconto se for dentro do prazo
         if ($dias_em_atraso < 0) {
-            $desconto = $lancamento->valor * $param_desconto->indice / 100;
+            $desconto = round($lancamento->valor * $param_desconto->indice / 100, 2); // arredondando para 2 casas decimais
         }
 
         // Calcular valor total a ser pago
-        $valor_total = $lancamento->valor + $juros + $multa - $desconto;
+        $valor_total = round($lancamento->valor + $juros + $multa - $desconto, 2); // arredondando para 2 casas decimais
 
         // Passar os valores para a view
         return view('lancamentos.pagar', compact('lancamento', 'juros', 'multa', 'desconto', 'valor_total', 'data_atual'));
     }
-
 
     public function baixaStore(Request $request)
     {

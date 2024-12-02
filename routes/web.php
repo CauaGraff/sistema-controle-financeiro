@@ -77,16 +77,12 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('recebimentos/{lancamento}', [LancamentoController::class, 'destroy'])->name('lancamentos.recebimentos.destroy');
         Route::get('recebimentos/{lancamento}/pagar', [LancamentoController::class, 'formbaixa'])->name('lancamentos.recebimentos.baixa');
 
-        Route::get('lancamento/{lancamento}/edit', [LancamentoController::class, 'edit'])->name('lancamentos.edit');
-        Route::put('lancamento/{lancamento}', [LancamentoController::class, 'update'])->name('lancamentos.update');
-
-
+        Route::get('/{lancamento}/edit', [LancamentoController::class, 'edit'])->name('lancamentos.edit');
+        Route::put('/{lancamento}/update', [LancamentoController::class, 'update'])->name('lancamentos.update');
     });
-
     Route::resource('categorias', CategoriaContasController::class);
 
     Route::resource('favorecidos', FornecedorClienteController::class);
 
     Route::resource('contas_banco', ContaBancoController::class);
-
 });
