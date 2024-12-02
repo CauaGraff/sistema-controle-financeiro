@@ -19,18 +19,18 @@
 
         <div class="form-group">
             <label for="valor_a_pagar">Valor a Pagar:</label>
-            <input type="text" class="form-control" id="valor_a_pagar"
-                value="R$ {{ number_format($lancamento->valor, 2, ',', '.') }}" disabled>
+            <input type="text" class="form-control" id="valor_a_pagar" value="{{$lancamento->valor}}" disabled>
         </div>
 
         <div class="form-group">
             <label for="data_venc">Data de Vencimento:</label>
-            <input type="text" class="form-control" id="data_venc" value="{{$lancamento->data_venc}}" disabled>
+            <input type="date" class="form-control" id="data_venc" value="{{$lancamento->data_venc}}" disabled>
         </div>
 
         <div class="form-group">
             <label for="data_pagamento">Data do Pagamento:</label>
-            <input type="date" class="form-control" name="data_pagamento" id="data_pagamento" required>
+            <input type="date" class="form-control" name="data_pagamento" id="data_pagamento"
+                value="{{$today = (new DateTime())->format('Y-m-d')}}" required>
         </div>
 
         <!-- Checkboxes para juros, multa, desconto -->
@@ -71,6 +71,7 @@
 
 @section('js')
 <script src="{{asset('js/toastr.min.js')}}"></script>
+<script src="{{asset("js/jquery.mask.min.js")}}"></script>
 <script>
     $(document).ready(function () {
         // Recalcular o valor total com base nos valores inseridos para juros, multa e desconto
@@ -102,11 +103,13 @@
             }
 
             // Atualizar o valor final a pagar no campo
-            $('#valor_a_pagar').val('R$ ' + valorFinal.toFixed(2).replace('.', ','));
+            $('#valor_a_pagar').val(valorFinal.toFixed(2));
         }
 
         // Inicializar o cálculo ao carregar a página
         calcularTotal();
+
+        $('#valor_a_pagar').mask('000.000.000.000.000,00', { reverse: true });
     });
 </script>
 @endsection

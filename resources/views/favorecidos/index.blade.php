@@ -1,44 +1,46 @@
 @extends('_theme')
 
-@section('title', 'Favorecidos')
-@section("css")
-<link rel="stylesheet" href="{{asset("css/dataTables.css")}}" />
-<link rel="stylesheet" href="{{asset("css/toastr.min.css")}}" />
+@section('title', 'Contas Bancárias')
+
+@section('css')
+<link rel="stylesheet" href="{{ asset('css/dataTables.css') }}" />
+<link rel="stylesheet" href="{{ asset('css/toastr.min.css') }}" />
 @endsection
+
 @section('content')
 <div class="container mt-4">
-    <h1>Fornecedor/Clientes</h1>
-    <a href="{{ route('favorecidos.create') }}" class="btn btn-primary mb-3">Cadastrar Novo Fornecedor/Clientes</a>
+    <h1>Contas Bancárias</h1>
+    <a href="{{ route('contas_banco.create') }}" class="btn btn-primary mb-3">Cadastrar Nova Conta Bancária</a>
     <div class="table-responsive">
 
-        <table id="favorecidosTable" class="table ">
+        <table id="contasBancoTable" class="table">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Nome</th>
-                    <th>CNPJ/CPF</th>
-                    <th>Tipo</th>
-                    <th>Cidade</th>
+                    <th>Agência</th>
+                    <th>Conta</th>
                     <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($favorecidos as $favorecido)
+                @foreach ($contas as $conta)
                     <tr>
-                        <td>{{ $favorecido->id }}</td>
-                        <td>{{ $favorecido->nome }}</td>
-                        <td>{{ $favorecido->formatarDocumento() }}</td>
-                        <td>{{ $favorecido->tipo == 'F' ? 'Fornecedor' : 'Cliente' }}</td>
-                        <td>{{ $favorecido->cidade }}</td>
+                        <td>{{ $conta->id }}</td>
+                        <td>{{ $conta->nome }}</td>
+                        <td>{{ $conta->agencia }}</td>
+                        <td>{{ $conta->conta }}</td>
                         <td>
-                            <a href="{{ route('favorecidos.edit', $favorecido->id) }}" class="btn btn-warning btn-sm"><i
-                                    class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
-                            <form action="{{ route('favorecidos.destroy', $favorecido->id) }}" method="POST"
+                            <a href="{{ route('contas_banco.edit', $conta->id) }}" class="btn btn-warning btn-sm">
+                                <i class="fa-solid fa-pen-to-square" style="color: white;"></i>
+                            </a>
+                            <form action="{{ route('contas_banco.destroy', $conta->id) }}" method="POST"
                                 style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm"><i
-                                        class="fa-solid fa-trash"></i></button>
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
                             </form>
                         </td>
                     </tr>
@@ -47,20 +49,17 @@
         </table>
     </div>
 </div>
-
-
 @endsection
+
 @section('js')
-<script src="{{asset("js/dataTables.js")}}"></script>
-<script src="{{asset("js/toastr.min.js")}}"></script>
+<script src="{{ asset('js/dataTables.js') }}"></script>
+<script src="{{ asset('js/toastr.min.js') }}"></script>
 
 <script>
-    $(".table").DataTable({
+    $("#contasBancoTable").DataTable({
         language: {
-            url: '{{asset("js/json/data_Table_pt_br.json")}}',
-        },
-        order: []
-
+            url: '{{ asset("js/json/data_Table_pt_br.json") }}',
+        }
     });
 </script>
 @endsection

@@ -264,7 +264,7 @@ class LancamentoController extends Controller
         $valor_total = $lancamento->valor + $juros + $multa - $desconto;
 
         // Passar os valores para a view
-        return view('lancamentos.pagar', compact('lancamento', 'juros', 'multa', 'desconto', 'valor_total'));
+        return view('lancamentos.pagar', compact('lancamento', 'juros', 'multa', 'desconto', 'valor_total', 'data_atual'));
     }
 
 

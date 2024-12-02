@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\FornecedorClienteController;
 use App\Http\Middleware\AdminIS;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdmController;
@@ -8,9 +7,11 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EmpresasController;
+use App\Http\Controllers\ContaBancoController;
 use App\Http\Controllers\FavorecidoController;
 use App\Http\Controllers\LancamentoController;
 use App\Http\Controllers\CategoriaContasController;
+use App\Http\Controllers\FornecedorClienteController;
 
 /**ROTAS */
 
@@ -85,4 +86,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('categorias', CategoriaContasController::class);
 
     Route::resource('favorecidos', FornecedorClienteController::class);
+
+    Route::resource('contas_banco', ContaBancoController::class);
+
 });

@@ -46,6 +46,9 @@
                   <a class="dropdown-item select-company" href="{{route("categorias.index")}}">Categorias</a>
                 </li>
                 <li>
+                  <a class="dropdown-item select-company" href="{{route("contas_banco.index")}}">Contas Banco/Caixa</a>
+                </li>
+                <li>
                   <a class="dropdown-item select-company" href="{{route("favorecidos.index")}}">Fornecedor/Clientes</a>
                 </li>
               </ul>
