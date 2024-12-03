@@ -208,14 +208,16 @@ class LancamentoController extends Controller
 
     public function update(Request $request, Lancamento $lancamento)
     {
+
+        // dd($request);
+        // dd($lancamento);
         // Validação dos dados
-        $request->validate([
-            'descricao' => 'required|string|max:255',
-            'valor' => 'required|numeric',
-            'tipo' => 'required|in:R,P',
-            'data_venc' => 'required|date',
-            'id_plano_contas' => 'required|exists:plano_de_contas,id',
-        ]);
+        // $request->validate([
+        //     'descricao' => 'required|string|max:255',
+        //     'valor' => 'required',
+        //     'data' => 'required|date',
+        //     'id_plano_contas' => 'required|exists:plano_de_contas,id',
+        // ]);
 
         // Atualiza o lançamento
         return dd($lancamento->update($request->all()));
@@ -253,17 +255,17 @@ class LancamentoController extends Controller
 
         // Aplica juros e multa se houver atraso
         if ($dias_em_atraso > 0) {
-            $juros = round(($lancamento->valor * $param_juros->indice / 100) * $dias_em_atraso, 2); // arredondando para 2 casas decimais
-            $multa = round(($lancamento->valor * $param_multa->indice / 100), 2); // arredondando para 2 casas decimais
+            $juros = ($lancamento->valor * ($param_juros->indice / 100)) * $dias_em_atraso;
+            $multa = ($lancamento->valor * $param_multa->indice / 100); // arredondando para 2 casas decimais
         }
 
         // Aplicar desconto se for dentro do prazo
         if ($dias_em_atraso < 0) {
-            $desconto = round($lancamento->valor * $param_desconto->indice / 100, 2); // arredondando para 2 casas decimais
+            $desconto = $lancamento->valor * $param_desconto->indice / 100;
         }
 
         // Calcular valor total a ser pago
-        $valor_total = round($lancamento->valor + $juros + $multa - $desconto, 2); // arredondando para 2 casas decimais
+        $valor_total = $lancamento->valor + $juros + $multa - $desconto;
 
         // Passar os valores para a view
         return view('lancamentos.pagar', compact('lancamento', 'juros', 'multa', 'desconto', 'valor_total', 'data_atual'));

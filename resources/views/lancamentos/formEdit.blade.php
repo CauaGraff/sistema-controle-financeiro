@@ -13,9 +13,9 @@
     </div>
 @endif
 
-<form action="{{ route('lancamentos.update', $lancamento->id) }}">
-    @csrf
+<form action="{{ route('lancamentos.update', $lancamento->id) }}" method="POST">
     @method('PUT')
+    @csrf
     <!-- Campo de Descrição -->
     <div class="row mb-3">
         <label for="descricao" class="col-sm-2 col-form-label">Descrição</label>
