@@ -30,4 +30,9 @@ class Lancamento extends Model
     {
         return $this->belongsTo(CategoriaContas::class, 'id_plano_contas');
     }
+
+    public function lancamentoBaixa()
+    {
+
+    }
 }

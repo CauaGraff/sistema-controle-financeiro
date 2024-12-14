@@ -76,6 +76,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('recebimentos', [LancamentoController::class, 'store'])->name('lancamentos.recebimentos.store');
         Route::delete('recebimentos/{lancamento}', [LancamentoController::class, 'destroy'])->name('lancamentos.recebimentos.destroy');
         Route::get('recebimentos/{lancamento}/pagar', [LancamentoController::class, 'formbaixa'])->name('lancamentos.recebimentos.baixa');
+        Route::post('recebimentos/{lancamento}/baixa', [LancamentoController::class, 'baixaStore'])->name('lancamentos.recebimentos.baixa.store');
+
 
         Route::get('/{lancamento}/edit', [LancamentoController::class, 'edit'])->name('lancamentos.edit');
         Route::put('/{lancamento}/update', [LancamentoController::class, 'update'])->name('lancamentos.update');

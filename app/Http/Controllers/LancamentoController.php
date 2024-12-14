@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LancamentoBaixa;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\FornecedorCliente;
@@ -255,27 +256,65 @@ class LancamentoController extends Controller
 
         // Aplica juros e multa se houver atraso
         if ($dias_em_atraso > 0) {
-            $juros = ($lancamento->valor * ($param_juros->indice / 100)) * $dias_em_atraso;
-            $multa = ($lancamento->valor * $param_multa->indice / 100); // arredondando para 2 casas decimais
+            $juros = number_format(($lancamento->valor * ($param_juros->indice / 100)) * $dias_em_atraso, 2);
+            $multa = number_format(($lancamento->valor * $param_multa->indice / 100), 2); // arredondando para 2 casas decimais
         }
 
         // Aplicar desconto se for dentro do prazo
         if ($dias_em_atraso < 0) {
-            $desconto = $lancamento->valor * $param_desconto->indice / 100;
+            $desconto = number_format($lancamento->valor * $param_desconto->indice / 100, 2);
         }
-
         // Calcular valor total a ser pago
-        $valor_total = $lancamento->valor + $juros + $multa - $desconto;
+        $valor_total = number_format($lancamento->valor + $juros + $multa - $desconto, 2);
 
         // Passar os valores para a view
         return view('lancamentos.pagar', compact('lancamento', 'juros', 'multa', 'desconto', 'valor_total', 'data_atual'));
     }
 
-    public function baixaStore(Request $request)
+    public function baixaStore(Request $request, Lancamento $lancamento)
     {
-        if ($request->hasFile('anexo')) {
-            $anexoPath = $request->file('anexo')->store('anexos', 'public');
-            dd($anexoPath, $request);
+        // Verificar se o lançamento já foi baixado (se já existe um registro na tabela LancamentoBaixa com o mesmo id_lancamento)
+        $existeBaixa = LancamentoBaixa::where('id_lancamento', $lancamento->id)->exists();
+
+        // Se o lançamento já foi baixado, retornar um erro ou mensagem de aviso
+        if ($existeBaixa) {
+            return redirect()->route($lancamento->tipo = 'p' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-danger', 'Este lançamento já foi baixado.');
         }
+
+        // Validação
+        $validate = $request->validate([
+            'data_pagamento' => 'required',
+        ]);
+
+        // Tratar os valores que vêm com separadores de milhar e vírgula como separador decimal
+        $valorPago = $this->formatarValor($request->valor_pago);
+        $multa = $this->formatarValor($request->multa);
+        $juros = $this->formatarValor($request->juros);
+        $desconto = $this->formatarValor($request->desconto);
+        // Criar a baixa do lançamento com os valores formatados
+        LancamentoBaixa::create([
+            'id_lancamento' => $lancamento->id,
+            'valor' => $valorPago,
+            'juros' => $juros,
+            'multa' => $multa,
+            'desconto' => $desconto,
+            'anexo' => $request->anexo
+        ]);
+
+        // Redirecionamento ou resposta após a criação
+        return redirect()->route($lancamento->tipo = 'p' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('success', 'Lançamento baixado com sucesso!');
     }
+
+    // Função para formatar valores recebidos
+    private function formatarValor($valor): float
+    {
+        // Remover os pontos (milhares) e substituir a vírgula por ponto decimal
+        $valor = str_replace('.', '', $valor); // Remove o ponto dos milhares
+        $valor = str_replace(',', '.', $valor); // Substitui a vírgula por ponto decimal
+
+        // Retornar o valor formatado como float
+        return (float) $valor;
+    }
+
+
 }
