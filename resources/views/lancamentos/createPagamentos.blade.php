@@ -118,8 +118,8 @@
             <div class=" row mb-3">
                 <label for="valorEntrada" class="col-sm-2 col-form-label" id="labelEntrada">Valor Entrada</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control @error('valorEntrada')is-invalid @enderror" id="
-                        valorEntrada" name="valorEntrada" value="{{ old('valorEntrada') }}">
+                    <input type="text" class="form-control @error('valorEntrada')is-invalid @enderror" id="valorEntrada"
+                        name="valorEntrada" value="{{ old('valorEntrada') }}">
                     @error('valorEntrada')
                         <div class="invalid-feedback">
                             {{ $message }}

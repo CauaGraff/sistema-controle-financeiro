@@ -11,7 +11,6 @@ class FornecedorCliente extends Model
 
     protected $table = 'fornecedor_cliente';
 
-
     protected $fillable = [
         'cnpj_cpf',
         'telefone',

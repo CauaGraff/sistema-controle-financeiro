@@ -33,6 +33,6 @@ class Lancamento extends Model
 
     public function lancamentoBaixa()
     {
-
+        return $this->hasOne(LancamentoBaixa::class, 'id_lancamento');
     }
 }

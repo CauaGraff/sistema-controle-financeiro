@@ -117,24 +117,25 @@
     $(document).ready(function () {
         $('#valor_a_pagar, #multa, #juros, #desconto, #valor_pago').mask('#.##0,00', { reverse: true });
         $('#valor_pago').change(function () {
-            var valorPago = parseFloat($(this).val());
+            // Remove os pontos (separadores de milhar) e troca a vírgula por ponto para valores decimais
+            var valorPago = parseFloat($("#valor_pago").val().replace(/\./g, '').replace(',', '.'));
             var valorOriginal = parseFloat("{{ $lancamento->valor }}");
             var novoTotal = valorPago - valorOriginal;
+            console.log(valorPago); // Verifique no console o valor correto de valorPago
             $('#multa, #juros, #desconto').val(0);
             if (novoTotal > 0) {
                 $('#juros').val(novoTotal.toFixed(2));
-                $('#juros').mask('#.##0,00', { reverse: true })
+                $('#juros').mask('#.##0,00', { reverse: true });
             }
             if (novoTotal < 0) {
                 $('#desconto').val(Math.abs(novoTotal.toFixed(2)));
-                $('#desconto').mask('#.##0,00', { reverse: true })
+                $('#desconto').mask('#.##0,00', { reverse: true });
             }
-        })
+        });
         // Recalcular o valor total com base nos valores inseridos para juros, multa e desconto
         $('#aplicar_juros, #aplicar_multa, #aplicar_desconto').change(function () {
             calcularTotal();
         });
-
         // Calcular os valores totais com base nos juros, multa e desconto
         function calcularTotal() {
             var valorOriginal = parseFloat("{{ $lancamento->valor }}");
@@ -143,15 +144,16 @@
             // Verificar e calcular juros
             if ($('#aplicar_juros').is(':checked')) {
                 $('#juros').prop('disabled', false)
-
             }
-
-
+            if ($('#aplicar_desconto').is(':checked')) {
+                $('#desconto').prop('disabled', false)
+            }
+            if ($('#aplicar_multa').is(':checked')) {
+                $('#multa').prop('disabled', false)
+            }
         }
-
         // Inicializar o cálculo ao carregar a página
         // calcularTotal();
-
     });
 </script>
 @endsection

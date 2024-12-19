@@ -105,7 +105,7 @@ class LancamentoController extends Controller
                     'valorTotal.required' => 'Preencha o Valor da Entrada'
                 ]
             );
-            Lancamento::create([
+            $lancamento = Lancamento::create([
                 'descricao' => $request->descricao . ' - Entrada',
                 'valor' => str_replace(['.', ','], ['', '.'], $request->valorEntrada),  // Formatação do valor
                 'tipo' => $typeLancamento,
@@ -114,11 +114,16 @@ class LancamentoController extends Controller
                 'id_empresa' => session('empresa_id'),
                 'id_fornecedor_cliente' => $request->fornecedor_cliente_id,
             ]);
+            LancamentoBaixa::create([
+                'valor' => str_replace(['.', ','], ['', '.'], $request->valorEntrada),  // Formatação do valor
+                'id_lancamento' => $lancamento->id
+            ]);
             if ($request->qtdParcelas > 1) {
                 $valorTotal = str_replace(['.', ','], ['', '.'], $request->valorTotal);
                 $valorEntrada = str_replace(['.', ','], ['', '.'], $request->valorEntrada);
                 $valorParcela = ($valorTotal - $valorEntrada) / $request->qtdParcelas;
                 $dataVencimento = Carbon::parse($request->dataVencPar);
+
                 for ($i = 1; $i <= $request->qtdParcelas; $i++) {
                     $novaDataVencimento = $dataVencimento->copy()->addMonths($i - 1);
                     Lancamento::create([
@@ -302,7 +307,7 @@ class LancamentoController extends Controller
         ]);
 
         // Redirecionamento ou resposta após a criação
-        return redirect()->route($lancamento->tipo = 'p' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('success', 'Lançamento baixado com sucesso!');
+        return redirect()->route($lancamento->tipo = 'P' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('success', 'Lançamento baixado com sucesso!');
     }
 
     // Função para formatar valores recebidos
@@ -315,6 +320,4 @@ class LancamentoController extends Controller
         // Retornar o valor formatado como float
         return (float) $valor;
     }
-
-
 }
