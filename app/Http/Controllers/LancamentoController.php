@@ -214,21 +214,28 @@ class LancamentoController extends Controller
 
     public function update(Request $request, Lancamento $lancamento)
     {
-
-        // dd($request);
-        // dd($lancamento);
         // Validação dos dados
-        // $request->validate([
-        //     'descricao' => 'required|string|max:255',
-        //     'valor' => 'required',
-        //     'data' => 'required|date',
-        //     'id_plano_contas' => 'required|exists:plano_de_contas,id',
-        // ]);
+        $validate = $request->validate([
+            'descricao' => 'required',
+            'valor' => 'required',
+            'data' => 'required'
+        ]);
+
+        // Remover os separadores de milhar (.) e substituir vírgula por ponto para a conversão para float
+        $valor = str_replace(['.', ','], ['', '.'], $request->valor);
 
         // Atualiza o lançamento
-        return dd($lancamento->update($request->all()));
-        // return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento atualizado com sucesso!');
+        $lancamento->update([
+            'descricao' => $request->descricao,
+            'valor' => (float) $valor,  // Convertendo para float após a formatação
+            'data_venc' => $request->data,
+            'id_categoria' => $request->categoria_id,
+            'id_fornecedor_cliente' => $request->fornecedor_cliente_id
+        ]);
+
+        return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento atualizado com sucesso!');
     }
+
 
     public function destroy(Lancamento $lancamento)
     {

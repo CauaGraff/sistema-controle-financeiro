@@ -10,6 +10,17 @@
         opacity: 0.5;
         /* Dá uma aparência de "desabilitado" */
     }
+
+    /* Ensure that the demo table scrolls */
+    th,
+    td {
+        white-space: nowrap;
+    }
+
+    div.dataTables_wrapper {
+        width: 800px;
+        margin: 0 auto;
+    }
 </style>
 @endsection
 
@@ -33,13 +44,13 @@
     @if (!$lancamentos)
         <p class="text-center">Nenhum {{$route == "P" ? "Pagamento" : "Recebimento"}} Cadastrado.</p>
     @else
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-dark">
+        <div class="">
+            <table class="table table-striped stripe row-border order-column" style="width:100%">
+                <thead class=" table-dark">
                     <tr>
                         <th>Nº</th>
-                        <th>Data Vencimento</th>
                         <th>Descrição</th>
+                        <th>Data Vencimento</th>
                         <th>Valor</th>
                         <th>Data de {{$route == "P" ? "Pagamento" : "Recebimento"}}</th>
                         <th>Valor {{$route == "P" ? "Pago" : "Recebido"}}</th>
@@ -55,8 +66,8 @@
 
                                 <tr class="{{ $pago ? 'table-success' : ($isVencido ? 'table-danger' : '') }}">
                                     <td>{{ $lancamento->id }}</td>
-                                    <td>{{ date('d/m/Y', strtotime($lancamento->data_venc)) }}</td>
                                     <td>{{ mb_strimwidth("$lancamento->descricao", 0, 25, "...") }}</td>
+                                    <td>{{ date('d/m/Y', strtotime($lancamento->data_venc)) }}</td>
                                     <td>R$ {{ number_format($lancamento->valor, 2, ",", ".") }}</td>
                                     <td>{{ $lancamento->lancamentoBaixa ? date('d/m/Y', strtotime($lancamento->lancamentoBaixa->created_at)) : '-' }}
                                     </td>
@@ -99,7 +110,6 @@
                                             </a>
                                         </td>
                                     @endif
-
                                 </tr>
                     @endforeach
                 </tbody>
@@ -112,12 +122,19 @@
 @section('js')
 <script src="{{asset("js/dataTables.js")}}"></script>
 <script src="{{asset("js/toastr.min.js")}}"></script>
+<script src="{{asset("js/dataTables.fixedColumns.js")}}"></script>
+<script src="{{asset("js/fixedColumns.dataTables.js")}}"></script>
 <script>
     $(document).ready(function () {
         var table = $(".table").DataTable({
             language: {
                 url: '{{asset("js/json/data_Table_pt_br.json")}}'
-            }
+            },
+            fixedColumns: {
+                start: 0,
+                end: 1
+            },
+            scrollX: true
         });
         // Filtrando os dados com base no intervalo de datas
         $('#filter_button').on('click', function () {

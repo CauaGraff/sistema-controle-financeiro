@@ -141,19 +141,48 @@
             var valorOriginal = parseFloat("{{ $lancamento->valor }}");
             var valorFinal = valorOriginal;
 
-            // Verificar e calcular juros
+            // Inicializar os valores de juros, multa e desconto
+            var juros = parseFloat($('#juros').val().replace(',', '.')) || 0;
+            var multa = parseFloat($('#multa').val().replace(',', '.')) || 0;
+            var desconto = parseFloat($('#desconto').val().replace(',', '.')) || 0;
+
+            // Verificar se o checkbox de juros está marcado
             if ($('#aplicar_juros').is(':checked')) {
-                $('#juros').prop('disabled', false)
+                // Se marcado, habilita o campo de juros e aplica ao valor final
+                $('#juros').prop('disabled', false);
+                valorFinal += juros;
+            } else {
+                // Se desmarcado, desabilita o campo de juros e subtrai os juros do valor final
+                $('#juros').prop('disabled', true);
+                valorFinal -= juros;
             }
+
+            // Verificar se o checkbox de desconto está marcado
             if ($('#aplicar_desconto').is(':checked')) {
-                $('#desconto').prop('disabled', false)
+                // Se marcado, habilita o campo de desconto e subtrai do valor final
+                $('#desconto').prop('disabled', false);
+                valorFinal -= desconto;
+            } else {
+                // Se desmarcado, desabilita o campo de desconto e adiciona o desconto de volta
+                $('#desconto').prop('disabled', true);
+                valorFinal += desconto;
             }
+
+            // Verificar se o checkbox de multa está marcado
             if ($('#aplicar_multa').is(':checked')) {
-                $('#multa').prop('disabled', false)
+                // Se marcado, habilita o campo de multa e aplica ao valor final
+                $('#multa').prop('disabled', false);
+                valorFinal += multa;
+            } else {
+                // Se desmarcado, desabilita o campo de multa e subtrai a multa do valor final
+                $('#multa').prop('disabled', true);
+                valorFinal -= multa;
             }
+
+            // Exibir o valor final (pode ser uma atualização de algum campo da interface)
+            $('#valor_pago').val(valorFinal.toFixed(2));  // Atualize o campo que exibe o valor final
+            $('#valor_pago').mask('#.##0,00', { reverse: true });  // Aplica a máscara para formatação de moeda
         }
-        // Inicializar o cálculo ao carregar a página
-        // calcularTotal();
     });
 </script>
 @endsection
