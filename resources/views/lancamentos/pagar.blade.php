@@ -50,37 +50,32 @@
         <div class="row mt-2">
             <div class="col-md-2">
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="aplicar_multa" name="aplicar_multa">
+                    <input type="checkbox" class="form-check-input" id="aplicar_multa" name="aplicar_multa" checked>
                     <label class="form-check-label" for="aplicar_multa">Multa:</label>
-                    <input type="text" class="form-control mt-2" id="multa" name="multa" placeholder="Multa (%)"
+                    <input type="text" class="form-control mt-2" id="multa" name="multa" placeholder="Multa (R$)"
                         value="{{$multa}}" disabled>
-                    <input type="hidden" class="form-control mt-2" id="multa" name="multa" placeholder="Multa (%)"
-                        value="{{$multa}}">
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="aplicar_juros" name="aplicar_juros">
+                    <input type="checkbox" class="form-check-input" id="aplicar_juros" name="aplicar_juros" checked>
                     <label class="form-check-label" for="aplicar_juros">Juros:</label>
-                    <input type="text" class="form-control mt-2" id="juros" name="juros" placeholder="Juros (%)"
+                    <input type="text" class="form-control mt-2" id="juros" name="juros" placeholder="Juros (R$)"
                         value="{{$juros}}" disabled>
-                    <input type="hidden" class="form-control mt-2" id="juros" name="juros" placeholder="Juros (%)"
-                        value="{{$juros}}">
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="aplicar_desconto" name="aplicar_desconto">
+                    <input type="checkbox" class="form-check-input" id="aplicar_desconto" name="aplicar_desconto"
+                        checked>
                     <label class="form-check-label" for="aplicar_desconto">Desconto:</label>
                     <input type="text" class="form-control mt-2" id="desconto" name="desconto"
-                        placeholder="Desconto (%)" value="{{$desconto}}" disabled>
-                    <input type="hidden" class="form-control mt-2" id="desconto" name="desconto"
-                        placeholder="Desconto (%)" value="{{$desconto}}">
+                        placeholder="Desconto (R$)" value="{{$desconto}}" disabled>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="form-check-label" for="aplicar_desconto">Valor Pago:</label>
+                    <label class="form-check-label" for="valor_pago">Valor Pago:</label>
                     <input type="text" class="form-control mt-2" id="valor_pago" name="valor_pago"
                         placeholder="Valor Pago" value="{{$valor_total}}">
                 </div>
@@ -115,73 +110,80 @@
 <script src="{{ asset('js/jquery.mask.min.js') }}"></script>
 <script>
     $(document).ready(function () {
+        var valorOriginal = parseFloat($('#valor_a_pagar').val().replace('.', '').replace(',', '.')); // Remover máscara e converter para número
+        // Aplica a máscara de moeda nos campos
         $('#valor_a_pagar, #multa, #juros, #desconto, #valor_pago').mask('#.##0,00', { reverse: true });
-        $('#valor_pago').change(function () {
-            // Remove os pontos (separadores de milhar) e troca a vírgula por ponto para valores decimais
-            var valorPago = parseFloat($("#valor_pago").val().replace(/\./g, '').replace(',', '.'));
-            var valorOriginal = parseFloat("{{ $lancamento->valor }}");
-            var novoTotal = valorPago - valorOriginal;
-            console.log(valorPago); // Verifique no console o valor correto de valorPago
-            $('#multa, #juros, #desconto').val(0);
-            if (novoTotal > 0) {
-                $('#juros').val(novoTotal.toFixed(2));
-                $('#juros').mask('#.##0,00', { reverse: true });
-            }
-            if (novoTotal < 0) {
-                $('#desconto').val(Math.abs(novoTotal.toFixed(2)));
-                $('#desconto').mask('#.##0,00', { reverse: true });
+        // Eventos separados para cada checkbox
+        $('#aplicar_multa').change(function () {
+            if ($(this).prop('checked')) {
+                $('#multa').prop('disabled', true); // Desabilita o input de multa
+            } else {
+                $('#multa').prop('disabled', false); // Habilita o input de multa
             }
         });
-        // Recalcular o valor total com base nos valores inseridos para juros, multa e desconto
-        $('#aplicar_juros, #aplicar_multa, #aplicar_desconto').change(function () {
-            calcularTotal();
+        $('#multa, #juros, #desconto').change(function () {
+            recalcularValores();
         });
-        // Calcular os valores totais com base nos juros, multa e desconto
-        function calcularTotal() {
-            var valorOriginal = parseFloat("{{ $lancamento->valor }}");
-            var valorFinal = valorOriginal;
-
-            // Inicializar os valores de juros, multa e desconto
-            var juros = parseFloat($('#juros').val().replace(',', '.')) || 0;
-            var multa = parseFloat($('#multa').val().replace(',', '.')) || 0;
-            var desconto = parseFloat($('#desconto').val().replace(',', '.')) || 0;
-
-            // Verificar se o checkbox de juros está marcado
-            if ($('#aplicar_juros').is(':checked')) {
-                // Se marcado, habilita o campo de juros e aplica ao valor final
-                $('#juros').prop('disabled', false);
-                valorFinal += juros;
+        $('#aplicar_juros').change(function () {
+            if ($(this).prop('checked')) {
+                $('#juros').prop('disabled', true); // Desabilita o input de juros
             } else {
-                // Se desmarcado, desabilita o campo de juros e subtrai os juros do valor final
-                $('#juros').prop('disabled', true);
-                valorFinal -= juros;
+                $('#juros').prop('disabled', false); // Habilita o input de juros
             }
-
-            // Verificar se o checkbox de desconto está marcado
-            if ($('#aplicar_desconto').is(':checked')) {
-                // Se marcado, habilita o campo de desconto e subtrai do valor final
-                $('#desconto').prop('disabled', false);
-                valorFinal -= desconto;
+        });
+        $('#aplicar_desconto').change(function () {
+            if ($(this).prop('checked')) {
+                $('#desconto').prop('disabled', true); // Desabilita o input de desconto
             } else {
-                // Se desmarcado, desabilita o campo de desconto e adiciona o desconto de volta
-                $('#desconto').prop('disabled', true);
-                valorFinal += desconto;
+                $('#desconto').prop('disabled', false); // Habilita o input de desconto
             }
-
-            // Verificar se o checkbox de multa está marcado
-            if ($('#aplicar_multa').is(':checked')) {
-                // Se marcado, habilita o campo de multa e aplica ao valor final
-                $('#multa').prop('disabled', false);
-                valorFinal += multa;
-            } else {
-                // Se desmarcado, desabilita o campo de multa e subtrai a multa do valor final
-                $('#multa').prop('disabled', true);
-                valorFinal -= multa;
+        });
+        // Atualiza o valor pago ao alterar o campo "Valor Pago"
+        $('#valor_pago').on('change', function () {
+            $('#multa').val("0,00");
+            $('#juros').val("0,00");
+            $('#desconto').val("0,00");
+            // Recalcula os valores com base nos inputs
+            var valorOriginal = parseFloat($('#valor_a_pagar').val().replace('.', '').replace(',', '.')); // Valor original
+            var valorPago = parseFloat($(this).val().replace('.', '').replace(',', '.'));
+            // Calcula a diferença entre o valor pago e o valor final
+            var diferenca = valorPago - valorOriginal;
+            // Se o valor pago for maior que o valor final, ajusta o desconto
+            if (diferenca < 0) {
+                // Se o campo de desconto estiver marcado, ajusta o valor do desconto com a diferença
+                $('#desconto').val(Math.abs(diferenca).toFixed(2).replace('.', ','));
             }
-
-            // Exibir o valor final (pode ser uma atualização de algum campo da interface)
-            $('#valor_pago').val(valorFinal.toFixed(2));  // Atualize o campo que exibe o valor final
-            $('#valor_pago').mask('#.##0,00', { reverse: true });  // Aplica a máscara para formatação de moeda
+            // Se o valor pago for menor que o valor final, ajusta os juros
+            else if (diferenca > 0) {
+                // Se o campo de juros estiver marcado, ajusta o valor dos juros com a diferença
+                $('#juros').val(diferenca.toFixed(2).replace('.', ','));
+            }
+            // Atualiza o campo "valor_pago" com a máscara de moeda
+            $(this).val(valorPago.toFixed(2).replace('.', ','));
+        });
+        function recalcularValores() {
+            // Recalcula os valores com base nos inputs
+            var valorOriginal = parseFloat($('#valor_a_pagar').val().replace('.', '').replace(',', '.')); // Valor original
+            var multa = parseFloat($('#multa').val().replace('.', '').replace(',', '.')) || 0; // Valor da multa
+            var juros = parseFloat($('#juros').val().replace('.', '').replace(',', '.')) || 0; // Valor dos juros
+            var desconto = parseFloat($('#desconto').val().replace('.', '').replace(',', '.')) || 0; // Valor do desconto
+            var valorFinal = valorOriginal + multa + juros - desconto; // Valor final considerando multa, juros e desconto
+            // Atualiza o campo de "Valor Pago"
+            $('#valor_pago').val(valorFinal.toFixed(2).replace('.', ','));
+            // Verifica o valor pago e ajusta a diferença de juros ou desconto
+            var valorPago = parseFloat($('#valor_pago').val().replace('.', '').replace(',', '.'));
+            var diferenca = valorPago - valorFinal;
+            if (diferenca > 0) {
+                // Se o valor pago for maior que o valor final, é provável que o desconto deva ser ajustado
+                if ($('#aplicar_desconto').prop('checked')) {
+                    $('#desconto').val(diferenca.toFixed(2).replace('.', ','));
+                }
+            } else if (diferenca < 0) {
+                // Se o valor pago for menor que o valor final, é provável que o juros deva ser ajustado
+                if ($('#aplicar_juros').prop('checked')) {
+                    $('#juros').val(Math.abs(diferenca).toFixed(2).replace('.', ',')); // Ajusta os juros com a diferença
+                }
+            }
         }
     });
 </script>

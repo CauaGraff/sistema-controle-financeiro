@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LancamentoBaixa;
 use Carbon\Carbon;
+use App\Models\Lancamento;
 use Illuminate\Http\Request;
+use App\Models\LancamentoBaixa;
 use App\Models\FornecedorCliente;
 use Illuminate\Support\Facades\Auth;
-use App\Models\CategoriaContas; // Modelo de Plano de Contas
-use App\Models\Lancamento;
+use Illuminate\Support\Facades\Storage;
 use Route;// Supondo que você tenha um modelo de Lancamento
+use App\Models\CategoriaContas; // Modelo de Plano de Contas
 
 class LancamentoController extends Controller
 {
@@ -239,9 +240,28 @@ class LancamentoController extends Controller
 
     public function destroy(Lancamento $lancamento)
     {
-        // Exclui o lançamento
+        // Buscar o lançamento e suas baixas associadas
+        $lancamento = Lancamento::findOrFail($lancamento->id);
+
+        // Buscar as baixas associadas a esse lançamento
+        $lancamentosBaixa = LancamentoBaixa::where('id_lancamento', $lancamento->id)->get();
+
+        foreach ($lancamentosBaixa as $baixa) {
+            // Verificar se existe um anexo para essa baixa
+            if ($baixa->anexo) {
+                // Verificar o disco em que o anexo foi salvo (por exemplo, 'local', 's3', etc.)
+                if (Storage::exists($baixa->anexo)) {
+                    // Excluir o arquivo do sistema de arquivos
+                    Storage::delete($baixa->anexo);
+                }
+            }
+            // Excluir a baixa após remover o anexo
+            $baixa->delete();
+        }
+        // Excluir o lançamento
         $lancamento->delete();
-        return redirect()->route($lancamento->tipo == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Excluido com sucesso!");
+
+        return redirect()->route('lancamentos.index')->with('success', 'Lançamento e anexo excluídos com sucesso!');
     }
 
     public function formbaixa(Lancamento $lancamento)
@@ -287,22 +307,30 @@ class LancamentoController extends Controller
     {
         // Verificar se o lançamento já foi baixado (se já existe um registro na tabela LancamentoBaixa com o mesmo id_lancamento)
         $existeBaixa = LancamentoBaixa::where('id_lancamento', $lancamento->id)->exists();
-
         // Se o lançamento já foi baixado, retornar um erro ou mensagem de aviso
         if ($existeBaixa) {
-            return redirect()->route($lancamento->tipo = 'p' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-danger', 'Este lançamento já foi baixado.');
+            return redirect()->route($lancamento->tipo = 'p' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')
+                ->with('alert-danger', 'Este lançamento já foi baixado.');
         }
-
         // Validação
         $validate = $request->validate([
             'data_pagamento' => 'required',
+            'anexo' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048', // Validação para o arquivo (opcional)
         ]);
-
         // Tratar os valores que vêm com separadores de milhar e vírgula como separador decimal
         $valorPago = $this->formatarValor($request->valor_pago);
         $multa = $this->formatarValor($request->multa);
         $juros = $this->formatarValor($request->juros);
         $desconto = $this->formatarValor($request->desconto);
+        // Processamento do arquivo (se houver)
+        $anexoPath = null; // Inicializar a variável do caminho do arquivo
+        if ($request->hasFile('anexo') && $request->file('anexo')->isValid()) {
+            // Gerar um nome único para o arquivo, incluindo o ID do lançamento e o timestamp
+            $fileName = $lancamento->id . '_' . session('empresa_id') . '_' . now()->format('YmdHis') . '.' . $request->file('anexo')->extension();
+
+            // Armazenar o arquivo no diretório 'public/anexos' (pode ser ajustado conforme necessário)
+            $anexoPath = $request->file('anexo')->storeAs('anexos', $fileName, 'public'); // 'public' é o disco configurado no config/filesystems.php
+        }
         // Criar a baixa do lançamento com os valores formatados
         LancamentoBaixa::create([
             'id_lancamento' => $lancamento->id,
@@ -310,11 +338,11 @@ class LancamentoController extends Controller
             'juros' => $juros,
             'multa' => $multa,
             'desconto' => $desconto,
-            'anexo' => $request->anexo
+            'anexo' => $anexoPath, // Caminho do arquivo armazenado
         ]);
-
         // Redirecionamento ou resposta após a criação
-        return redirect()->route($lancamento->tipo = 'P' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('success', 'Lançamento baixado com sucesso!');
+        return redirect()->route($lancamento->tipo = 'P' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')
+            ->with('success', 'Lançamento baixado com sucesso!');
     }
 
     // Função para formatar valores recebidos

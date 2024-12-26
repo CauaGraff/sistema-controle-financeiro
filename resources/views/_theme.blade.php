@@ -63,14 +63,15 @@
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="companyDropdown" role="button" data-bs-toggle="dropdown"
       aria-expanded="false" title="{{session('empresa_nome')}}">
-      {{ session('empresa_nome') }} <!-- Exibe o nome da empresa ativa ou a primeira empresa -->
+      {{mb_strimwidth(session('empresa_nome'), 0, 12, "...") }}
+      <!-- Exibe o nome da empresa ativa ou a primeira empresa -->
       </a>
       <ul class="dropdown-menu dropdown-menu-end w-auto" aria-labelledby="companyDropdown">
       @foreach(auth()->user()->empresas as $empresa)
       <li>
       <a class="dropdown-item select-company" href="{{route('empresa.definir', $empresa->id)}}"
       title="{{session('empresa_nome')}}">
-      {{mb_strimwidth($empresa->nome, 0, 12, "...") }}</a>
+      {{$empresa->nome}}</a>
       </li>
     @endforeach
       </ul>
