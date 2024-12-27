@@ -9,7 +9,6 @@ use App\Models\LancamentoBaixa;
 use App\Models\FornecedorCliente;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Route;// Supondo que você tenha um modelo de Lancamento
 use App\Models\CategoriaContas; // Modelo de Plano de Contas
 
 class LancamentoController extends Controller
@@ -163,8 +162,7 @@ class LancamentoController extends Controller
     private function criarLançamentosRecorrentes(Lancamento $lancamento)
     {
         $proximoVencimento = Carbon::parse($lancamento->data_venc);
-        // Por exemplo, criar 12 lançamentos futuros (1 para cada mês, por 1 ano)
-        $quantidadeDeLançamentos = 12;  // Você pode ajustar esse número conforme a necessidade (ano inteiro, por exemplo)
+        $quantidadeDeLançamentos = 12;
         for ($i = 1; $i <= $quantidadeDeLançamentos; $i++) {
             switch ($lancamento->tipo_recorrencia) {
                 case 'diario':
@@ -194,23 +192,23 @@ class LancamentoController extends Controller
 
     public function edit(Lancamento $lancamento)
     {
-        // Obtém os dados necessários para o formulário
+        // Verificar se o lançamento está baixado
+        $lancamentoBaixa = $lancamento->lancamentoBaixa;
+
+        // Outros dados necessários
         $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))->get();
-        // Agrupar categorias por pai
         $categoriasAgrupadas = [];
-        // Primeiro, organize categorias em um array por ID
         foreach ($categorias as $categoria) {
             if ($categoria->id_categoria_pai) {
-                // Se a categoria tem um pai, adicione-a à lista do pai correspondente
                 $categoriasAgrupadas[$categoria->id_categoria_pai]['subcategorias'][] = $categoria;
             } else {
-                // Se a categoria não tem pai, é uma categoria principal
                 $categoriasAgrupadas[$categoria->id]['categoria'] = $categoria;
             }
         }
         $fornecedores = FornecedorCliente::where("id_empresa", session('empresa_id'))->get();
         $clientes = FornecedorCliente::where("id_empresa", session('empresa_id'))->get();
-        return view('lancamentos.formEdit', compact('lancamento', 'categoriasAgrupadas', 'fornecedores', 'clientes'));
+
+        return view('lancamentos.formEdit', compact('lancamento', 'categoriasAgrupadas', 'fornecedores', 'clientes', 'lancamentoBaixa'));
     }
 
     public function update(Request $request, Lancamento $lancamento)
@@ -242,27 +240,46 @@ class LancamentoController extends Controller
     {
         // Buscar o lançamento e suas baixas associadas
         $lancamento = Lancamento::findOrFail($lancamento->id);
-
         // Buscar as baixas associadas a esse lançamento
         $lancamentosBaixa = LancamentoBaixa::where('id_lancamento', $lancamento->id)->get();
-
+        // Verificar se existe um anexo para essa baixa
         foreach ($lancamentosBaixa as $baixa) {
             // Verificar se existe um anexo para essa baixa
             if ($baixa->anexo) {
-                // Verificar o disco em que o anexo foi salvo (por exemplo, 'local', 's3', etc.)
-                if (Storage::exists($baixa->anexo)) {
+                // Verificar na pasta se exise o arquivo
+                if (Storage::disk('public')->exists($baixa->anexo)) {
                     // Excluir o arquivo do sistema de arquivos
-                    Storage::delete($baixa->anexo);
+                    Storage::disk('public')->delete($baixa->anexo);
+                    dd('Arquivo excluído com sucesso!');
                 }
             }
             // Excluir a baixa após remover o anexo
             $baixa->delete();
         }
-        // Excluir o lançamento
         $lancamento->delete();
-
-        return redirect()->route('lancamentos.index')->with('success', 'Lançamento e anexo excluídos com sucesso!');
+        return redirect()->route($lancamento->tipo = 'P' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')
+            ->with('success', 'Lançamento e anexo excluídos com sucesso!');
     }
+
+    public function deleteBaixa(Lancamento $lancamento)
+    {
+        // Verificar se o lançamento tem uma baixa associada
+        if ($lancamento->lancamentoBaixa) {
+            // Excluir a baixa associada
+            dd($lancamento->lancamentoBaixa());
+            // Verificar na pasta se exise o arquivo
+            if (Storage::disk('public')->exists($lancamento->lancamentoBaixa()->anexo)) {
+                // Excluir o arquivo do sistema de arquivos
+                Storage::disk('public')->delete($lancamento->lancamentoBaixa()->anexo);
+
+            }
+            $lancamento->lancamentoBaixa()->delete();
+            return redirect()->route('lancamentos.edit', $lancamento->id)->with('success', 'Baixa excluída com sucesso!');
+        }
+
+        return redirect()->route('lancamentos.edit', $lancamento->id)->with('error', 'Lançamento não tem baixa associada.');
+    }
+
 
     public function formbaixa(Lancamento $lancamento)
     {
@@ -326,7 +343,7 @@ class LancamentoController extends Controller
         $anexoPath = null; // Inicializar a variável do caminho do arquivo
         if ($request->hasFile('anexo') && $request->file('anexo')->isValid()) {
             // Gerar um nome único para o arquivo, incluindo o ID do lançamento e o timestamp
-            $fileName = $lancamento->id . '_' . session('empresa_id') . '_' . now()->format('YmdHis') . '.' . $request->file('anexo')->extension();
+            $fileName = $lancamento->id . '_' . session('empresa_id') . '_' . now()->format('YmdHis') . "_" . uniqid() . '.' . $request->file('anexo')->extension();
 
             // Armazenar o arquivo no diretório 'public/anexos' (pode ser ajustado conforme necessário)
             $anexoPath = $request->file('anexo')->storeAs('anexos', $fileName, 'public'); // 'public' é o disco configurado no config/filesystems.php

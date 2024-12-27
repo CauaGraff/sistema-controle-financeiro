@@ -12,7 +12,6 @@
         action="{{$lancamento->tipo = 'P' ? route('lancamentos.pagamentos.baixa.store', $lancamento->id) : route('lancamentos.recebimento.baixa.store', $lancamento->id)}}"
         method="POST" enctype="multipart/form-data">
         @csrf
-
         <!-- Linha para Descrição e Valor a Pagar -->
         <div class="row">
             <div class="col-md-6">
@@ -45,7 +44,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Linha para Juros, Multa e Desconto -->
         <div class="row mt-2">
             <div class="col-md-2">
@@ -53,7 +51,7 @@
                     <input type="checkbox" class="form-check-input" id="aplicar_multa" name="aplicar_multa" checked>
                     <label class="form-check-label" for="aplicar_multa">Multa:</label>
                     <input type="text" class="form-control mt-2" id="multa" name="multa" placeholder="Multa (R$)"
-                        value="{{$multa}}" disabled>
+                        value="{{$multa}}" readonly>
                 </div>
             </div>
             <div class="col-md-2">
@@ -61,7 +59,7 @@
                     <input type="checkbox" class="form-check-input" id="aplicar_juros" name="aplicar_juros" checked>
                     <label class="form-check-label" for="aplicar_juros">Juros:</label>
                     <input type="text" class="form-control mt-2" id="juros" name="juros" placeholder="Juros (R$)"
-                        value="{{$juros}}" disabled>
+                        value="{{$juros}}" readonly>
                 </div>
             </div>
             <div class="col-md-2">
@@ -70,7 +68,7 @@
                         checked>
                     <label class="form-check-label" for="aplicar_desconto">Desconto:</label>
                     <input type="text" class="form-control mt-2" id="desconto" name="desconto"
-                        placeholder="Desconto (R$)" value="{{$desconto}}" disabled>
+                        placeholder="Desconto (R$)" value="{{$desconto}}">
                 </div>
             </div>
             <div class="col-md-6">
@@ -110,33 +108,48 @@
 <script src="{{ asset('js/jquery.mask.min.js') }}"></script>
 <script>
     $(document).ready(function () {
+        $('#multa, #juros, #desconto').css({
+            "background-color": "var(--bs-secondary-bg)",
+        });
         var valorOriginal = parseFloat($('#valor_a_pagar').val().replace('.', '').replace(',', '.')); // Remover máscara e converter para número
         // Aplica a máscara de moeda nos campos
         $('#valor_a_pagar, #multa, #juros, #desconto, #valor_pago').mask('#.##0,00', { reverse: true });
         // Eventos separados para cada checkbox
         $('#aplicar_multa').change(function () {
             if ($(this).prop('checked')) {
-                $('#multa').prop('disabled', true); // Desabilita o input de multa
+                $('#multa').prop('readonly', true).css({
+                    "background-color": "var(--bs-secondary-bg)",
+                }); // Desabilita o input de multa
             } else {
-                $('#multa').prop('disabled', false); // Habilita o input de multa
+                $('#multa').prop('readonly', false).css({
+                    "background-color": "var(--bs-body-bg)",
+                }); // Habilita o input de multa
             }
-        });
-        $('#multa, #juros, #desconto').change(function () {
-            recalcularValores();
         });
         $('#aplicar_juros').change(function () {
             if ($(this).prop('checked')) {
-                $('#juros').prop('disabled', true); // Desabilita o input de juros
+                $('#juros').prop('readonly', true).css({
+                    "background-color": "var(--bs-secondary-bg)",
+                }); // Desabilita o input de multa
             } else {
-                $('#juros').prop('disabled', false); // Habilita o input de juros
+                $('#juros').prop('readonly', false).css({
+                    "background-color": "var(--bs-body-bg)",
+                }); // Habilita o input de multa
             }
         });
         $('#aplicar_desconto').change(function () {
             if ($(this).prop('checked')) {
-                $('#desconto').prop('disabled', true); // Desabilita o input de desconto
+                $('#desconto').prop('readonly', true).css({
+                    "background-color": "var(--bs-secondary-bg)",
+                }); // Desabilita o input de multa
             } else {
-                $('#desconto').prop('disabled', false); // Habilita o input de desconto
+                $('#desconto').prop('readonly', false).css({
+                    "background-color": "var(--bs-body-bg)",
+                }); // Habilita o input de multa
             }
+        });
+        $('#multa, #juros, #desconto').change(function () {
+            recalcularValores();
         });
         // Atualiza o valor pago ao alterar o campo "Valor Pago"
         $('#valor_pago').on('change', function () {
