@@ -17,6 +17,7 @@ class LancamentoBaixa extends Model
         'juros',
         'multa',
         'desconto',
+        'doc',
         'anexo'
     ];
 

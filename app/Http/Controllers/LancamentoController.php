@@ -210,32 +210,78 @@ class LancamentoController extends Controller
 
         return view('lancamentos.formEdit', compact('lancamento', 'categoriasAgrupadas', 'fornecedores', 'clientes', 'lancamentoBaixa'));
     }
-
-    public function update(Request $request, Lancamento $lancamento)
+    // Função para atualizar um lançamento
+    public function update(Request $request, $id)
     {
-        // Validação dos dados
-        $validate = $request->validate([
-            'descricao' => 'required',
-            'valor' => 'required',
-            'data' => 'required'
-        ]);
+        // Verifica se o lançamento foi baixado
+        $lancamento = Lancamento::findOrFail($id);
+        $lancamentoBaixa = $lancamento->lancamentoBaixa;
+        // Definir as regras de validação com base no estado de "baixado"
+        // if ($lancamentoBaixa) {
+        //     // Se já foi baixado, somente permita editar a descrição, categoria, fornecedor/cliente, número do documento e anexo
+        //     $validated = $request->validate([
+        //         'descricao' => 'required|string|max:255',
+        //         'categoria_id' => 'required|exists:categorias_de_contas,id',
+        //         'fornecedor_cliente_id' => 'required|exists:fornecedor_cliente,id',
+        //         'anexo' => 'mimes:pdf,jpeg,png,jpg|max:2048',
+        //     ]);
+        // } else {
+        //     // Se não foi baixado, permite editar todos os campos
+        //     $validated = $request->validate([
+        //         'descricao' => 'required|string|max:255',
+        //         'valor' => 'required|min:0',
+        //         'data' => 'required|date',
+        //         'categoria_id' => 'required|exists:categorias_de_contas,id',
+        //         'fornecedor_cliente_id' => 'required|exists:fornecedor_cliente,id',
+        //         'numero_documento' => 'nullable|string|max:255',
+        //         'anexo' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
+        //     ]);
+        // }
 
-        // Remover os separadores de milhar (.) e substituir vírgula por ponto para a conversão para float
-        $valor = str_replace(['.', ','], ['', '.'], $request->valor);
+        // Atualiza os dados principais do lançamento
+        $lancamento->descricao = $request->descricao;
+        $lancamento->id_categoria = $request->categoria_id;
+        $lancamento->id_fornecedor_cliente = $request->fornecedor_cliente_id;
 
-        // Atualiza o lançamento
-        $lancamento->update([
-            'descricao' => $request->descricao,
-            'valor' => (float) $valor,  // Convertendo para float após a formatação
-            'data_venc' => $request->data,
-            'id_categoria' => $request->categoria_id,
-            'id_fornecedor_cliente' => $request->fornecedor_cliente_id
-        ]);
+        // Se o lançamento não foi baixado, permite editar o valor e a data
+        if (!$lancamentoBaixa) {
+            $lancamento->valor = $this->formatarValor($request->valor);
+            $lancamento->data_venc = $request->data;
+        }
+        // Verifica se há um anexo para upload
+        if ($request->hasFile('anexo') && $request->file('anexo')->isValid()) {
 
-        return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento atualizado com sucesso!');
+            // Remove o anexo antigo, se houver
+            if ($lancamentoBaixa && $lancamentoBaixa->anexo) {
+                Storage::disk('public')->delete($lancamentoBaixa->anexo);
+            }
+            // Gerar um nome único para o arquivo, incluindo o ID do lançamento e o timestamp
+            $fileName = $lancamento->id . '_' . session('empresa_id') . '_' . now()->format('YmdHis') . "_" . uniqid() . '.' . $request->file('anexo')->extension();
+
+            // Armazenar o arquivo no diretório 'public/anexos' (pode ser ajustado conforme necessário)
+            $anexoPath = $request->file('anexo')->storeAs('anexos', $fileName, 'public'); // 'public' é o disco configurado no config/filesystems.php
+
+            // Faz o upload do novo anexo
+            if ($lancamentoBaixa) {
+                // Atualiza o anexo no LancamentoBaixa
+                $lancamentoBaixa->anexo = $anexoPath;
+                $lancamentoBaixa->save();
+            }
+        }
+
+        // Atualiza o número do documento, se fornecido
+        if ($lancamentoBaixa) {
+            $lancamentoBaixa->doc = $request->numero_documento ?? $lancamentoBaixa->doc;
+            $lancamentoBaixa->save();
+        }
+
+        // Se o lançamento já foi baixado, atualiza apenas os campos permitidos
+        $lancamento->save();
+
+        // Retorna para a página de edição com uma mensagem de sucesso
+        return redirect()->route($lancamento->tipo = 'P' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')
+            ->with('success', 'Lançamento atualizado com sucesso!');
     }
-
-
     public function destroy(Lancamento $lancamento)
     {
         // Buscar o lançamento e suas baixas associadas
@@ -249,8 +295,7 @@ class LancamentoController extends Controller
                 // Verificar na pasta se exise o arquivo
                 if (Storage::disk('public')->exists($baixa->anexo)) {
                     // Excluir o arquivo do sistema de arquivos
-                    Storage::disk('public')->delete($baixa->anexo);
-                    dd('Arquivo excluído com sucesso!');
+                    $this->deleteFileFromStorage($baixa->id);
                 }
             }
             // Excluir a baixa após remover o anexo
@@ -265,13 +310,11 @@ class LancamentoController extends Controller
     {
         // Verificar se o lançamento tem uma baixa associada
         if ($lancamento->lancamentoBaixa) {
-            // Excluir a baixa associada
-            dd($lancamento->lancamentoBaixa());
+
             // Verificar na pasta se exise o arquivo
             if (Storage::disk('public')->exists($lancamento->lancamentoBaixa()->anexo)) {
                 // Excluir o arquivo do sistema de arquivos
-                Storage::disk('public')->delete($lancamento->lancamentoBaixa()->anexo);
-
+                $this->deleteFileFromStorage($lancamento->lancamentoBaixa()->id);
             }
             $lancamento->lancamentoBaixa()->delete();
             return redirect()->route('lancamentos.edit', $lancamento->id)->with('success', 'Baixa excluída com sucesso!');
@@ -355,6 +398,7 @@ class LancamentoController extends Controller
             'juros' => $juros,
             'multa' => $multa,
             'desconto' => $desconto,
+            'doc' => $request->numero_documento,
             'anexo' => $anexoPath, // Caminho do arquivo armazenado
         ]);
         // Redirecionamento ou resposta após a criação
@@ -371,5 +415,22 @@ class LancamentoController extends Controller
 
         // Retornar o valor formatado como float
         return (float) $valor;
+    }
+
+    private function deleteFileFromStorage($id)
+    {
+        $lancamentoBaixa = LancamentoBaixa::findOrFail($id);
+
+        // Deletar o arquivo do armazenamento
+        if (Storage::disk('public')->exists($lancamentoBaixa->anexo)) {
+            Storage::disk('public')->delete($lancamentoBaixa->anexo);
+        }
+
+        // Atualizar o campo 'anexo' no banco de dados (opcional)
+        $lancamentoBaixa->anexo = null;
+        $lancamentoBaixa->save();
+
+        // Redirecionar ou retornar uma resposta
+        return redirect()->back()->with('success', 'Arquivo excluído com sucesso.');
     }
 }
