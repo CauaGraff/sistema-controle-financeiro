@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ContaBanco;
 use Carbon\Carbon;
 use App\Models\Lancamento;
 use Illuminate\Http\Request;
@@ -116,7 +117,8 @@ class LancamentoController extends Controller
             ]);
             LancamentoBaixa::create([
                 'valor' => str_replace(['.', ','], ['', '.'], $request->valorEntrada),  // Formatação do valor
-                'id_lancamento' => $lancamento->id
+                'id_lancamento' => $lancamento->id,
+                'id_contaBancaria' => ContaBanco::where('id_empresa', session('empresa_id'))->first()->id,
             ]);
             if ($request->qtdParcelas > 1) {
                 $valorTotal = str_replace(['.', ','], ['', '.'], $request->valorTotal);
@@ -312,22 +314,22 @@ class LancamentoController extends Controller
         if ($lancamento->lancamentoBaixa) {
 
             // Verificar na pasta se exise o arquivo
-            if (Storage::disk('public')->exists($lancamento->lancamentoBaixa()->anexo)) {
+            if (Storage::disk('public')->exists($lancamento->lancamentoBaixa->anexo)) {
                 // Excluir o arquivo do sistema de arquivos
-                $this->deleteFileFromStorage($lancamento->lancamentoBaixa()->id);
+                $this->deleteFileFromStorage($lancamento->lancamentoBaixa->id);
             }
             $lancamento->lancamentoBaixa()->delete();
-            return redirect()->route('lancamentos.edit', $lancamento->id)->with('success', 'Baixa excluída com sucesso!');
+            return redirect()->route('lancamentos.edit', $lancamento->id)->with('alert-success', 'Baixa excluída com sucesso!');
         }
 
-        return redirect()->route('lancamentos.edit', $lancamento->id)->with('error', 'Lançamento não tem baixa associada.');
+        return redirect()->route('lancamentos.edit', $lancamento->id)->with('alert-danger', 'Lançamento não tem baixa associada.');
     }
-
-
     public function formbaixa(Lancamento $lancamento)
     {
         // Recupera os parâmetros de cálculo
         $parametros = \App\Models\ParametrosCalculo::all();
+
+        $contasBancarias = ContaBanco::where('id_empresa', session('empresa_id'))->get();
 
         // Calcular valores de juros, multa e desconto
         $juros = 0;
@@ -360,7 +362,7 @@ class LancamentoController extends Controller
         $valor_total = number_format($lancamento->valor + $juros + $multa - $desconto, 2);
 
         // Passar os valores para a view
-        return view('lancamentos.pagar', compact('lancamento', 'juros', 'multa', 'desconto', 'valor_total', 'data_atual'));
+        return view('lancamentos.pagar', compact('lancamento', 'juros', 'multa', 'desconto', 'valor_total', 'data_atual', 'contasBancarias'));
     }
 
     public function baixaStore(Request $request, Lancamento $lancamento)
@@ -375,6 +377,7 @@ class LancamentoController extends Controller
         // Validação
         $validate = $request->validate([
             'data_pagamento' => 'required',
+            'contasBancarias' => 'required|exists:contas_bancarias,id',
             'anexo' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048', // Validação para o arquivo (opcional)
         ]);
         // Tratar os valores que vêm com separadores de milhar e vírgula como separador decimal
@@ -394,6 +397,7 @@ class LancamentoController extends Controller
         // Criar a baixa do lançamento com os valores formatados
         LancamentoBaixa::create([
             'id_lancamento' => $lancamento->id,
+            'id_contaBancaria' => $request->conta_bancaria,
             'valor' => $valorPago,
             'juros' => $juros,
             'multa' => $multa,
@@ -417,7 +421,7 @@ class LancamentoController extends Controller
         return (float) $valor;
     }
 
-    private function deleteFileFromStorage($id)
+    public function deleteFileFromStorage($id)
     {
         $lancamentoBaixa = LancamentoBaixa::findOrFail($id);
 

@@ -33,7 +33,7 @@ class ContaBancoController extends Controller
 
         ContaBanco::create(array_merge($request->all(), ['id_empresa' => session('empresa_id')]));
 
-        return redirect()->route('contas_banco.index')->with('success', 'Conta bancária cadastrada com sucesso.');
+        return redirect()->route('contas_banco.index')->with('alert-success', 'Conta bancária cadastrada com sucesso.');
     }
 
     // Exibir o formulário de edição
@@ -55,7 +55,7 @@ class ContaBancoController extends Controller
         $conta = ContaBanco::findOrFail($id);
         $conta->update($request->all());
 
-        return redirect()->route('contas_banco.index')->with('success', 'Conta bancária atualizada com sucesso.');
+        return redirect()->route('contas_banco.index')->with('alert-success', 'Conta bancária atualizada com sucesso.');
     }
 
     // Excluir uma conta bancária
@@ -64,6 +64,6 @@ class ContaBancoController extends Controller
         $conta = ContaBanco::findOrFail($id);
         $conta->delete();
 
-        return redirect()->route('contas_banco.index')->with('success', 'Conta bancária excluída com sucesso.');
+        return redirect()->route('contas_banco.index')->with('alert-success', 'Conta bancária excluída com sucesso.');
     }
 }

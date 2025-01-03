@@ -13,6 +13,7 @@ class LancamentoBaixa extends Model
 
     protected $fillable = [
         'id_lancamento',
+        'id_contaBancaria',
         'valor',
         'juros',
         'multa',

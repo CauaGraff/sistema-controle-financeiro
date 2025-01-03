@@ -15,6 +15,6 @@ class ContaBanco extends Model
     // Relacionamento com a empresa
     public function empresa()
     {
-        return $this->belongsTo(Empresa::class, 'id_empresa');
+        return $this->belongsTo(Empresas::class, 'id_empresa');
     }
 }

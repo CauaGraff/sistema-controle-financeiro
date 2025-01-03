@@ -175,17 +175,17 @@
                     <!-- Verifica se o anexo existe -->
                     @if($lancamentoBaixa->anexo)
                         <div class="d-flex justify-content-between mt-2 mb-2">
-                            <a href="{{ \Illuminate\Support\Facades\Storage::url($lancamentoBaixa->anexo) }}"
+                            <a href="{{ getenv("APP_URL") . \Illuminate\Support\Facades\Storage::url($lancamentoBaixa->anexo) }}"
                                 class="btn btn-secondary" target="_blank" style="flex: 1; margin-right: 5px;">
                                 <i class="fa-solid fa-eye"></i> Visualizar
                             </a>
-                            <a href="{{ route('lancamentos.anexo.delete', [$lancamentoBaixa->id, $lancamentoBaixa->anexo]) }}"
-                                class="btn btn-danger" style="flex: 1; margin-left: 5px;">
+                            <a href="{{ route('lancamentos.anexo.delete', $lancamentoBaixa->id) }}" class="btn btn-danger"
+                                style="flex: 1; margin-left: 5px;">
                                 <i class="fa-solid fa-trash"></i> Excluir
                             </a>
                         </div>
                         <!-- Caso haja um anexo, exibe a pré-visualização do arquivo -->
-                        <iframe src="{{ \Illuminate\Support\Facades\Storage::url($lancamentoBaixa->anexo) }}"
+                        <iframe src="{{getenv("APP_URL") . \Illuminate\Support\Facades\Storage::url($lancamentoBaixa->anexo) }}"
                             style="width: 100%; height: 275px;"></iframe>
                     @else
                         <!-- Caso não haja anexo, exibe o input para upload -->

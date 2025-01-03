@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('lancamentos_baixa', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_lancamento');
+            $table->unsignedBigInteger('id_contaBancaria');
             $table->decimal('valor', 10, 2)->default('0.00');
             $table->decimal('juros', 10, 2)->default('0.00');
             $table->decimal('multa', 10, 2)->default('0.00');
@@ -21,6 +22,7 @@ return new class extends Migration {
             $table->string('anexo')->nullable();
             $table->timestamps();
             $table->foreign(columns: 'id_lancamento')->references('id')->on('lancamentos');
+            $table->foreign(columns: 'id_contaBancaria')->references('id')->on('contas_banco');
         });
     }
 

@@ -72,14 +72,27 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="form-group">
-                    <label class="form-check-label" for="valor_pago">Valor Pago:</label>
-                    <input type="text" class="form-control mt-2" id="valor_pago" name="valor_pago"
-                        placeholder="Valor Pago" value="{{$valor_total}}">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label class="form-check-label" for="valor_pago">Valor Pago:</label>
+                            <input type="text" class="form-control mt-2" id="valor_pago" name="valor_pago"
+                                placeholder="Valor Pago" value="{{$valor_total}}">
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="form-group">
+                            <label class="form-check-label" for="contasBancarias">Pago com:</label>
+                            <select name="contasBancarias" id="contasBancarias" class="form-select mt-2">
+                                @foreach($contasBancarias as $conta)
+                                    <option value="{{$conta->id}}">{{$conta->nome}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
         <!-- Linha para o número do documento -->
         <div class="row mt-2">
             <div class="col-md-3">

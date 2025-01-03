@@ -29,7 +29,7 @@
             <tbody>
                 @foreach($contas as $conta)
                     <tr>
-                        <td><input type="checkbox" name="" id=""> - {{ $conta->id }}</td>
+                        <td>{{ $conta->id }}</td>
                         <td>{{ $conta->nome }}</td>
                         <td>{{ $conta->agencia }}</td>
                         <td>{{ $conta->conta }}</td>
