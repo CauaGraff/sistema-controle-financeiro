@@ -377,7 +377,7 @@ class LancamentoController extends Controller
         // Validação
         $validate = $request->validate([
             'data_pagamento' => 'required',
-            'contasBancarias' => 'required|exists:contas_bancarias,id',
+            'contasBancarias' => 'required|exists:contas_banco,id',
             'anexo' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048', // Validação para o arquivo (opcional)
         ]);
         // Tratar os valores que vêm com separadores de milhar e vírgula como separador decimal
@@ -397,7 +397,7 @@ class LancamentoController extends Controller
         // Criar a baixa do lançamento com os valores formatados
         LancamentoBaixa::create([
             'id_lancamento' => $lancamento->id,
-            'id_contaBancaria' => $request->conta_bancaria,
+            'id_contaBancaria' => $request->contasBancarias,
             'valor' => $valorPago,
             'juros' => $juros,
             'multa' => $multa,
