@@ -195,6 +195,9 @@
             </div>
         </div>
     @endif
+    <div class="col-md-15 d-grid">
+        <button type="submit" class="btn btn-primary btn-lg">Atualizar</button>
+    </div>
 </form>
 
 @endsection

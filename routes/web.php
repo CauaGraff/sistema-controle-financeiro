@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CalendarioController;
 use App\Http\Middleware\AdminIS;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdmController;
@@ -25,6 +26,7 @@ Route::prefix('login')->group(function () {
 Route::middleware(['auth', AdminIS::class])->group(function () {
     Route::prefix('adm')->group(function () {
         Route::get('/', [AdmController::class, 'index'])->name("home.adm");
+
         /**USUARIOS */
         Route::prefix('/usuarios')->group(function () {
             Route::get('/{type}', [UsersController::class, 'index'])->name("adm.usuarios");
@@ -51,7 +53,9 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/', [HomeController::class, "index"])->name("home");
+    Route::get('/', [CalendarioController::class, "index"])->name("home");
+    Route::get('/calendario/eventos', [CalendarioController::class, 'getEventos'])->name('calendario.getEventos');
+
 
     Route::prefix('/empresas')->group(function () {
         Route::get('/selecionar/{id}', [EmpresasController::class, 'definirEmpresa'])->name('empresa.definir');
