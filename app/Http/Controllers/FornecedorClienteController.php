@@ -22,13 +22,13 @@ class FornecedorClienteController extends Controller
 
     public function store(Request $request)
     {
-
+        // Validação dos dados recebidos
         $validate = $request->validate([
             'nome' => 'required',
-            'cnpj_cpf' => 'required|string|max:14',
-            'telefone' => 'nullable|string|max:15',
+            'cnpj_cpf' => 'required|max:18',
+            'telefone' => 'nullable|max:15',
             'email' => 'nullable|email|max:255',
-            'cep' => 'nullable|string|size:8',
+            'cep' => 'nullable|string|size:9',
             'uf' => 'nullable|string|size:2',
             'cidade' => 'nullable|string|max:100',
             'bairro' => 'nullable|string|max:100',
@@ -37,8 +37,23 @@ class FornecedorClienteController extends Controller
             'tipo' => 'required|in:F,C', // 'F' para Fornecedor e 'C' para Cliente
         ]);
 
-        FornecedorCliente::create(array_merge($request->all(), ['id_empresa' => session('empresa_id')]));
+        // Remover caracteres especiais do campo cnpj_cpf, telefone e cep
+        $cnpj_cpf = preg_replace('/\D/', '', $request->cnpj_cpf); // Remove qualquer coisa que não seja número
+        $telefone = preg_replace('/\D/', '', $request->telefone); // Remove qualquer coisa que não seja número
+        $cep = preg_replace('/\D/', '', $request->cep); // Remove qualquer coisa que não seja número
 
+        // Criar o registro no banco de dados com o id_empresa da sessão
+        FornecedorCliente::create(array_merge(
+            $request->all(),
+            [
+                'cnpj_cpf' => $cnpj_cpf,
+                'telefone' => $telefone,
+                'cep' => $cep,
+                'id_empresa' => session('empresa_id')
+            ]
+        ));
+
+        // Redirecionar com uma mensagem de sucesso
         return redirect()->route('favorecidos.index')->with('alert-success', 'Favorecido criado com sucesso!');
     }
 
@@ -47,23 +62,42 @@ class FornecedorClienteController extends Controller
         return view('favorecidos.edit', compact('favorecido'));
     }
 
-    public function update(Request $request, FornecedorCliente $favorecido)
+    public function update(Request $request, $id)
     {
-        $request->validate([
-            'cnpj_cpf' => 'required|string|max:14',
+        // Validação dos dados recebidos
+        $validate = $request->validate([
+            'nome' => 'required',
+            'cnpj_cpf' => 'required|string|max:18',
             'telefone' => 'nullable|string|max:15',
             'email' => 'nullable|email|max:255',
-            'cep' => 'required|string|size:8',
-            'uf' => 'required|string|size:2',
-            'cidade' => 'required|string|max:100',
-            'bairro' => 'required|string|max:100',
-            'rua' => 'required|string|max:100',
+            'cep' => 'nullable|string|size:9',
+            'uf' => 'nullable|string|size:2',
+            'cidade' => 'nullable|string|max:100',
+            'bairro' => 'nullable|string|max:100',
+            'rua' => 'nullable|string|max:100',
             'complemento' => 'nullable|string|max:255',
             'tipo' => 'required|in:F,C', // 'F' para Fornecedor e 'C' para Cliente
         ]);
 
-        $favorecido->update(array_merge($request->all(), ['id_empresa' => session('empresa_id')]));
+        // Buscar o fornecedor/cliente pelo ID
+        $favorecido = FornecedorCliente::findOrFail($id);
 
+        // Remover caracteres especiais do campo cnpj_cpf, telefone e cep
+        $cnpj_cpf = preg_replace('/\D/', '', $request->cnpj_cpf); // Remove qualquer coisa que não seja número
+        $telefone = preg_replace('/\D/', '', $request->telefone); // Remove qualquer coisa que não seja número
+        $cep = preg_replace('/\D/', '', $request->cep); // Remove qualquer coisa que não seja número
+
+        // Atualizar o fornecedor/cliente no banco de dados
+        $favorecido->update(array_merge(
+            $request->all(),
+            [
+                'cnpj_cpf' => $cnpj_cpf,
+                'telefone' => $telefone,
+                'cep' => $cep,
+            ]
+        ));
+
+        // Redirecionar com uma mensagem de sucesso
         return redirect()->route('favorecidos.index')->with('alert-success', 'Favorecido atualizado com sucesso!');
     }
 

@@ -4,10 +4,10 @@
 <div class="container mt-5">
     <h1>Cadastrar Recebimentos</h1>
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
 
     <form action="{{ route('lancamentos.recebimentos.store') }}" method="POST">
@@ -20,9 +20,9 @@
                 <input type="text" class="form-control @error('descricao')is-invalid @enderror" id="descricao"
                     name="descricao" value="{{ old('descricao') }}">
                 @error('descricao')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
+                <div class="invalid-feedback">
+                    {{ $message }}
+                </div>
                 @enderror
             </div>
 
@@ -37,9 +37,9 @@
                     <option value="2" {{ old('tipo') == 2 ? 'selected' : '' }}>Recorrente</option>
                 </select>
                 @error('tipo')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
+                <div class="invalid-feedback">
+                    {{ $message }}
+                </div>
                 @enderror
             </div>
         </div>
@@ -52,9 +52,9 @@
                     <input type="text" class="form-control @error('valor')is-invalid @enderror" id="valor" name="valor"
                         value="{{ old('valor') }}">
                     @error('valor')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
                     @enderror
                 </div>
             </div>
@@ -65,9 +65,9 @@
                     <input type="date" name="data" id="data" class="form-control @error('data')is-invalid @enderror"
                         value="{{ old('data') }}">
                     @error('data')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
                     @enderror
                 </div>
             </div>
@@ -95,9 +95,9 @@
                     <input type="text" class="form-control @error('valorTotal')is-invalid @enderror" id="valorTotal"
                         name="valorTotal" value="{{ old('valorTotal') }}">
                     @error('valorTotal')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
                     @enderror
                 </div>
             </div>
@@ -109,9 +109,9 @@
                     <input type="date" name="dataVencPar" id="dataVencPar"
                         class="form-control @error('dataVencPar')is-invalid @enderror" value="{{ old('dataVencPar') }}">
                     @error('dataVencPar')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
                     @enderror
                 </div>
             </div>
@@ -122,9 +122,9 @@
                     <input type="text" class="form-control @error('valorEntrada')is-invalid @enderror" id="
                         valorEntrada" name="valorEntrada" value="{{ old('valorEntrada') }}">
                     @error('valorEntrada')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
                     @enderror
                 </div>
             </div>
@@ -136,9 +136,9 @@
                     <input type="number" class="form-control @error('valorEntrada')is-invalid @enderror"
                         id="qtdParcelas" name="qtdParcelas" value="{{ old('qtdParcelas') }}">
                     @error('qtdParcelas')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
                     @enderror
                 </div>
             </div>
@@ -151,38 +151,54 @@
                     name="categoria_id">
                     <option value="">Selecione uma categoria</option>
                     @foreach ($categoriasAgrupadas as $grupo)
-                        @if (isset($grupo['categoria']))
-                            <optgroup label="{{ $grupo['categoria']->descricao }}">
-                                @foreach ($grupo['subcategorias'] as $subcategoria)
-                                    <option value="{{ $subcategoria->id }}" {{ old('categoria_id') == $subcategoria->id ? 'selected' : '' }}>{{ $subcategoria->descricao }}</option>
-                                @endforeach
-                            </optgroup>
-                        @endif
+                    @if (isset($grupo['categoria']))
+                    <optgroup label="{{ $grupo['categoria']->descricao }}">
+                        @foreach ($grupo['subcategorias'] as $subcategoria)
+                        <option value="{{ $subcategoria->id }}" {{ old('categoria_id') == $subcategoria->id ? 'selected' : '' }}>{{ $subcategoria->descricao }}</option>
+                        @endforeach
+                    </optgroup>
+                    @endif
                     @endforeach
                 </select>
             </div>
             @error('categoria_id')
-                <div class="invalid-feedback">
-                    {{ $message }}
-                </div>
+            <div class="invalid-feedback">
+                {{ $message }}
+            </div>
             @enderror
         </div>
         <!-- Campo de Favorecido -->
         <div class="row mb-3">
-            <label for="fornecedor_cliente" class="col-sm-2 col-form-label">Fornecedor/Cleinte</label>
+            <label for="fornecedor_cliente" class="col-sm-2 col-form-label">Fornecedor/Cliente</label>
             <div class="col-sm-10">
-                <select class="form-select @error('fornecedor_cliente_id')is-invalid @enderror" id="fornecedor_cliente"
-                    name="fornecedor_cliente_id">
+                <select class="form-select @error('fornecedor_cliente_id') is-invalid @enderror" id="fornecedor_cliente" name="fornecedor_cliente_id">
                     <option value="">Selecione o Fornecedor/Cliente</option>
-                    @foreach ($fornecedores as $fornecedor)
-                        <option value="{{ $fornecedor->id }}" {{ old('fornecedor_cliente_id') == $fornecedor->id ? 'selected' : '' }}>{{ $fornecedor->nome }}</option>
-                    @endforeach
-                    @foreach ($clientes as $cliente)
-                        <option value="{{ $cliente->id }}" {{ old('fornecedor_cliente_id') == $fornecedor->id ? 'selected' : '' }}>{{ $cliente->nome }}</option>
-                    @endforeach
+
+                    <!-- Grupo de Fornecedores -->
+                    <optgroup label="Fornecedores">
+                        @foreach ($fornecedores as $fornecedor)
+                        <option value="{{ $fornecedor->id }}" {{ old('fornecedor_cliente_id') == $fornecedor->id ? 'selected' : '' }}>
+                            {{ $fornecedor->nome }}
+                        </option>
+                        @endforeach
+                    </optgroup>
+
+                    <!-- Grupo de Clientes -->
+                    <optgroup label="Clientes">
+                        @foreach ($clientes as $cliente)
+                        <option value="{{ $cliente->id }}" {{ old('fornecedor_cliente_id') == $cliente->id ? 'selected' : '' }}>
+                            {{ $cliente->nome }}
+                        </option>
+                        @endforeach
+                    </optgroup>
                 </select>
+
+                @error('fornecedor_cliente_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
         </div>
+
         <button type="submit" class="btn btn-primary">Cadastrar Lançamento</button>
     </form>
 </div>

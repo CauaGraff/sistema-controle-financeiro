@@ -12,6 +12,7 @@ class FornecedorCliente extends Model
     protected $table = 'fornecedor_cliente';
 
     protected $fillable = [
+        'nome',
         'cnpj_cpf',
         'telefone',
         'email',
@@ -47,5 +48,4 @@ class FornecedorCliente extends Model
 
         return false; // Retorna false se o documento não for válido
     }
-
 }
