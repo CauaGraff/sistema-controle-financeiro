@@ -50,8 +50,8 @@ class LancamentoController extends Controller
                 $categoriasAgrupadas[$categoria->id]['categoria'] = $categoria;
             }
         }
-        $fornecedores = FornecedorCliente::where("id_empresa", $empresaId)->get();
-        $clientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
+        $fornecedores = FornecedorCliente::where("id_empresa", $empresaId)->where("tipo", "F")->get();
+        $clientes = FornecedorCliente::where("id_empresa", $empresaId)->where("tipo", "C")->get();
 
         if ($request->path() == "lancamentos/pagamentos/create") {
             return view('lancamentos.createPagamentos', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));

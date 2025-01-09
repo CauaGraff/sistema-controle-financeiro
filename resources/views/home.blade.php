@@ -109,7 +109,7 @@
 <script src="{{asset("js/dataTables.fixedColumns.js")}}"></script>
 <script src="{{asset("js/fixedColumns.dataTables.js")}}"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $("main section").removeClass("container");
         let currentMonth = moment().month(); // Mês atual (0-11)
         let currentYear = moment().year(); // Ano atual
@@ -123,7 +123,7 @@
                     month: month + 1,
                     year: year
                 },
-                success: function(events) {
+                success: function (events) {
                     $('#calendar-body').empty();
                     $('#month-title').text(moment([year, month]).format('MMMM YYYY'));
 
@@ -172,7 +172,7 @@
                     month: month + 1,
                     year: year
                 },
-                success: function(data) {
+                success: function (data) {
                     // Pagamentos
                     $('#table-pagamentos').DataTable({
                         language: {
@@ -185,46 +185,46 @@
                         scrollX: true,
                         data: data.pagamentos,
                         columns: [{
-                                data: 'id',
-                                title: '#'
-                            },
-                            {
-                                data: 'descricao',
-                                title: 'Descrição'
-                            },
-                            {
-                                data: 'valor',
-                                title: 'Valor'
-                            },
-                            {
-                                data: 'data_venc',
-                                title: 'Vencimento',
-                                render: function(data, type, row) {
-                                    let vencido = moment().isAfter(data, 'day') && row.status !== 'pago';
-                                    return `<span class="${vencido ? 'text-danger' : ''}">${data}</span>`;
-                                }
-                            },
-                            {
-                                data: null,
-                                title: 'Ações',
-                                render: function(data, type, row) {
-                                    let editRoute = `{{ route('lancamentos.edit', ':id') }}`.replace(':id', row.id);
-                                    let deleteRoute = `{{ route('lancamentos.pagamentos.destroy', ':id') }}`.replace(':id', row.id);
-                                    let baixaRoute = `{{ route('lancamentos.pagamentos.baixa', ':id') }}`.replace(':id', row.id);
+                            data: 'id',
+                            title: '#'
+                        },
+                        {
+                            data: 'descricao',
+                            title: 'Descrição'
+                        },
+                        {
+                            data: 'valor',
+                            title: 'Valor'
+                        },
+                        {
+                            data: 'data_venc',
+                            title: 'Vencimento',
+                            render: function (data, type, row) {
+                                let vencido = moment().isAfter(data, 'day') && row.status !== 'pago';
+                                return `<span class="${vencido ? 'text-danger' : ''}">${data}</span>`;
+                            }
+                        },
+                        {
+                            data: null,
+                            title: 'Ações',
+                            render: function (data, type, row) {
+                                let editRoute = `{{ route('lancamentos.edit', ':id') }}`.replace(':id', row.id);
+                                let deleteRoute = `{{ route('lancamentos.pagamentos.destroy', ':id') }}`.replace(':id', row.id);
+                                let baixaRoute = `{{ route('lancamentos.pagamentos.baixa', ':id') }}`.replace(':id', row.id);
 
-                                    return `
-                                        <a href="${editRoute}" class="btn btn-sm btn-warning">Editar</a>
+                                return `
+                                        <a href="${editRoute}" class="btn btn-sm btn-warning"><i class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
                                         <form action="${deleteRoute}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                            <button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
                                         </form>
-                                        <a href="${baixaRoute}" class="btn btn-sm btn-success">Baixar</a>
+                                        <a href="${baixaRoute}" class="btn btn-sm btn-success"><i class="fa-solid fa-dollar-sign"></i></a>
                                     `;
-                                }
                             }
+                        }
                         ],
-                        createdRow: function(row, data) {
+                        createdRow: function (row, data) {
                             // Aplica cor de fundo nas linhas da tabela
                             if (data.status === 'vencido') {
                                 $(row).addClass('table-danger'); // Linha vermelha para vencido
@@ -249,46 +249,46 @@
                         scrollX: true,
                         data: data.recebimentos,
                         columns: [{
-                                data: 'id',
-                                title: '#'
-                            },
-                            {
-                                data: 'descricao',
-                                title: 'Descrição'
-                            },
-                            {
-                                data: 'valor',
-                                title: 'Valor'
-                            },
-                            {
-                                data: 'data_venc',
-                                title: 'Vencimento',
-                                render: function(data, type, row) {
-                                    let vencido = moment().isAfter(data, 'day') && row.status !== 'pago';
-                                    return `<span class="${vencido ? 'text-danger' : ''}">${data}</span>`;
-                                }
-                            },
-                            {
-                                data: null,
-                                title: 'Ações',
-                                render: function(data, type, row) {
-                                    let editRoute = `{{ route('lancamentos.edit', ':id') }}`.replace(':id', row.id);
-                                    let deleteRoute = `{{ route('lancamentos.recebimentos.destroy', ':id') }}`.replace(':id', row.id);
-                                    let baixaRoute = `{{ route('lancamentos.recebimentos.baixa', ':id') }}`.replace(':id', row.id);
+                            data: 'id',
+                            title: '#'
+                        },
+                        {
+                            data: 'descricao',
+                            title: 'Descrição'
+                        },
+                        {
+                            data: 'valor',
+                            title: 'Valor'
+                        },
+                        {
+                            data: 'data_venc',
+                            title: 'Vencimento',
+                            render: function (data, type, row) {
+                                let vencido = moment().isAfter(data, 'day') && row.status !== 'pago';
+                                return `<span class="${vencido ? 'text-danger' : ''}">${data}</span>`;
+                            }
+                        },
+                        {
+                            data: null,
+                            title: 'Ações',
+                            render: function (data, type, row) {
+                                let editRoute = `{{ route('lancamentos.edit', ':id') }}`.replace(':id', row.id);
+                                let deleteRoute = `{{ route('lancamentos.recebimentos.destroy', ':id') }}`.replace(':id', row.id);
+                                let baixaRoute = `{{ route('lancamentos.recebimentos.baixa', ':id') }}`.replace(':id', row.id);
 
-                                    return `
-                                        <a href="${editRoute}" class="btn btn-sm btn-warning">Editar</a>
+                                return `
+                                        <a href="${editRoute}" class="btn btn-sm btn-warning"><i class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
                                         <form action="${deleteRoute}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                            <button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
                                         </form>
-                                        <a href="${baixaRoute}" class="btn btn-sm btn-success">Baixar</a>
+                                        <a href="${baixaRoute}" class="btn btn-sm btn-success"><i class="fa-solid fa-dollar-sign"></i></a>
                                     `;
-                                }
                             }
+                        }
                         ],
-                        createdRow: function(row, data) {
+                        createdRow: function (row, data) {
                             // Aplica cor de fundo nas linhas da tabela
                             if (data.status === 'vencido') {
                                 $(row).addClass('table-danger'); // Linha vermelha para vencido
@@ -308,7 +308,7 @@
         generateCalendar(currentMonth, currentYear);
 
         // Mês anterior
-        $('#prev-month').click(function() {
+        $('#prev-month').click(function () {
             currentMonth--;
             if (currentMonth < 0) {
                 currentMonth = 11;
@@ -318,7 +318,7 @@
         });
 
         // Próximo mês
-        $('#next-month').click(function() {
+        $('#next-month').click(function () {
             currentMonth++;
             if (currentMonth > 11) {
                 currentMonth = 0;
