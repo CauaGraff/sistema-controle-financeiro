@@ -2,7 +2,6 @@
 
 @section("css")
 <link rel="stylesheet" href="{{asset("css/dataTables.css")}}" />
-<link rel="stylesheet" href="{{asset("css/toastr.min.css")}}" />
 <style>
     .btn:disabled {
         pointer-events: none;

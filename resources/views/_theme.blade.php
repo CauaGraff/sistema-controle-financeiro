@@ -56,27 +56,27 @@
           </ul>
           <ul class="navbar-nav ms-auto d-lg-inline-flex">
             @if(auth()->user()->empresas->count() === 1)
-        <li class="nav-item mx-2" style="vertical-align: middle"><small class="nav-link"
-          title="{{session('empresa_nome')}}">{{mb_strimwidth(session('empresa_nome'), 0, 12, "...") }}</small>
-        </li>
-      @elseif(auth()->user()->empresas->count() > 1)
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" id="companyDropdown" role="button" data-bs-toggle="dropdown"
-      aria-expanded="false" title="{{session('empresa_nome')}}">
-      {{mb_strimwidth(session('empresa_nome'), 0, 12, "...") }}
-      <!-- Exibe o nome da empresa ativa ou a primeira empresa -->
-      </a>
-      <ul class="dropdown-menu dropdown-menu-end w-auto" aria-labelledby="companyDropdown">
-      @foreach(auth()->user()->empresas as $empresa)
-      <li>
-      <a class="dropdown-item select-company" href="{{route('empresa.definir', $empresa->id)}}"
-      title="{{session('empresa_nome')}}">
-      {{$empresa->nome}}</a>
-      </li>
-    @endforeach
-      </ul>
-    </li>
-  @endif
+            <li class="nav-item mx-2" style="vertical-align: middle"><small class="nav-link"
+                title="{{session('empresa_nome')}}">{{mb_strimwidth(session('empresa_nome'), 0, 12, "...") }}</small>
+            </li>
+            @elseif(auth()->user()->empresas->count() > 1)
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="companyDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false" title="{{session('empresa_nome')}}">
+                {{mb_strimwidth(session('empresa_nome'), 0, 12, "...") }}
+                <!-- Exibe o nome da empresa ativa ou a primeira empresa -->
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end w-auto" aria-labelledby="companyDropdown">
+                @foreach(auth()->user()->empresas as $empresa)
+                <li>
+                  <a class="dropdown-item select-company" href="{{route('empresa.definir', $empresa->id)}}"
+                    title="{{session('empresa_nome')}}">
+                    {{$empresa->nome}}</a>
+                </li>
+                @endforeach
+              </ul>
+            </li>
+            @endif
 
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
@@ -127,11 +127,11 @@
 
     @if(Session::has('alert-success'))
     toastr.success("{{ Session::get('alert-success') }} ")
-  @elseif(Session::has('alert-warning'))
-  toastr.warning("{{ Session::get('alert-warning') }} ")
-@elseif(Session::has('alert-danger'))
-  toastr.error("{{ Session::get('alert-danger') }} ")
-@endif
+    @elseif(Session::has('alert-warning'))
+    toastr.warning("{{ Session::get('alert-warning') }} ")
+    @elseif(Session::has('alert-danger'))
+    toastr.error("{{ Session::get('alert-danger') }} ")
+    @endif
   </script>
   @yield("js")
 </body>

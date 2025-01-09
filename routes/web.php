@@ -54,8 +54,8 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/', [CalendarioController::class, "index"])->name("home");
-    Route::get('/calendario/eventos', [CalendarioController::class, 'getEventos'])->name('calendario.getEventos');
-
+    Route::post('/calendario/eventos', [CalendarioController::class, 'postEventos'])->name('calendario.eventos.post');
+    Route::post('/calendario/lacamentos', [CalendarioController::class, 'postLancamentos'])->name('calendario.lancamentos.post');
 
     Route::prefix('/empresas')->group(function () {
         Route::get('/selecionar/{id}', [EmpresasController::class, 'definirEmpresa'])->name('empresa.definir');
