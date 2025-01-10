@@ -85,7 +85,6 @@
         }
     }
 
-
     /* Estilo do calendário */
     #calendar-body td {
         padding: 15px 10px;
@@ -154,9 +153,11 @@
         <div class="col-md-10">
             <!-- Calendário -->
             <div class="d-flex justify-content-between mb-3">
-                <button id="prev-month" class="calendar-nav-btn"><i class="fa-solid fa-angle-left fa-2xl"></i></button>
+                <button id="prev-month" class="calendar-nav-btn btn-primary"><i
+                        class="fa-solid fa-angle-left fa-2xl"></i></button>
                 <h3 id="month-title">{{ \Carbon\Carbon::now()->locale('pt-BR')->format('F Y') }}</h3>
-                <button id="next-month" class="calendar-nav-btn"><i class="fa-solid fa-angle-right fa-2xl"></i></button>
+                <button id="next-month" class="calendar-nav-btn btn-primary"><i
+                        class="fa-solid fa-angle-right fa-2xl"></i></button>
             </div>
 
             <table class="table shadow-sm" style="background-color: transparent;" outline: none;>
@@ -432,11 +433,8 @@
                 <button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
             </form>
                         <a href="${baixaRoute}" class="btn btn-sm btn-success ${disabled}" ${disabled}><i class="fa-solid fa-dollar-sign"></i></a>
-
-        </div>
-    `;
+        </div>`;
                                 }
-
                             }
                         ],
                         createdRow: function (row, data) {
