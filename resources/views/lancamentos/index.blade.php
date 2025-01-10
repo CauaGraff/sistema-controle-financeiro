@@ -41,79 +41,79 @@
     </div> -->
 
     @if (!$lancamentos)
-    <p class="text-center">Nenhum {{$route == "P" ? "Pagamento" : "Recebimento"}} Cadastrado.</p>
+        <p class="text-center">Nenhum {{$route == "P" ? "Pagamento" : "Recebimento"}} Cadastrado.</p>
     @else
-    <div class="">
-        <table class="table table-striped stripe row-border order-column" style="width:100%">
-            <thead class=" table-dark">
-                <tr>
-                    <th>Nº</th>
-                    <th>Descrição</th>
-                    <th>Data Vencimento</th>
-                    <th>Valor</th>
-                    <th>Data de {{$route == "P" ? "Pagamento" : "Recebimento"}}</th>
-                    <th>Valor {{$route == "P" ? "Pago" : "Recebido"}}</th>
-                    <th class="text-center">Ação</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($lancamentos as $lancamento)
-                @php
-                $pago = $lancamento->data_baixa !== null || $lancamento->lancamentoBaixa; // Verifica se existe data de baixa ou se o relacionamento foi preenchido
-                $isVencido = date('Y-m-d', strtotime($lancamento->data_venc)) < date('Y-m-d'); // Verifica se a data de vencimento é anterior à data atual
-                    @endphp
-
-                    <tr class="{{ $pago ? 'table-success' : ($isVencido ? 'table-danger' : '') }}">
-                    <td>{{ $lancamento->id }}</td>
-                    <td>{{ mb_strimwidth("$lancamento->descricao", 0, 25, "...") }}</td>
-                    <td>{{ date('d/m/Y', strtotime($lancamento->data_venc)) }}</td>
-                    <td>R$ {{ number_format($lancamento->valor, 2, ",", ".") }}</td>
-                    <td>{{ $lancamento->lancamentoBaixa ? date('d/m/Y', strtotime($lancamento->lancamentoBaixa->created_at)) : '-' }}
-                    </td>
-                    <td>{{ $lancamento->lancamentoBaixa ? "R$" . number_format($lancamento->lancamentoBaixa->valor, 2, ",", ".") : '-'}}
-                    </td>
-                    @if ($route == "P")
-                    <td class="text-center">
-                        <a href="{{ route('lancamentos.edit', $lancamento) }}" class="btn btn-sm btn-warning"><i
-                                class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
-                        <form action="{{ route('lancamentos.pagamentos.destroy', $lancamento) }}" method="POST"
-                            style="display: inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger"
-                                onclick="return confirm('Tem certeza que deseja excluir?')"><i
-                                    class="fa-solid fa-trash"></i></button>
-                        </form>
-                        <a href="{{ $pago ? '#' : route('lancamentos.pagamentos.baixa', $lancamento) }}"
-                            class="btn btn-sm btn-success {{ $pago ? 'disabled' : '' }}"
-                            style="{{ $pago ? 'opacity: 0.5;' : '' }}" @if($pago) aria-disabled="true" @endif>
-                            <i class="fa-solid fa-dollar-sign"></i>
-                        </a>
-                    </td>
-                    @else
-                    <td class="text-center">
-                        <a href="{{ route('lancamentos.edit', $lancamento) }}" class="btn btn-sm btn-warning"><i
-                                class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
-                        <form action="{{ route('lancamentos.recebimentos.destroy', $lancamento) }}" method="POST"
-                            style="display: inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger"
-                                onclick="return confirm('Tem certeza que deseja excluir?')"><i
-                                    class="fa-solid fa-trash"></i></button>
-                        </form>
-                        <a href="{{ $pago ? '#' : route('lancamentos.recebimentos.baixa', $lancamento) }}"
-                            class="btn btn-sm btn-success {{ $pago ? 'disabled' : '' }}"
-                            style="{{ $pago ? 'opacity: 0.5;' : '' }}" @if($pago) aria-disabled="true" @endif>
-                            <i class="fa-solid fa-dollar-sign"></i>
-                        </a>
-                    </td>
-                    @endif
+        <div class="">
+            <table class="table table-striped stripe row-border order-column" style="width:100%">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nº</th>
+                        <th>Descrição</th>
+                        <th>Data Vencimento</th>
+                        <th>Valor (R$)</th>
+                        <th>Data de {{$route == "P" ? "Pagamento" : "Recebimento"}}</th>
+                        <th>Valor {{$route == "P" ? "Pago" : "Recebido"}}</th>
+                        <th class="text-center">Ação</th>
                     </tr>
+                </thead>
+                <tbody>
+                    @foreach ($lancamentos as $lancamento)
+                                @php
+                                    $pago = $lancamento->data_baixa !== null || $lancamento->lancamentoBaixa; // Verifica se existe data de baixa ou se o relacionamento foi preenchido
+                                    $isVencido = date('Y-m-d', strtotime($lancamento->data_venc)) < date('Y-m-d'); // Verifica se a data de vencimento é anterior à data atual
+                                @endphp
+
+                                <tr class="{{ $pago ? 'table-success' : ($isVencido ? 'table-danger' : '') }}">
+                                    <td>{{ $lancamento->id }}</td>
+                                    <td>{{ mb_strimwidth("$lancamento->descricao", 0, 25, "...") }}</td>
+                                    <td>{{ date('d/m/Y', strtotime($lancamento->data_venc)) }}</td>
+                                    <td>R$ {{ number_format($lancamento->valor, 2, ",", ".") }}</td>
+                                    <td>{{ $lancamento->lancamentoBaixa ? date('d/m/Y', strtotime($lancamento->lancamentoBaixa->created_at)) : '-' }}
+                                    </td>
+                                    <td>{{ $lancamento->lancamentoBaixa ? "R$" . number_format($lancamento->lancamentoBaixa->valor, 2, ",", ".") : '-'}}
+                                    </td>
+                                    @if ($route == "P")
+                                        <td class="text-center">
+                                            <a href="{{ route('lancamentos.edit', $lancamento) }}" class="btn btn-sm btn-warning"><i
+                                                    class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
+                                            <form action="{{ route('lancamentos.pagamentos.destroy', $lancamento) }}" method="POST"
+                                                style="display: inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Tem certeza que deseja excluir?')"><i
+                                                        class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                            <a href="{{ $pago ? '#' : route('lancamentos.pagamentos.baixa', $lancamento) }}"
+                                                class="btn btn-sm btn-success {{ $pago ? 'disabled' : '' }}"
+                                                style="{{ $pago ? 'opacity: 0.5;' : '' }}" @if($pago) aria-disabled="true" @endif>
+                                                <i class="fa-solid fa-dollar-sign"></i>
+                                            </a>
+                                        </td>
+                                    @else
+                                        <td class="text-center">
+                                            <a href="{{ route('lancamentos.edit', $lancamento) }}" class="btn btn-sm btn-warning"><i
+                                                    class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
+                                            <form action="{{ route('lancamentos.recebimentos.destroy', $lancamento) }}" method="POST"
+                                                style="display: inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Tem certeza que deseja excluir?')"><i
+                                                        class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                            <a href="{{ $pago ? '#' : route('lancamentos.recebimentos.baixa', $lancamento) }}"
+                                                class="btn btn-sm btn-success {{ $pago ? 'disabled' : '' }}"
+                                                style="{{ $pago ? 'opacity: 0.5;' : '' }}" @if($pago) aria-disabled="true" @endif>
+                                                <i class="fa-solid fa-dollar-sign"></i>
+                                            </a>
+                                        </td>
+                                    @endif
+                                </tr>
                     @endforeach
-            </tbody>
-        </table>
-    </div>
+                </tbody>
+            </table>
+        </div>
     @endif
 </div>
 @endsection
@@ -124,7 +124,7 @@
 <script src="{{asset("js/dataTables.fixedColumns.js")}}"></script>
 <script src="{{asset("js/fixedColumns.dataTables.js")}}"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         var table = $(".table").DataTable({
             language: {
                 url: '{{asset("js/json/data_Table_pt_br.json")}}'
@@ -136,14 +136,14 @@
             scrollX: true
         });
         // Filtrando os dados com base no intervalo de datas
-        $('#filter_button').on('click', function() {
+        $('#filter_button').on('click', function () {
             // Obtendo as datas selecionadas
             var startDate = $('#start_date').val();
             var endDate = $('#end_date').val();
 
             // Filtrando as linhas da tabela com base nas datas
             table.columns(1).search(
-                function(data, type, row) {
+                function (data, type, row) {
                     // Converte as datas do DataTables para o formato YYYY-MM-DD
                     var dataVenc = data.split('/').reverse().join('-'); // Ex: "2024-11-26"
 
