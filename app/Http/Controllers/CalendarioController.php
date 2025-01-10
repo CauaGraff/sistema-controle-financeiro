@@ -115,6 +115,20 @@ class CalendarioController extends Controller
                 ->get();
         }
 
+        // Filtra os lançamentos com baixa para o cálculo dos totais
+        $pagamentosComBaixa = $pagamentos->filter(function ($lancamento) {
+            return $lancamento->lancamentoBaixa; // Filtra apenas os lançamentos com baixa
+        });
+
+        $recebimentosComBaixa = $recebimentos->filter(function ($lancamento) {
+            return $lancamento->lancamentoBaixa; // Filtra apenas os lançamentos com baixa
+        });
+
+        // Calcular totais apenas para os lançamentos com baixa
+        $totalPagamentos = $pagamentosComBaixa->sum('valor'); // Soma os valores dos pagamentos com baixa
+        $totalRecebimentos = $recebimentosComBaixa->sum('valor'); // Soma os valores dos recebimentos com baixa
+        $totalGeral = $totalRecebimentos - $totalPagamentos;
+
         // Formatar os dados para DataTables
         $data = [
             'pagamentos' => $pagamentos->map(function ($lancamento) {
@@ -147,6 +161,12 @@ class CalendarioController extends Controller
                     'status' => $status, // Agora o status vai ser 'vencido', 'recebido' ou 'pendente'
                 ];
             }),
+            // Totais
+            'totais' => [
+                'pagamentos' => number_format($totalPagamentos, 2, ',', '.'),
+                'recebimentos' => number_format($totalRecebimentos, 2, ',', '.'),
+                'geral' => number_format($totalGeral, 2, ',', '.'),
+            ]
         ];
 
         return response()->json($data);

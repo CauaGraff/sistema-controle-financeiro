@@ -55,7 +55,7 @@
         <label for="data" class="col-sm-2 col-form-label" id="labelDataVenc">Data de Vencimento</label>
         <div class="col-sm-10">
             <input type="date" name="data" id="data" class="form-control @error('data')is-invalid @enderror"
-                value="{{ old('data', $lancamento->data_venc) }}" {{ $lancamentoBaixa ? 'disabled' : '' }}>
+                value="{{ old('data', \Carbon\Carbon::parse($lancamento->data_venc)->format('Y-m-d')) }}" {{ $lancamentoBaixa ? 'disabled' : '' }}>
             @error('data')
                 <div class="invalid-feedback">
                     {{ $message }}
@@ -155,24 +155,19 @@
                     </div>
                 </div>
                 <!-- Botão para excluir a baixa (se o lançamento estiver baixado) -->
-                @if ($lancamentoBaixa)
-                    <div class="row mt-3 g-3">
-                        <div class="col-md-15 d-grid">
-                            <!-- <form action="{{ route('lancamentos.baixa.delete', $lancamento->id) }}" method="POST">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     </form> -->
-                            <a href="{{route('lancamentos.baixa.delete', $lancamento->id)}}" type="submit"
-                                class="btn btn-danger btn-lg btn-block">Excluir Baixa</a>
-                        </div>
-                        <div class="col-md-15 d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">Atualizar</button>
-                        </div>
+                <div class="row mt-3 g-3">
+                    <div class="col-md-15 d-grid">
+                        <a href="{{route('lancamentos.baixa.delete', $lancamento->id)}}"
+                            class="btn btn-danger btn-lg btn-block">
+                            Excluir Baixa
+                        </a>
                     </div>
-                @endif
+                </div>
             </div>
             <!-- Coluna direita para o anexo -->
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="anexo">Documento Anexado:</label>
-                    <!-- Verifica se o anexo existe -->
                     @if($lancamentoBaixa->anexo)
                         <div class="d-flex justify-content-between mt-2 mb-2">
                             <a href="{{ getenv("APP_URL") . \Illuminate\Support\Facades\Storage::url($lancamentoBaixa->anexo) }}"
@@ -184,17 +179,16 @@
                                 <i class="fa-solid fa-trash"></i> Excluir
                             </a>
                         </div>
-                        <!-- Caso haja um anexo, exibe a pré-visualização do arquivo -->
                         <iframe src="{{getenv("APP_URL") . \Illuminate\Support\Facades\Storage::url($lancamentoBaixa->anexo) }}"
                             style="width: 100%; height: 275px;"></iframe>
                     @else
-                        <!-- Caso não haja anexo, exibe o input para upload -->
                         <input type="file" class="form-control" id="anexo" name="anexo" accept="application/pdf,image/*">
                     @endif
                 </div>
             </div>
         </div>
     @endif
+    <!-- Botão Atualizar (exibido apenas uma vez, no final do formulário) -->
     <div class="col-md-15 d-grid">
         <button type="submit" class="btn btn-primary btn-lg">Atualizar</button>
     </div>

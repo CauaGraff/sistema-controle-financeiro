@@ -159,23 +159,60 @@
                 <button id="next-month" class="calendar-nav-btn"><i class="fa-solid fa-angle-right fa-2xl"></i></button>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-borderless" style="background-color: transparent;">
-                    <thead class="calendar-header">
-                        <tr>
-                            <th>Dom</th>
-                            <th>Seg</th>
-                            <th>Ter</th>
-                            <th>Qua</th>
-                            <th>Qui</th>
-                            <th>Sex</th>
-                            <th>Sáb</th>
-                        </tr>
-                    </thead>
-                    <tbody id="calendar-body">
-                        <!-- Calendário será gerado aqui -->
-                    </tbody>
-                </table>
+            <table class="table shadow-sm" style="background-color: transparent;" outline: none;>
+                <thead class="calendar-header">
+                    <tr>
+                        <th>Dom</th>
+                        <th>Seg</th>
+                        <th>Ter</th>
+                        <th>Qua</th>
+                        <th>Qui</th>
+                        <th>Sex</th>
+                        <th>Sáb</th>
+                    </tr>
+                </thead>
+                <tbody id="calendar-body">
+                    <!-- Calendário será gerado aqui -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Cards abaixo do calendário -->
+        <div class="row mt-4">
+            <!-- Card de Pagamento -->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"> Total Pagamentos
+                        </h5>
+                        <div class="card-text">
+                            <h5 id="totalPagamentos">R$ 0,00</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Recebimento -->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"> Total Recebimentos </h5>
+                        <div class="card-text">
+                            <h5 id="totalRecebimentos">R$ 0,00</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Total Geral -->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"> Total Recebimentos </h5>
+                        <div class="card-text">
+                            <h5 id="totalGeral">R$ 0,00</h5>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -287,6 +324,11 @@
                     date: date // Envia a data caso tenha sido selecionada
                 },
                 success: function (data) {
+
+                    // Atualizar os cards com os totais
+                    $('#totalPagamentos').text('R$ ' + data.totais.pagamentos);
+                    $('#totalRecebimentos').text('R$ ' + data.totais.recebimentos);
+                    $('#totalGeral').text('R$ ' + data.totais.geral);
                     // Pagamentos
                     if ($.fn.DataTable.isDataTable('#table-pagamentos')) {
                         $('#table-pagamentos').DataTable().clear().destroy();
