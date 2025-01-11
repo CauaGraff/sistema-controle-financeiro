@@ -22,25 +22,35 @@ class EmpresasController extends Controller
 
     public function save(Request $request)
     {
-
+        // Validar os dados de entrada
         $request->validate([
-            'nome' => 'required|string|max:255',
-            'cnpj_cpf' => 'required|max:14',
-            'cep' => 'max:8'
+            'nome' => 'required|max:255',
+            'cnpj_cpf' => 'required|max:18',
+            'cep' => 'max:9',
+            'cidade' => 'max:255',
+            'bairro' => 'max:255',
+            'rua' => 'string|max:255'
         ]);
 
-        // Criação da empresa
+        // Remover os caracteres especiais (., -, /) do CNPJ/CPF e CEP
+        $cnpj_cpf = preg_replace('/[^0-9]/', '', $request->cnpj_cpf);
+        $cep = preg_replace('/[^0-9]/', '', $request->cep);
+
+        // Criar a nova empresa (empresa)
         Empresas::create([
             'nome' => $request->nome,
-            'cnpj_cpf' => $request->cnpj_cpf,
-            'cep' => $request->cep,
+            'cnpj_cpf' => $cnpj_cpf,
+            'cep' => $cep,
             'cidade' => $request->cidade,
             'bairro' => $request->bairro,
             'rua' => $request->rua,
-            'active' => 1
+            'active' => 1 // Supondo que '1' significa que a empresa está ativa
         ]);
+
+        // Redirecionar com a mensagem de sucesso
         return redirect()->route('adm.empresas')->with('alert-success', 'Empresa Cadastrada com sucesso!');
     }
+
 
     public function delete(int $id)
     {
@@ -56,7 +66,7 @@ class EmpresasController extends Controller
     {
         $empresa = Empresas::findOrFail($id);
         $usuarios = $empresa->usuarios; // Assumindo que a relação está configurada no modelo Empresa
-        $allUsers = User::whereNotIn('id', $usuarios->pluck('id'))->get();
+        $allUsers = User::whereNotIn('id', $usuarios->pluck('id'))->where('id_typeuser', 3)->get();
         return view('admin.empresas.view', compact('empresa', 'usuarios', 'allUsers'));
     }
     public function addUsuario(Request $request, $id)
@@ -110,5 +120,39 @@ class EmpresasController extends Controller
 
         // Opcional: redirecionar para a página principal ou onde for necessário
         return redirect()->route('home')->with('alert-success', 'Empresa definida com sucesso.');
+    }
+
+    public function edit($id)
+    {
+        $empresa = Empresas::findOrFail($id);
+        return view('admin.empresas.formupdate', compact('empresa'));
+    }
+    public function update(Request $request, $id)
+    {
+        // Validação dos dados
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'cnpj_cpf' => 'required|max:18',
+            'cep' => 'max:9',
+            'cidade' => 'required|string|max:255',
+            'bairro' => 'required|string|max:255',
+            'rua' => 'required|string|max:255'
+        ]);
+
+        // Encontrar a empresa no banco de dados
+        $empresa = Empresas::findOrFail($id);
+
+        // Atualizar os dados
+        $empresa->update([
+            'nome' => $request->nome,
+            'cnpj_cpf' => preg_replace('/[^0-9]/', '', $request->cnpj_cpf),
+            'cep' => preg_replace('/[^0-9]/', '', $request->cep),
+            'cidade' => $request->cidade,
+            'bairro' => $request->bairro,
+            'rua' => $request->rua
+        ]);
+
+        // Redirecionar com mensagem de sucesso
+        return redirect()->route('adm.empresas')->with('alert-success', 'Empresa atualizada com sucesso!');
     }
 }

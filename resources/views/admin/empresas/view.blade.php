@@ -20,9 +20,8 @@
         </div>
     </div>
     <div class="table-responsive">
-
-        <table class="table">
-            <thead>
+        <table class="table table-striped stripe row-border order-column" style="width:100%">
+            <thead class="table-dark">
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
@@ -32,19 +31,19 @@
             </thead>
             <tbody>
                 @foreach ($usuarios as $usuario)
-                    <tr>
-                        <td>{{ $usuario->id }}</td>
-                        <td>{{ $usuario->name }}</td>
-                        <td>{{ $usuario->email }}</td>
-                        <td>
-                            <a href="{{route("adm.usuarios.edit", [$usuario->id])}}" class="btn"><i
-                                    class="fa-solid fa-pen-to-square"></i></a>
-                            <a href="{{route("adm.empresas.removeUsuario", ['idEmpresa' => $empresa->id, 'idUser' => $usuario->id])}}"
-                                class="btn"><i class="fa-solid fa-trash"></i></a>
-                            <a href="{{route("adm.usuarios.edit", [$usuario->id])}}" class="btn"><i
-                                    class="fa-solid fa-eye"></i></a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>{{ $usuario->id }}</td>
+                    <td>{{ $usuario->name }}</td>
+                    <td>{{ $usuario->email }}</td>
+                    <td>
+                        <a href="{{route("adm.usuarios.edit", [$usuario->id])}}" class="btn"><i
+                                class="fa-solid fa-pen-to-square"></i></a>
+                        <a href="{{route("adm.empresas.removeUsuario", ['idEmpresa' => $empresa->id, 'idUser' => $usuario->id])}}"
+                            class="btn"><i class="fa-solid fa-trash"></i></a>
+                        <a href="{{route("adm.usuarios.edit", [$usuario->id])}}" class="btn"><i
+                                class="fa-solid fa-eye"></i></a>
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
@@ -64,13 +63,13 @@
                             <select name="user_id" id="user_id" class="form-control" data-live-search="true" required>
                                 <option value="">Selecione um usuário</option>
                                 @foreach ($allUsers as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->email }}</option>
+                                <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->email }}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-primary">Adicionar Usuário</button>
                 </form>
             </div>

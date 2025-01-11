@@ -145,7 +145,7 @@
         });
         var tamanho = $("#cnpj_cpf").val().replace(/\D/g, '').length;
 
-        if (tamanho < 11) {
+        if (tamanho <= 11) {
             $("#cnpj_cpf").mask("000.000.000-00");
         } else {
             $("#cnpj_cpf").mask("00.000.000/0000-00");

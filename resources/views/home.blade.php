@@ -27,6 +27,22 @@
         opacity: 0.5;
     }
 
+    .btn-actions {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        /* Espaço entre os botões */
+        flex-wrap: wrap;
+        /* Permitir quebra de linha caso o espaço seja insuficiente */
+    }
+
+    .btn-actions .btn {
+        flex: 1;
+        min-width: 30%;
+        padding: 5px;
+        font-size: 0.8rem;
+    }
+
     /* Adicionando maior responsividade */
     @media (max-width: 576px) {
         .calendar-nav-btn {
@@ -101,7 +117,7 @@
     }
 
     #calendar-body td.selected {
-        background-color: #007bff;
+        background-color: #0f1426;
         color: white;
     }
 
@@ -155,7 +171,7 @@
             <div class="d-flex justify-content-between mb-3">
                 <button id="prev-month" class="calendar-nav-btn btn-primary"><i
                         class="fa-solid fa-angle-left fa-2xl"></i></button>
-                <h3 id="month-title">{{ \Carbon\Carbon::now()->locale('pt-BR')->format('F Y') }}</h3>
+                <h3 id="month-title"></h3>
                 <button id="next-month" class="calendar-nav-btn btn-primary"><i
                         class="fa-solid fa-angle-right fa-2xl"></i></button>
             </div>
@@ -248,11 +264,12 @@
 
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/pt-br.min.js"></script>
 <script src="{{asset('js/dataTables.js')}}"></script>
 <script src="{{asset('js/dataTables.fixedColumns.js')}}"></script>
 <script src="{{asset('js/fixedColumns.dataTables.js')}}"></script>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $("main section").removeClass("container");
         let currentMonth = moment().month(); // Mês atual (0-11)
         let currentYear = moment().year(); // Ano atual
@@ -260,6 +277,9 @@
 
         // Configuração do idioma para português
         moment.locale('pt'); // Certifique-se de definir o idioma como 'pt'
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
 
         function generateCalendar(month, year) {
             $.ajax({
@@ -270,11 +290,11 @@
                     month: month + 1,
                     year: year
                 },
-                success: function (events) {
+                success: function(events) {
                     $('#calendar-body').empty();
 
                     // Atualizando o título do mês para português
-                    $('#month-title').text(moment([year, month]).format('MMMM YYYY')); // Usando 'MMMM' para o nome completo do mês
+                    $('#month-title').text(capitalizeFirstLetter(moment([year, month]).format('MMMM YYYY')));
 
                     let firstDayOfMonth = moment([year, month]).startOf('month').day();
                     let daysInMonth = moment([year, month]).daysInMonth();
@@ -324,7 +344,7 @@
                     year: year,
                     date: date // Envia a data caso tenha sido selecionada
                 },
-                success: function (data) {
+                success: function(data) {
 
                     // Atualizar os cards com os totais
                     $('#totalPagamentos').text('R$ ' + data.totais.pagamentos);
@@ -343,19 +363,30 @@
                             start: 0,
                             end: 1
                         },
-                        pageLength: 10,  // Fixando o número de registros por página (modifique conforme necessário)
+                        pageLength: 10, // Fixando o número de registros por página (modifique conforme necessário)
                         lengthChange: false, // Removendo a opção de mudar o número de itens por página
                         scrollX: true,
                         data: data.pagamentos,
-                        columns: [
-                            { data: 'id', title: '#' },
-                            { data: 'descricao', title: 'Descrição' },
-                            { data: 'valor', title: 'Valor' },
-                            { data: 'data_venc', title: 'Vencimento' },
+                        columns: [{
+                                data: 'id',
+                                title: '#'
+                            },
+                            {
+                                data: 'descricao',
+                                title: 'Descrição'
+                            },
+                            {
+                                data: 'valor',
+                                title: 'Valor'
+                            },
+                            {
+                                data: 'data_venc',
+                                title: 'Vencimento'
+                            },
                             {
                                 data: null,
                                 title: 'Ações',
-                                render: function (data, type, row) {
+                                render: function(data, type, row) {
                                     let editRoute = `{{ route('lancamentos.edit', ':id') }}`.replace(':id', row.id);
                                     let deleteRoute = `{{ route('lancamentos.pagamentos.destroy', ':id') }}`.replace(':id', row.id);
                                     let baixaRoute = `{{ route('lancamentos.pagamentos.baixa', ':id') }}`.replace(':id', row.id);
@@ -377,7 +408,7 @@
 
                             }
                         ],
-                        createdRow: function (row, data) {
+                        createdRow: function(row, data) {
                             // Aplica cor de fundo nas linhas da tabela
                             if (data.status === 'vencido') {
                                 $(row).addClass('table-danger'); // Linha vermelha para vencido
@@ -387,7 +418,7 @@
                                 $(row).addClass('');
                             }
                         },
-                        headerCallback: function (thead, data, start, end, display) {
+                        headerCallback: function(thead, data, start, end, display) {
                             $(thead).addClass('table-dark');
                         }
                     });
@@ -405,19 +436,30 @@
                             start: 0,
                             end: 1
                         },
-                        pageLength: 10,  // Fixando o número de registros por página (modifique conforme necessário)
+                        pageLength: 10, // Fixando o número de registros por página (modifique conforme necessário)
                         lengthChange: false, // Removendo a opção de mudar o número de itens por página
                         scrollX: true,
                         data: data.recebimentos,
-                        columns: [
-                            { data: 'id', title: '#' },
-                            { data: 'descricao', title: 'Descrição' },
-                            { data: 'valor', title: 'Valor' },
-                            { data: 'data_venc', title: 'Vencimento' },
+                        columns: [{
+                                data: 'id',
+                                title: '#'
+                            },
+                            {
+                                data: 'descricao',
+                                title: 'Descrição'
+                            },
+                            {
+                                data: 'valor',
+                                title: 'Valor'
+                            },
+                            {
+                                data: 'data_venc',
+                                title: 'Vencimento'
+                            },
                             {
                                 data: null,
                                 title: 'Ações',
-                                render: function (data, type, row) {
+                                render: function(data, type, row) {
                                     let editRoute = `{{ route('lancamentos.edit', ':id') }}`.replace(':id', row.id);
                                     let deleteRoute = `{{ route('lancamentos.recebimentos.destroy', ':id') }}`.replace(':id', row.id);
                                     let baixaRoute = `{{ route('lancamentos.recebimentos.baixa', ':id') }}`.replace(':id', row.id);
@@ -437,14 +479,14 @@
                                 }
                             }
                         ],
-                        createdRow: function (row, data) {
+                        createdRow: function(row, data) {
                             if (data.status === 'vencido') {
                                 $(row).addClass('table-danger');
                             } else if (data.status === 'recebido') {
                                 $(row).addClass('table-success');
                             }
                         },
-                        headerCallback: function (thead, data, start, end, display) {
+                        headerCallback: function(thead, data, start, end, display) {
                             $(thead).addClass('table-dark');
                         }
                     });
@@ -456,7 +498,7 @@
         generateCalendar(currentMonth, currentYear);
 
         // Quando o usuário clica em uma data específica no calendário
-        $('#calendar-body').on('click', 'td[data-date]', function () {
+        $('#calendar-body').on('click', 'td[data-date]', function() {
             // Remove a seleção anterior
             $('#calendar-body td').removeClass('selected');
 
@@ -468,7 +510,7 @@
         });
 
         // Navegação entre meses
-        $('#prev-month').on('click', function () {
+        $('#prev-month').on('click', function() {
             currentMonth--;
             if (currentMonth < 0) {
                 currentMonth = 11;
@@ -477,7 +519,7 @@
             generateCalendar(currentMonth, currentYear);
         });
 
-        $('#next-month').on('click', function () {
+        $('#next-month').on('click', function() {
             currentMonth++;
             if (currentMonth > 11) {
                 currentMonth = 0;

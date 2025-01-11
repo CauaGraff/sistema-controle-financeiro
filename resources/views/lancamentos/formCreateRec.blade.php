@@ -29,11 +29,11 @@
         </div>
         <!-- Campo de tipo do cadastro -->
         <div class="row mb-3">
-            <label for="tipo" class="col-sm-2 col-form-label">Tipo</label>
+            <label for="tipo" class="col-sm-2 col-form-label">Tipo do Recebimento</label>
             <div class="col-sm-10">
                 <select class="form-select @error('tipo')is-invalid @enderror" id="tipo" name="tipo">
-                    <option value="0" {{ old('tipo') == 0 ? 'selected' : '' }}>Nenhum</option>
-                    <option value="1" {{ old('tipo') == 1 ? 'selected' : '' }}>Parcelas</option>
+                    <option value="0" {{ old('tipo') == 0 ? 'selected' : '' }}>Padrão</option>
+                    <option value="1" {{ old('tipo') == 1 ? 'selected' : '' }}>Parcelado</option>
                     <option value="2" {{ old('tipo') == 2 ? 'selected' : '' }}>Recorrente</option>
                 </select>
                 @error('tipo')
@@ -74,17 +74,35 @@
         </div>
 
         <!-- Campos adicionais para lançamentos recorrentes -->
-        <!-- <div id="recorrenteFields" style="display: none;">
+        <div id="recorrenteFields" style="display: none;">
             <div class="row mb-3">
                 <label for="frequencia" class="col-sm-2 col-form-label">Frequência</label>
                 <div class="col-sm-10">
-                    <select class="form-select" id="frequencia" name="frequencia">
-                        <option value="mensal">Mensal</option>
-                        <option value="anual">Anual</option>
+                    <select class="form-select @error('frequencia')is-invalid @enderror" id="frequencia" name="frequencia">
+                        <option value="diaria" {{ old('frequencia') == 'diaria' ? 'selected' : '' }}>Diária</option>
+                        <option value="semanal" {{ old('frequencia') == 'semanal' ? 'selected' : '' }}>Semanal</option>
+                        <option value="mensal" {{ old('frequencia') == 'mensal' ? 'selected' : '' }}>Mensal</option>
+                        <option value="anual" {{ old('frequencia') == 'anual' ? 'selected' : '' }}>Anual</option>
                     </select>
+                    @error('frequencia')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                    @enderror
                 </div>
             </div>
-        </div> -->
+            <div class="row mb-3">
+                <label for="data_fim" class="col-sm-2 col-form-label">Fim da Recorrência</label>
+                <div class="col-sm-10">
+                    <input type="date" name="data_fim" id="data_fim" class="form-control @error('data_fim')is-invalid @enderror" value="{{ old('data_fim') }}">
+                    @error('data_fim')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                    @enderror
+                </div>
+            </div>
+        </div>
 
         <!-- Campos adicionais para lançamentos Parcelas -->
         <div id="parcelasFields" style="display: none;">
@@ -202,4 +220,40 @@
         <button type="submit" class="btn btn-primary">Cadastrar Lançamento</button>
     </form>
 </div>
+@endsection
+
+@section('js')
+<script src="{{asset("js/jquery.mask.min.js")}}"></script>
+<script>
+    $(document).ready(function() {
+        function selecionaCampos() {
+            if ($("#tipo").val() == 0) {
+                $("#nenhumFields").show()
+                $("#recorrenteFields").hide()
+                $("#parcelasFields").hide()
+            } else if ($("#tipo").val() == 1) {
+                $("#nenhumFields").hide()
+                $("#recorrenteFields").hide()
+                $("#parcelasFields").show()
+            } else if ($("#tipo").val() == 2) {
+                $("#nenhumFields").show()
+                $("#recorrenteFields").show()
+                $("#parcelasFields").hide()
+            }
+        }
+        selecionaCampos();
+        $('#valor').mask('000.000.000.000.000,00', {
+            reverse: true
+        });
+        $('#valorTotal').mask('000.000.000.000.000,00', {
+            reverse: true
+        });
+        $('#valorEntrada').mask('000.000.000.000.000,00', {
+            reverse: true
+        });
+        $("#tipo").change(function() {
+            selecionaCampos();
+        })
+    })
+</script>
 @endsection

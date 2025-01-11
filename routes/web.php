@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\CalendarioController;
 use App\Http\Middleware\AdminIS;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdmController;
@@ -8,11 +7,13 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EmpresasController;
+use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\ContaBancoController;
 use App\Http\Controllers\FavorecidoController;
 use App\Http\Controllers\LancamentoController;
 use App\Http\Controllers\CategoriaContasController;
 use App\Http\Controllers\FornecedorClienteController;
+use App\Http\Controllers\LancamentoRecorrenciaController;
 
 /**ROTAS */
 
@@ -81,6 +82,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('recebimentos/{lancamento}', [LancamentoController::class, 'destroy'])->name('lancamentos.recebimentos.destroy');
         Route::get('recebimentos/{lancamento}/pagar', [LancamentoController::class, 'formbaixa'])->name('lancamentos.recebimentos.baixa');
         Route::post('recebimentos/{lancamento}/baixa', [LancamentoController::class, 'baixaStore'])->name('lancamentos.recebimentos.baixa.store');
+        Route::get('lancamentos', [LancamentoController::class, 'index'])->name('lancamentos.index');
 
 
         Route::get('/{lancamento}/edit', [LancamentoController::class, 'edit'])->name('lancamentos.edit');
@@ -94,4 +96,12 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('favorecidos', FornecedorClienteController::class);
 
     Route::resource('contas_banco', ContaBancoController::class);
+
+
+    Route::prefix('recorrencias')->name('recorrencias.')->group(function () {
+        Route::get('/', [LancamentoRecorrenciaController::class, 'index'])->name('index');
+        Route::get('/edit/{id}', [LancamentoRecorrenciaController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [LancamentoRecorrenciaController::class, 'update'])->name('update');
+        Route::delete('/destroy/{id}', [LancamentoRecorrenciaController::class, 'destroy'])->name('destroy');
+    });
 });

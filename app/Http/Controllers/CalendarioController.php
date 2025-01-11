@@ -70,7 +70,6 @@ class CalendarioController extends Controller
     }
 
     // Consulta os lançamentos e retorna um JSON dentro do período especificado
-    // Consulta os lançamentos e retorna um JSON dentro do período especificado
     public function postLancamentos(Request $request)
     {
         $date = $request->get('date'); // Recebe a data específica
@@ -132,10 +131,20 @@ class CalendarioController extends Controller
         // Formatar os dados para DataTables
         $data = [
             'pagamentos' => $pagamentos->map(function ($lancamento) {
-                $status = $lancamento->isPago() ? 'pago' : 'pendente';
-                $vencido = Carbon::parse($lancamento->data_venc)->lt(Carbon::now()); // Verifica se a data de vencimento já passou
-                if ($vencido && !$lancamento->isPago()) {
-                    $status = 'vencido'; // Atualiza o status para 'vencido'
+                // Status default
+                $status = 'pendente';
+
+                // Verifica se a data de vencimento é igual à data atual (ou seja, está vencendo hoje)
+                $vencido = Carbon::parse($lancamento->data_venc)->lt(Carbon::now());
+                $hoje = Carbon::parse($lancamento->data_venc)->isToday(); // Verifica se a data é hoje
+
+                // Se a data de vencimento for igual a hoje ou se não tiver status (não pago ainda), marca como 'warning' (pendente)
+                if ($hoje) {
+                    $status = 'warning'; // 'warning' é a cor para mostrar que é algo "pendente" e importante
+                } elseif ($vencido && !$lancamento->isPago()) {
+                    $status = 'vencido'; // Caso esteja vencido e não pago, marca como 'vencido'
+                } elseif ($lancamento->isPago()) {
+                    $status = 'pago'; // Se já estiver pago, marca como 'pago'
                 }
 
                 return [
@@ -143,14 +152,24 @@ class CalendarioController extends Controller
                     'descricao' => $lancamento->descricao,
                     'valor' => number_format($lancamento->valor, 2, ',', '.'),
                     'data_venc' => $lancamento->data_venc->format('d/m/Y'),
-                    'status' => $status, // Agora o status vai ser 'vencido', 'pago' ou 'pendente'
+                    'status' => $status, // Agora o status pode ser 'vencido', 'pago', 'pendente' ou 'warning'
                 ];
             }),
             'recebimentos' => $recebimentos->map(function ($lancamento) {
-                $status = $lancamento->isPago() ? 'recebido' : 'pendente';
-                $vencido = Carbon::parse($lancamento->data_venc)->lt(Carbon::now()); // Verifica se a data de vencimento já passou
-                if ($vencido && !$lancamento->isPago()) {
-                    $status = 'vencido'; // Atualiza o status para 'vencido'
+                // Status default
+                $status = 'pendente';
+
+                // Verifica se a data de vencimento é igual à data atual (ou seja, está vencendo hoje)
+                $vencido = Carbon::parse($lancamento->data_venc)->lt(Carbon::now());
+                $hoje = Carbon::parse($lancamento->data_venc)->isToday(); // Verifica se a data é hoje
+
+                // Se a data de vencimento for igual a hoje ou se não tiver status (não pago ainda), marca como 'warning' (pendente)
+                if ($hoje) {
+                    $status = 'warning'; // 'warning' para mostrar que está vencendo hoje
+                } elseif ($vencido && !$lancamento->isPago()) {
+                    $status = 'vencido'; // Caso esteja vencido e não pago, marca como 'vencido'
+                } elseif ($lancamento->isPago()) {
+                    $status = 'recebido'; // Se já tiver sido recebido, marca como 'recebido'
                 }
 
                 return [
@@ -158,7 +177,7 @@ class CalendarioController extends Controller
                     'descricao' => $lancamento->descricao,
                     'valor' => number_format($lancamento->valor, 2, ',', '.'),
                     'data_venc' => $lancamento->data_venc->format('d/m/Y'),
-                    'status' => $status, // Agora o status vai ser 'vencido', 'recebido' ou 'pendente'
+                    'status' => $status, // Agora o status pode ser 'vencido', 'recebido', 'pendente' ou 'warning'
                 ];
             }),
             // Totais

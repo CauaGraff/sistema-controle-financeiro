@@ -31,13 +31,15 @@
                     <td>{{ $conta->agencia }}</td>
                     <td>{{ $conta->conta }}</td>
                     <td class="text-center">
-                        <a href="{{ route('contas_banco.edit', $conta->id) }}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="{{ route('contas_banco.edit', $conta->id) }}" class="btn btn-warning btn-sm"><i
+                                class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
                         <form action="{{ route('contas_banco.destroy', $conta->id) }}" method="POST"
                             style="display:inline;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-sm"
-                                onclick="return confirm('Deseja realmente excluir esta conta bancária?')">Excluir</button>
+                                onclick="return confirm('Deseja realmente excluir esta conta bancária?')"><i class="fa-solid fa-trash"></i>
+                        </form></button>
                         </form>
                     </td>
                 </tr>

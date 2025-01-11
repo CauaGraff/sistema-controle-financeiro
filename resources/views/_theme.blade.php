@@ -51,6 +51,9 @@
                 <li>
                   <a class="dropdown-item select-company" href="{{route("favorecidos.index")}}">Fornecedor/Clientes</a>
                 </li>
+                <li>
+                  <a class="dropdown-item select-company" href="{{route("recorrencias.index")}}">Lancamentos Recorrentes</a>
+                </li>
               </ul>
             </li>
           </ul>

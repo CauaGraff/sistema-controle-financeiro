@@ -41,7 +41,7 @@
             <tr>
                 <td><strong>{{ $numeroCategoriaPai }}</strong></td>
                 <td><strong>{{ $categoria->descricao }}</strong></td>
-                <td>
+                <td class="text-center">
                     <a href="{{ route('categorias.edit', $categoria->id) }}" class="btn btn-warning btn-sm"><i
                             class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
                     <form action="{{ route('categorias.destroy', $categoria->id) }}" method="POST"
@@ -63,7 +63,7 @@
             <tr>
                 <td>{{ $numeroCategoriaPai }}.{{ $numeroSubcategoria }}</td>
                 <td>-- {{ $subcategoria->descricao }}</td>
-                <td>
+                <td class="text-center">
                     <a href="{{ route('categorias.edit', $subcategoria->id) }}" class="btn btn-warning btn-sm"><i
                             class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
                     <form action="{{ route('categorias.destroy', $subcategoria->id) }}" method="POST"

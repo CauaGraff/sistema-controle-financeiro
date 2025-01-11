@@ -19,17 +19,24 @@ class LoginController extends Controller
      */
     public function authenticate(Request $request)
     {
+        // Validação das credenciais
         $credentials = $request->validate([
             'email' => 'required',
-            'password' => 'required|min:8'
+            'password' => 'required|min:8',
         ], [
             'email.required' => 'Preencha o e-mail',
             'password.required' => 'Preencha a senha',
-            'password.min' => 'Esse campo tem que ter no mínimo :min caracteres'
+            'password.min' => 'Esse campo tem que ter no mínimo :min caracteres',
         ]);
 
-        if (Auth::attempt(['email' => $credentials["email"], 'password' => $credentials["password"], 'active' => 1])) {
+        // Verifica se o campo 'remember' foi marcado
+        $remember = $request->has('remember');
+
+        // Tenta autenticar o usuário com o parâmetro 'remember'
+        if (Auth::attempt(['email' => $credentials["email"], 'password' => $credentials["password"], 'active' => 1], $remember)) {
             $request->session()->regenerate();
+
+            // Redireciona de acordo com o tipo de usuário (admin ou usuário comum)
             if (Auth::user()->isAdmim()) {
                 return redirect()->route('home.adm');
             } else {
@@ -37,17 +44,17 @@ class LoginController extends Controller
                 $primeiraEmpresa = Auth::user()->empresas()->first();
 
                 if ($primeiraEmpresa) {
-                    // Definir a primeira empresa na sessão automaticamente
+                    // Define a primeira empresa na sessão automaticamente
                     session([
                         'empresa_id' => $primeiraEmpresa->id,
                         'empresa_nome' => $primeiraEmpresa->nome,
                     ]);
                 } else {
-                    // Opcional: se o usuário não tiver empresas associadas, você pode redirecionar ou tratar de forma adequada
+                    // Opcional: se o usuário não tiver empresas associadas
                     return redirect()->route('empresa.selecionar')->withErrors('Nenhuma empresa disponível.');
                 }
 
-                // Redirecionar para a home
+                // Redireciona para a home
                 return redirect()->route('home');
             }
         }
@@ -57,8 +64,6 @@ class LoginController extends Controller
             'email' => 'As credenciais fornecidas estão incorretas ou a conta está inativa.',
         ]);
     }
-
-
     public function destroy()
     {
         Auth::logout();

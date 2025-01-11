@@ -13,7 +13,7 @@
     </div>
     @endif
 
-    <form action="{{ route('lancamentos.pagamentos.store') }}" method="POST">
+    <form action="{{ route('lancamentos.pagamentos.store') }}" method="POST" id="formPagamento">
         @csrf
         <!-- Campo de Descrição -->
         <div class="row mb-3">
@@ -27,15 +27,15 @@
                 </div>
                 @enderror
             </div>
-
         </div>
+
         <!-- Campo de tipo do cadastro -->
         <div class="row mb-3">
-            <label for="tipo" class="col-sm-2 col-form-label">Tipo</label>
+            <label for="tipo" class="col-sm-2 col-form-label">Tipo Pagamento</label>
             <div class="col-sm-10">
                 <select class="form-select @error('tipo')is-invalid @enderror" id="tipo" name="tipo">
-                    <option value="0" {{ old('tipo') == 0 ? 'selected' : '' }}>Nenhum</option>
-                    <option value="1" {{ old('tipo') == 1 ? 'selected' : '' }}>Parcelas</option>
+                    <option value="0" {{ old('tipo') == 0 ? 'selected' : '' }}>Padrão</option>
+                    <option value="1" {{ old('tipo') == 1 ? 'selected' : '' }}>Parcelado</option>
                     <option value="2" {{ old('tipo') == 2 ? 'selected' : '' }}>Recorrente</option>
                 </select>
                 @error('tipo')
@@ -45,6 +45,7 @@
                 @enderror
             </div>
         </div>
+
         <!-- Campos normal -->
         <div id="nenhumFields">
             <!-- Campo de Valor -->
@@ -76,23 +77,41 @@
         </div>
 
         <!-- Campos adicionais para lançamentos recorrentes -->
-        <!-- <div id="recorrenteFields" style="display: none;">
+        <div id="recorrenteFields" style="display: none;">
             <div class="row mb-3">
                 <label for="frequencia" class="col-sm-2 col-form-label">Frequência</label>
                 <div class="col-sm-10">
-                    <select class="form-select" id="frequencia" name="frequencia">
-                        <option value="mensal">Mensal</option>
-                        <option value="anual">Anual</option>
+                    <select class="form-select @error('frequencia')is-invalid @enderror" id="frequencia" name="frequencia">
+                        <option value="diaria" {{ old('frequencia') == 'diaria' ? 'selected' : '' }}>Diária</option>
+                        <option value="semanal" {{ old('frequencia') == 'semanal' ? 'selected' : '' }}>Semanal</option>
+                        <option value="mensal" {{ old('frequencia') == 'mensal' ? 'selected' : '' }}>Mensal</option>
+                        <option value="anual" {{ old('frequencia') == 'anual' ? 'selected' : '' }}>Anual</option>
                     </select>
+                    @error('frequencia')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                    @enderror
                 </div>
             </div>
-        </div> -->
+            <div class="row mb-3">
+                <label for="data_fim" class="col-sm-2 col-form-label">Fim da Recorrência</label>
+                <div class="col-sm-10">
+                    <input type="date" name="data_fim" id="data_fim" class="form-control @error('data_fim')is-invalid @enderror" value="{{ old('data_fim') }}">
+                    @error('data_fim')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                    @enderror
+                </div>
+            </div>
+        </div>
 
         <!-- Campos adicionais para lançamentos Parcelas -->
         <div id="parcelasFields" style="display: none;">
-            <!-- Campo de Valor -->
+            <!-- Campo de Valor Total -->
             <div class="row mb-3">
-                <label for="valor" class="col-sm-2 col-form-label" id="labelValor">Valor Total</label>
+                <label for="valorTotal" class="col-sm-2 col-form-label" id="labelValor">Valor Total</label>
                 <div class="col-sm-10">
                     <input type="text" class="form-control @error('valorTotal')is-invalid @enderror" id="valorTotal"
                         name="valorTotal" value="{{ old('valorTotal') }}">
@@ -103,10 +122,9 @@
                     @enderror
                 </div>
             </div>
-            <!-- Campo de Data de Vencimento -->
+            <!-- Campo de 1º Data de Vencimento -->
             <div class="row mb-3">
-                <label for="dataVencPar" class="col-sm-2 col-form-label" id="labelDataVenc">1º Data de
-                    Vencimento</label>
+                <label for="dataVencPar" class="col-sm-2 col-form-label" id="labelDataVenc">1º Data de Vencimento</label>
                 <div class="col-sm-10">
                     <input type="date" name="dataVencPar" id="dataVencPar"
                         class="form-control @error('dataVencPar')is-invalid @enderror" value="{{ old('dataVencPar') }}">
@@ -118,7 +136,7 @@
                 </div>
             </div>
             <!-- Campo de Entrada -->
-            <div class=" row mb-3">
+            <div class="row mb-3">
                 <label for="valorEntrada" class="col-sm-2 col-form-label" id="labelEntrada">Valor Entrada</label>
                 <div class="col-sm-10">
                     <input type="text" class="form-control @error('valorEntrada')is-invalid @enderror" id="valorEntrada"
@@ -132,10 +150,9 @@
             </div>
             <!-- Campo de qtd parcelas -->
             <div class="row mb-3">
-                <label for="qtdParcelas" class="col-sm-2 col-form-label" id="labelDataVenc">Quantidade
-                    Parcelas</label>
+                <label for="qtdParcelas" class="col-sm-2 col-form-label" id="labelQtdParcelas">Quantidade Parcelas</label>
                 <div class="col-sm-10">
-                    <input type="number" class="form-control @error('valorEntrada')is-invalid @enderror"
+                    <input type="number" class="form-control @error('qtdParcelas')is-invalid @enderror"
                         id="qtdParcelas" name="qtdParcelas" value="{{ old('qtdParcelas') }}">
                     @error('qtdParcelas')
                     <div class="invalid-feedback">
@@ -145,6 +162,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Campo de Categoria -->
         <div class="row mb-3">
             <label for="categoria" class="col-sm-2 col-form-label">Categoria</label>
@@ -169,6 +187,7 @@
             </div>
             @enderror
         </div>
+
         <!-- Campo de Favorecido -->
         <div class="row mb-3">
             <label for="fornecedor_cliente" class="col-sm-2 col-form-label">Fornecedor/Cliente</label>
@@ -179,18 +198,14 @@
                     <!-- Grupo de Fornecedores -->
                     <optgroup label="Fornecedores">
                         @foreach ($fornecedores as $fornecedor)
-                        <option value="{{ $fornecedor->id }}" {{ old('fornecedor_cliente_id') == $fornecedor->id ? 'selected' : '' }}>
-                            {{ $fornecedor->nome }}
-                        </option>
+                        <option value="{{ $fornecedor->id }}" {{ old('fornecedor_cliente_id') == $fornecedor->id ? 'selected' : '' }}>{{ $fornecedor->nome }}</option>
                         @endforeach
                     </optgroup>
 
                     <!-- Grupo de Clientes -->
                     <optgroup label="Clientes">
                         @foreach ($clientes as $cliente)
-                        <option value="{{ $cliente->id }}" {{ old('fornecedor_cliente_id') == $cliente->id ? 'selected' : '' }}>
-                            {{ $cliente->nome }}
-                        </option>
+                        <option value="{{ $cliente->id }}" {{ old('fornecedor_cliente_id') == $cliente->id ? 'selected' : '' }}>{{ $cliente->nome }}</option>
                         @endforeach
                     </optgroup>
                 </select>
@@ -212,20 +227,28 @@
     $(document).ready(function() {
         function selecionaCampos() {
             if ($("#tipo").val() == 0) {
-                $("#nenhumFields").show()
-                $("#recorrenteFields").hide()
-                $("#parcelasFields").hide()
+                $("#nenhumFields").show();
+                $("#recorrenteFields").hide();
+                $("#parcelasFields").hide();
+                // Resetando campos recorrentes e parcelas
+                $('#frequencia').val('');
+                $('#data_fim').val('');
             } else if ($("#tipo").val() == 1) {
-                $("#nenhumFields").hide()
-                $("#recorrenteFields").hide()
-                $("#parcelasFields").show()
+                $("#nenhumFields").hide();
+                $("#recorrenteFields").hide();
+                $("#parcelasFields").show();
+                // Resetando campos recorrentes
+                $('#frequencia').val('');
+                $('#data_fim').val('');
             } else if ($("#tipo").val() == 2) {
-                $("#nenhumFields").show()
-                $("#recorrenteFields").show()
-                $("#parcelasFields").hide()
+                $("#nenhumFields").show();
+                $("#recorrenteFields").show();
+                $("#parcelasFields").hide();
             }
         }
+
         selecionaCampos();
+
         $('#valor').mask('000.000.000.000.000,00', {
             reverse: true
         });
@@ -235,11 +258,10 @@
         $('#valorEntrada').mask('000.000.000.000.000,00', {
             reverse: true
         });
+
         $("#tipo").change(function() {
             selecionaCampos();
-        })
-
-
-    })
+        });
+    });
 </script>
 @endsection

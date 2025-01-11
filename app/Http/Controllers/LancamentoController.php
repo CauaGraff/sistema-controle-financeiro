@@ -2,36 +2,102 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ContaBanco;
 use Carbon\Carbon;
+use App\Models\ContaBanco;
 use App\Models\Lancamento;
 use Illuminate\Http\Request;
 use App\Models\LancamentoBaixa;
 use App\Models\FornecedorCliente;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\LancamentoRecorrenciaConfig;
 use App\Models\CategoriaContas; // Modelo de Plano de Contas
 
 class LancamentoController extends Controller
 {
     // Método para listar todos os lançamentos (pagamentos)
-    public function indexPagamentos()
+    public function indexPagamentos(Request $request)
     {
-        // Verifica se o usuário está autenticado e se tem permissão para acessar a empresa
         $empresaId = session('empresa_id');
-        $lancamentos = Lancamento::where('id_empresa', $empresaId)->where('tipo', 'P')->get();
+        $query = Lancamento::where('id_empresa', $empresaId)->where('tipo', 'P');
+
+        // Filtros
+        if ($request->has('descricao') && $request->descricao != '') {
+            $query->where('descricao', 'like', '%' . $request->descricao . '%');
+        }
+
+        if ($request->has('data_inicio') && $request->data_inicio != '') {
+            $query->where('data_venc', '>=', Carbon::parse($request->data_inicio)->startOfDay());
+        }
+
+        if ($request->has('data_fim') && $request->data_fim != '') {
+            $query->where('data_venc', '<=', Carbon::parse($request->data_fim)->endOfDay());
+        }
+
+        if ($request->has('valor_min') && $request->valor_min != '') {
+            $query->where('valor', '>=', str_replace(['.', ','], ['', '.'], $request->valor_min));
+        }
+
+        if ($request->has('valor_max') && $request->valor_max != '') {
+            $query->where('valor', '<=', str_replace(['.', ','], ['', '.'], $request->valor_max));
+        }
+
+        if ($request->has('categoria_id') && $request->categoria_id != '') {
+            $query->where('id_categoria', $request->categoria_id);
+        }
+
+        if ($request->has('fornecedor_cliente_id') && $request->fornecedor_cliente_id != '') {
+            $query->where('id_fornecedor_cliente', $request->fornecedor_cliente_id);
+        }
+
+        $lancamentos = $query->get();
+
         $route = "P";
-        return view('lancamentos.index', compact('lancamentos', 'route'));
+
+        $categorias = CategoriaContas::where("id_empresa", $empresaId)->get(); // Supondo que você tenha um modelo de CategoriaContas
+        $fornecedoresClientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
+        return view('lancamentos.index', compact('lancamentos', 'categorias', 'route', 'fornecedoresClientes'));
     }
 
-    // Método para listar todos os lançamentos (recebimentos)
-    public function indexRecebimentos()
+    public function indexRecebimentos(Request $request)
     {
         $empresaId = session('empresa_id');
-        $lancamentos = Lancamento::where('id_empresa', $empresaId)->where('tipo', 'R')->get();
+        $query = Lancamento::where('id_empresa', $empresaId)->where('tipo', 'R');
+
+        // Filtros
+
+        if ($request->has('data_inicio') && $request->data_inicio != '') {
+            $query->where('data_venc', '>=', Carbon::parse($request->data_inicio)->startOfDay());
+        }
+
+        if ($request->has('data_fim') && $request->data_fim != '') {
+            $query->where('data_venc', '<=', Carbon::parse($request->data_fim)->endOfDay());
+        }
+
+        if ($request->has('valor_min') && $request->valor_min != '') {
+            $query->where('valor', '>=', str_replace(['.', ','], ['', '.'], $request->valor_min));
+        }
+
+        if ($request->has('valor_max') && $request->valor_max != '') {
+            $query->where('valor', '<=', str_replace(['.', ','], ['', '.'], $request->valor_max));
+        }
+
+        if ($request->has('categoria_id') && $request->categoria_id != '') {
+            $query->where('id_categoria', $request->categoria_id);
+        }
+
+        if ($request->has('fornecedor_cliente_id') && $request->fornecedor_cliente_id != '') {
+            $query->where('id_fornecedor_cliente', $request->fornecedor_cliente_id);
+        }
+
+        $lancamentos = $query->get();
+
         $route = "R";
-        return view('lancamentos.index', compact('lancamentos', 'route'));
+        $categorias = CategoriaContas::where("id_empresa", $empresaId)->get(); // Supondo que você tenha um modelo de CategoriaContas
+        $fornecedoresClientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
+        return view('lancamentos.index', compact('lancamentos', 'categorias', 'route', 'fornecedoresClientes'));
     }
+
 
     public function create(Request $request)
     {
@@ -140,58 +206,37 @@ class LancamentoController extends Controller
                 }
                 return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Cadastrado com sucesso!");
             }
-            // if ($request->tipo == 2) {
-            //     // Criação do lançamento inicial
-            //     $lancamento = Lancamento::create([
-            //         'descricao' => $request->descricao,
-            //         'valor' => $request->valor,
-            //         'data_venc' => $request->data_venc,
-            //         'recorrente' => $request->recorrente ?? false,
-            //         'tipo_recorrencia' => $request->recorrente ? $request->tipo_recorrencia : null,
-            //         'frequencia' => $request->recorrente ? $request->frequencia : null,
-            //     ]);
-            //     // Se for recorrente, criar os próximos lançamentos
-            //     if ($lancamento->recorrente) {
-            //         $this->criarLançamentosRecorrentes($lancamento);
-            //     }
-            //     return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Cadastrado com sucesso!");
-            // }
             return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-danger', "Cadastrado com sucesso!");
         }
-        // return redirect()->route('lancamentos.pagamentos.index')->with('success', 'Lançamento criado com sucesso!');
-    }
-
-    private function criarLançamentosRecorrentes(Lancamento $lancamento)
-    {
-        $proximoVencimento = Carbon::parse($lancamento->data_venc);
-        $quantidadeDeLançamentos = 12;
-        for ($i = 1; $i <= $quantidadeDeLançamentos; $i++) {
-            switch ($lancamento->tipo_recorrencia) {
-                case 'diario':
-                    $proximoVencimento->addDay();
-                    break;
-                case 'semanal':
-                    $proximoVencimento->addWeek();
-                    break;
-                case 'mensal':
-                    $proximoVencimento->addMonth();
-                    break;
-                case 'anual':
-                    $proximoVencimento->addYear();
-                    break;
-            }
-            // Cria o próximo lançamento com a data calculada
-            Lancamento::create([
-                'descricao' => $lancamento->descricao,
-                'valor' => $lancamento->valor,
-                'data_venc' => $proximoVencimento->format('Y-m-d'), // Formato adequado para o banco
-                'recorrente' => true,
-                'tipo_recorrencia' => $lancamento->tipo_recorrencia,
-                'frequencia' => $lancamento->frequencia,
+        if ($request->tipo == 2) {
+            // Ajustando os campos de validação e removendo o dd()
+            $validated = $request->validate([
+                'descricao' => 'required|max:255',
+                'frequencia' => 'required|in:diaria,semanal,mensal,anual',
+                'data' => 'required',
+                'data_fim' => 'nullable|after_or_equal:data',
+                'valor' => 'required',
+                'categoria_id' => 'required|exists:categorias_de_contas,id',
+                'fornecedor_cliente_id' => 'required|exists:fornecedor_cliente,id',
             ]);
+            // Criar configuração de recorrência
+            $recorrencia = LancamentoRecorrenciaConfig::create([
+                'descricao' => $request->descricao,
+                'tipo_recorrencia' => $request->frequencia, // Campo correto no formulário
+                'data_inicio' => $request->data,
+                'data_fim' => $request->data_fim,
+                'valor' => str_replace(['.', ','], ['', '.'], $request->valor), // Formatação do valor
+                'id_categoria' => $request->categoria_id,
+                'id_empresa' => session('empresa_id'),
+                'id_fornecedor_cliente' => $request->fornecedor_cliente_id,
+                'ativo' => true,
+                'tipo' => $typeLancamento,
+            ]);
+            return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')->with('alert-success', "Cadastrado com sucesso!");
         }
+        return redirect()->route($typeLancamento == "P" ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')
+            ->with('alert-danger', "Erro ao cadastrar o lançamento.");
     }
-
     public function edit(Lancamento $lancamento)
     {
         // Verificar se o lançamento está baixado
@@ -335,6 +380,8 @@ class LancamentoController extends Controller
         $juros = 0;
         $multa = 0;
         $desconto = 0;
+        $valor = (float) $lancamento->valor;
+
 
         // Define os parâmetros de juros, multa e desconto (exemplo)
         $param_juros = $parametros->where('descricao', 'Juros')->first();  // exemplo: aplicação de juros
@@ -350,17 +397,18 @@ class LancamentoController extends Controller
 
         // Aplica juros e multa se houver atraso
         if ($dias_em_atraso > 0) {
-            $juros = number_format(($lancamento->valor * ($param_juros->indice / 100)) * $dias_em_atraso, 2);
-            $multa = number_format(($lancamento->valor * $param_multa->indice / 100), 2); // arredondando para 2 casas decimais
+            $juros = number_format(($valor * ($param_juros->indice / 100)) * $dias_em_atraso, 2);
+            $multa = number_format(($valor * $param_multa->indice / 100), 2); // arredondando para 2 casas decimais
         }
 
         // Aplicar desconto se for dentro do prazo
         if ($dias_em_atraso < 0) {
-            $desconto = number_format($lancamento->valor * $param_desconto->indice / 100, 2);
+            $desconto = number_format($valor * $param_desconto->indice / 100, 2);
         }
-        // Calcular valor total a ser pago
-        $valor_total = number_format($lancamento->valor + $juros + $multa - $desconto, 2);
 
+
+        // Calcular valor total a ser pago
+        $valor_total = number_format((float)$valor + (float)$juros + (float)$multa - (float)$desconto, 2);
         // Passar os valores para a view
         return view('lancamentos.pagar', compact('lancamento', 'juros', 'multa', 'desconto', 'valor_total', 'data_atual', 'contasBancarias'));
     }
