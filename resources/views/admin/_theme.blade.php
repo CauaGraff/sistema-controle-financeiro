@@ -64,7 +64,7 @@
     </nav>
   </header>
 
-  <main>
+  <main class="mt-5">
     <section class="container">
       @yield('content')
     </section>
@@ -96,11 +96,11 @@
 
     @if(Session::has('alert-success'))
     toastr.success("{{ Session::get('alert-success') }} ")
-  @elseif(Session::has('alert-warning'))
-  toastr.warning("{{ Session::get('alert-warning') }} ")
-@elseif(Session::has('alert-danger'))
-  toastr.error("{{ Session::get('alert-danger') }} ")
-@endif
+    @elseif(Session::has('alert-warning'))
+    toastr.warning("{{ Session::get('alert-warning') }} ")
+    @elseif(Session::has('alert-danger'))
+    toastr.error("{{ Session::get('alert-danger') }} ")
+    @endif
   </script>
 
   @yield("js")

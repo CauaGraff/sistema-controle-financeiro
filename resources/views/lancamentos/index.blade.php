@@ -64,10 +64,14 @@
             {{$route == "P" ? "Pagar" : "Receber"}}</a>
     </div>
     <!-- Ícone de filtro -->
-    <div class="d-flex justify-content-start mb-3">
+    <div class="d-flex justify-content-between mb-3 g-2">
         <button id="filter-toggle" class="btn btn-outline-info">
             <i class="fa-solid fa-filter"></i> Filtro
         </button>
+        <a href="{{ route('lancamentos.export') }}" class="btn btn-outline-info">
+            <i class="fa-solid fa-file-export"></i> Exportar
+        </a>
+
     </div>
     @if (!$lancamentos)
     <p class="text-center">Nenhum {{$route == "P" ? "Pagamento" : "Recebimento"}} Cadastrado.</p>

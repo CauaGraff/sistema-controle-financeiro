@@ -38,6 +38,16 @@
                     @endforeach
                 </select>
             </div>
+            <div class="form-group col-md-12">
+                <label for="status">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">Selecione o Status</option>
+                    <option value="pago" @if(request('status')=='pago' ) selected @endif>Pago</option>
+                    <option value="em_aberto" @if(request('status')=='em_aberto' ) selected @endif>Em Aberto</option>
+                    <option value="vencido" @if(request('status')=='vencido' ) selected @endif>Vencido</option>
+                </select>
+            </div>
+
             <button type="submit" class="btn btn-primary btn-block mt-3">Aplicar Filtros</button>
         </div>
     </form>

@@ -43,6 +43,11 @@ class Lancamento extends Model
         return $this->hasOne(LancamentoBaixa::class, 'id_lancamento');
     }
 
+
+    public function lancamentoBaixaFilter()
+    {
+        return $this->hasMany(LancamentoBaixa::class, 'id_lancamento');
+    }
     // Verifica se o lançamento foi pago
     public function isPago()
     {

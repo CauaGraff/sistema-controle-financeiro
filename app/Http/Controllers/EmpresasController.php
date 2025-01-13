@@ -67,6 +67,11 @@ class EmpresasController extends Controller
         $empresa = Empresas::findOrFail($id);
         $usuarios = $empresa->usuarios; // Assumindo que a relação está configurada no modelo Empresa
         $allUsers = User::whereNotIn('id', $usuarios->pluck('id'))->where('id_typeuser', 3)->get();
+        session([
+            'empresa_id' => $empresa->id,
+            'empresa_nome' => $empresa->nome,
+        ]);
+
         return view('admin.empresas.view', compact('empresa', 'usuarios', 'allUsers'));
     }
     public function addUsuario(Request $request, $id)

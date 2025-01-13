@@ -18,9 +18,15 @@
   <header class="border-bottom" style="background-color: #fff;">
     <nav class="navbar navbar-expand-lg navbar-light p-3">
       <div class="container-fluid">
-        <a class="navbar-brand" href="{{route("lancamentos.pagamentos.index")}}">
+        @if (Auth::user()->isAdmim())
+        <a class="navbar-brand" href="{{route('adm.empresas.show', session('empresa_id'))}}">
           <img src="{{asset("imgs/banner.png")}}" alt="Logo" style="width: 140px;">
         </a>
+        @else
+        <a class="navbar-brand" href="{{route("home")}}">
+          <img src="{{asset("imgs/banner.png")}}" alt="Logo" style="width: 140px;">
+        </a>
+        @endif
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
           aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>

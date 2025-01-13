@@ -10,6 +10,7 @@ use App\Models\LancamentoBaixa;
 use App\Models\FornecedorCliente;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
 use App\Models\LancamentoRecorrenciaConfig;
 use App\Models\CategoriaContas; // Modelo de Plano de Contas
 
@@ -50,12 +51,31 @@ class LancamentoController extends Controller
             $query->where('id_fornecedor_cliente', $request->fornecedor_cliente_id);
         }
 
+        // Filtro de Status (Pago, Em Aberto, Vencido)
+        if ($request->has('status') && $request->status != '') {
+            $status = $request->status;
+
+            if ($status == 'pago') {
+                // Lançamentos pagos possuem uma baixa registrada
+                $query->whereHas('lancamentoBaixaFilter', function ($query) {
+                    $query->whereNotNull('id_lancamento');
+                });
+            } elseif ($status == 'em_aberto') {
+                // Lançamentos em aberto não possuem uma baixa registrada
+                $query->whereDoesntHave('lancamentoBaixaFilter');
+            } elseif ($status == 'vencido') {
+                // Lançamentos vencidos sem baixa registrada
+                $query->where('data_venc', '<', Carbon::now())
+                    ->whereDoesntHave('lancamentoBaixaFilter');
+            }
+        }
+
         $lancamentos = $query->get();
 
         $route = "P";
-
-        $categorias = CategoriaContas::where("id_empresa", $empresaId)->get(); // Supondo que você tenha um modelo de CategoriaContas
+        $categorias = CategoriaContas::where("id_empresa", $empresaId)->get();
         $fornecedoresClientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
+
         return view('lancamentos.index', compact('lancamentos', 'categorias', 'route', 'fornecedoresClientes'));
     }
 
@@ -484,5 +504,74 @@ class LancamentoController extends Controller
 
         // Redirecionar ou retornar uma resposta
         return redirect()->back()->with('success', 'Arquivo excluído com sucesso.');
+    }
+
+    public function export()
+    {
+        // Recupera os lançamentos conforme os filtros da requisição
+        $lancamentos = Lancamento::query();
+
+        // Adiciona filtros se existirem (data_inicio, data_fim, etc)
+        if ($startDate = request('data_inicio')) {
+            $lancamentos->where('data_venc', '>=', $startDate);
+        }
+        if ($endDate = request('data_fim')) {
+            $lancamentos->where('data_venc', '<=', $endDate);
+        }
+        if ($valorMin = request('valor_min')) {
+            $lancamentos->where('valor', '>=', $valorMin);
+        }
+        if ($valorMax = request('valor_max')) {
+            $lancamentos->where('valor', '<=', $valorMax);
+        }
+        if ($categoriaId = request('categoria_id')) {
+            $lancamentos->where('categoria_id', $categoriaId);
+        }
+        if ($fornecedorClienteId = request('fornecedor_cliente_id')) {
+            $lancamentos->where('fornecedor_cliente_id', $fornecedorClienteId);
+        }
+        if ($status = request('status')) {
+            if ($status == 'pago') {
+                $lancamentos->whereNotNull('data_baixa');
+            } elseif ($status == 'em_aberto') {
+                $lancamentos->whereNull('data_baixa');
+            } elseif ($status == 'vencido') {
+                $lancamentos->where('data_venc', '<', now());
+            }
+        }
+
+        $lancamentos = $lancamentos->get();
+
+        // Cabeçalhos do arquivo CSV
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=lancamentos.csv",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        // Abre o "output" do arquivo CSV
+        $handle = fopen('php://output', 'w');
+
+        // Cabeçalho do CSV
+        fputcsv($handle, ['Nº', 'Descrição', 'Data Vencimento', 'Valor', 'Data de Baixa', 'Valor Baixado']);
+
+        // Conteúdo dos lançamentos
+        foreach ($lancamentos as $lancamento) {
+            fputcsv($handle, [
+                $lancamento->id,
+                $lancamento->descricao,
+                $lancamento->data_venc ? date('d/m/Y', strtotime($lancamento->data_venc)) : '',
+                'R$ ' . number_format($lancamento->valor, 2, ",", "."),
+                $lancamento->data_baixa ? date('d/m/Y', strtotime($lancamento->data_baixa)) : '',
+                $lancamento->data_baixa ? 'R$ ' . number_format($lancamento->valor, 2, ",", ".") : ''
+            ]);
+        }
+
+        fclose($handle);
+
+        // Retorna o arquivo CSV como resposta
+        return Response::make('', 200, $headers);
     }
 }

@@ -17,6 +17,9 @@
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 + Adcionar
             </button>
+            <a type="submit" class="btn btn-success" href="{{ route('home') }}">
+                Acessar Controle Financeiro
+            </a>
         </div>
     </div>
     <div class="table-responsive">
