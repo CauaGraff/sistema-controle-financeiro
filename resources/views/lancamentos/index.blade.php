@@ -32,7 +32,7 @@
         background-color: #f8f9fa;
         /* Fundo mais suave */
         color: #343a40;
-        padding: 20px;
+        padding: 5px 20px;
         transition: left 0.3s ease-in-out;
         z-index: 9999;
         box-shadow: 4px 0 6px rgba(0, 0, 0, 0.1);

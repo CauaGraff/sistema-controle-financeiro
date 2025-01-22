@@ -73,10 +73,18 @@ class LancamentoController extends Controller
         $lancamentos = $query->get();
 
         $route = "P";
-        $categorias = CategoriaContas::where("id_empresa", $empresaId)->get();
+        $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))->get();
+        $categoriasAgrupadas = [];
+        foreach ($categorias as $categoria) {
+            if ($categoria->id_categoria_pai) {
+                $categoriasAgrupadas[$categoria->id_categoria_pai]['subcategorias'][] = $categoria;
+            } else {
+                $categoriasAgrupadas[$categoria->id]['categoria'] = $categoria;
+            }
+        }
         $fornecedoresClientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
 
-        return view('lancamentos.index', compact('lancamentos', 'categorias', 'route', 'fornecedoresClientes'));
+        return view('lancamentos.index', compact('lancamentos', 'categoriasAgrupadas', 'route', 'fornecedoresClientes'));
     }
 
     public function indexRecebimentos(Request $request)
@@ -428,7 +436,7 @@ class LancamentoController extends Controller
 
 
         // Calcular valor total a ser pago
-        $valor_total = number_format((float)$valor + (float)$juros + (float)$multa - (float)$desconto, 2);
+        $valor_total = number_format((float) $valor + (float) $juros + (float) $multa - (float) $desconto, 2);
         // Passar os valores para a view
         return view('lancamentos.pagar', compact('lancamento', 'juros', 'multa', 'desconto', 'valor_total', 'data_atual', 'contasBancarias'));
     }
