@@ -8,11 +8,12 @@
             <div class="form-group col-md-12">
                 <label for="data_inicio">Data Início</label>
                 <input type="date" name="data_inicio" id="data_inicio" class="form-control"
-                    value="{{ request('data_inicio') }}">
+                    value="{{ request('data_inicio') ?: \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d') }}">
             </div>
             <div class="form-group col-md-12 mt-1">
                 <label for="data_fim">Data Fim</label>
-                <input type="date" name="data_fim" id="data_fim" class="form-control" value="{{ request('data_fim') }}">
+                <input type="date" name="data_fim" id="data_fim" class="form-control"
+                    value="{{ request('data_fim') ?: \Carbon\Carbon::now()->endOfMonth()->format('Y-m-d') }}">
             </div>
             <div class="form-group col-md-12 mt-1">
                 <label for="valor_min">Valor Mínimo</label>
@@ -59,6 +60,7 @@
                     <option value="vencido" @if(request('status') == 'vencido') selected @endif>Vencido</option>
                 </select>
             </div>
+            <input type="hidden" name="route" value="{{ $route }}">
             <button type="submit" class="btn btn-primary btn-block mt-3">Aplicar Filtros</button>
             <button type="reset" class="btn btn-wharing btn-block mt-3">Limpar</button>
         </div>

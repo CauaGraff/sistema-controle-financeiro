@@ -21,6 +21,10 @@ class LancamentoBaixa extends Model
         'doc',
         'anexo'
     ];
+    public function contaBancaria()
+    {
+        return $this->belongsTo(ContaBanco::class, 'id_contaBancaria');
+    }
 
 
 }

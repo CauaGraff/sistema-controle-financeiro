@@ -32,4 +32,10 @@ class CategoriaContas extends Model
     {
         return $this->belongsTo(CategoriaContas::class, 'id_categoria_pai');
     }
+
+    public function categoriaContas()
+    {
+        return $this->belongsTo(CategoriaContas::class, 'id_categoria');
+    }
+
 }

@@ -22,19 +22,19 @@ class LancamentoController extends Controller
         $empresaId = session('empresa_id');
         $query = Lancamento::where('id_empresa', $empresaId)->where('tipo', 'P');
 
-        // Filtros
-        if ($request->has('descricao') && $request->descricao != '') {
-            $query->where('descricao', 'like', '%' . $request->descricao . '%');
-        }
+        // Definir o período como o mês atual, caso não fornecido
+        $startDate = $request->has('data_inicio') && $request->data_inicio != ''
+            ? Carbon::parse($request->data_inicio)->startOfDay()
+            : Carbon::now()->startOfMonth(); // Data de início do mês atual
 
-        if ($request->has('data_inicio') && $request->data_inicio != '') {
-            $query->where('data_venc', '>=', Carbon::parse($request->data_inicio)->startOfDay());
-        }
+        $endDate = $request->has('data_fim') && $request->data_fim != ''
+            ? Carbon::parse($request->data_fim)->endOfDay()
+            : Carbon::now()->endOfMonth(); // Data de fim do mês atual
 
-        if ($request->has('data_fim') && $request->data_fim != '') {
-            $query->where('data_venc', '<=', Carbon::parse($request->data_fim)->endOfDay());
-        }
+        // Aplicar filtros de data
+        $query->whereBetween('data_venc', [$startDate, $endDate]);
 
+        // Filtros adicionais
         if ($request->has('valor_min') && $request->valor_min != '') {
             $query->where('valor', '>=', str_replace(['.', ','], ['', '.'], $request->valor_min));
         }
@@ -70,8 +70,10 @@ class LancamentoController extends Controller
             }
         }
 
+        // Recupera os lançamentos
         $lancamentos = $query->get();
 
+        // Recupera categorias e fornecedores/clientes para exibição
         $route = "P";
         $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))->get();
         $categoriasAgrupadas = [];
@@ -90,18 +92,21 @@ class LancamentoController extends Controller
     public function indexRecebimentos(Request $request)
     {
         $empresaId = session('empresa_id');
-        $query = Lancamento::where('id_empresa', $empresaId)->where('tipo', 'R');
+        $query = Lancamento::where('id_empresa', $empresaId)->where('tipo', 'P');
 
-        // Filtros
+        // Definir o período como o mês atual, caso não fornecido
+        $startDate = $request->has('data_inicio') && $request->data_inicio != ''
+            ? Carbon::parse($request->data_inicio)->startOfDay()
+            : Carbon::now()->startOfMonth(); // Data de início do mês atual
 
-        if ($request->has('data_inicio') && $request->data_inicio != '') {
-            $query->where('data_venc', '>=', Carbon::parse($request->data_inicio)->startOfDay());
-        }
+        $endDate = $request->has('data_fim') && $request->data_fim != ''
+            ? Carbon::parse($request->data_fim)->endOfDay()
+            : Carbon::now()->endOfMonth(); // Data de fim do mês atual
 
-        if ($request->has('data_fim') && $request->data_fim != '') {
-            $query->where('data_venc', '<=', Carbon::parse($request->data_fim)->endOfDay());
-        }
+        // Aplicar filtros de data
+        $query->whereBetween('data_venc', [$startDate, $endDate]);
 
+        // Filtros adicionais
         if ($request->has('valor_min') && $request->valor_min != '') {
             $query->where('valor', '>=', str_replace(['.', ','], ['', '.'], $request->valor_min));
         }
@@ -118,12 +123,42 @@ class LancamentoController extends Controller
             $query->where('id_fornecedor_cliente', $request->fornecedor_cliente_id);
         }
 
+        // Filtro de Status (Pago, Em Aberto, Vencido)
+        if ($request->has('status') && $request->status != '') {
+            $status = $request->status;
+
+            if ($status == 'pago') {
+                // Lançamentos pagos possuem uma baixa registrada
+                $query->whereHas('lancamentoBaixaFilter', function ($query) {
+                    $query->whereNotNull('id_lancamento');
+                });
+            } elseif ($status == 'em_aberto') {
+                // Lançamentos em aberto não possuem uma baixa registrada
+                $query->whereDoesntHave('lancamentoBaixaFilter');
+            } elseif ($status == 'vencido') {
+                // Lançamentos vencidos sem baixa registrada
+                $query->where('data_venc', '<', Carbon::now())
+                    ->whereDoesntHave('lancamentoBaixaFilter');
+            }
+        }
+
+        // Recupera os lançamentos
         $lancamentos = $query->get();
 
+        // Recupera categorias e fornecedores/clientes para exibição
         $route = "R";
-        $categorias = CategoriaContas::where("id_empresa", $empresaId)->get(); // Supondo que você tenha um modelo de CategoriaContas
+        $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))->get();
+        $categoriasAgrupadas = [];
+        foreach ($categorias as $categoria) {
+            if ($categoria->id_categoria_pai) {
+                $categoriasAgrupadas[$categoria->id_categoria_pai]['subcategorias'][] = $categoria;
+            } else {
+                $categoriasAgrupadas[$categoria->id]['categoria'] = $categoria;
+            }
+        }
         $fornecedoresClientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
-        return view('lancamentos.index', compact('lancamentos', 'categorias', 'route', 'fornecedoresClientes'));
+
+        return view('lancamentos.index', compact('lancamentos', 'categoriasAgrupadas', 'route', 'fornecedoresClientes'));
     }
 
 
@@ -514,41 +549,51 @@ class LancamentoController extends Controller
         return redirect()->back()->with('success', 'Arquivo excluído com sucesso.');
     }
 
-    public function export()
+    public function export(Request $request)
     {
         // Recupera os lançamentos conforme os filtros da requisição
-        $lancamentos = Lancamento::query();
+        $lancamentosQuery = Lancamento::with(['fornecedorCliente', 'categoriaContas', 'lancamentoBaixa.contaBancaria']);
 
-        // Adiciona filtros se existirem (data_inicio, data_fim, etc)
+        // Filtros de pesquisa
         if ($startDate = request('data_inicio')) {
-            $lancamentos->where('data_venc', '>=', $startDate);
+            $lancamentosQuery->where('data_venc', '>=', Carbon::parse($startDate));
         }
         if ($endDate = request('data_fim')) {
-            $lancamentos->where('data_venc', '<=', $endDate);
+            $lancamentosQuery->where('data_venc', '<=', Carbon::parse($endDate));
         }
         if ($valorMin = request('valor_min')) {
-            $lancamentos->where('valor', '>=', $valorMin);
+            $lancamentosQuery->where('valor', '>=', $valorMin);
         }
         if ($valorMax = request('valor_max')) {
-            $lancamentos->where('valor', '<=', $valorMax);
+            $lancamentosQuery->where('valor', '<=', $valorMax);
         }
         if ($categoriaId = request('categoria_id')) {
-            $lancamentos->where('categoria_id', $categoriaId);
+            $lancamentosQuery->where('id_categoria', $categoriaId);
         }
         if ($fornecedorClienteId = request('fornecedor_cliente_id')) {
-            $lancamentos->where('fornecedor_cliente_id', $fornecedorClienteId);
+            $lancamentosQuery->where('id_fornecedor_cliente', $fornecedorClienteId);
         }
         if ($status = request('status')) {
-            if ($status == 'pago') {
-                $lancamentos->whereNotNull('data_baixa');
-            } elseif ($status == 'em_aberto') {
-                $lancamentos->whereNull('data_baixa');
-            } elseif ($status == 'vencido') {
-                $lancamentos->where('data_venc', '<', now());
+            switch ($status) {
+                case 'pago':
+                    $lancamentosQuery->whereNotNull('data_baixa');
+                    break;
+                case 'em_aberto':
+                    $lancamentosQuery->whereNull('data_baixa');
+                    break;
+                case 'vencido':
+                    $lancamentosQuery->where('data_venc', '<', now());
+                    break;
             }
         }
 
-        $lancamentos = $lancamentos->get();
+        // Recupera os lançamentos
+        $lancamentos = $lancamentosQuery->get();
+
+        if ($lancamentos->isEmpty()) {
+            // Se não houver lançamentos, retorna uma resposta de erro
+            return response()->json(['message' => 'Nenhum lançamento encontrado para exportação.'], 404);
+        }
 
         // Cabeçalhos do arquivo CSV
         $headers = [
@@ -559,27 +604,51 @@ class LancamentoController extends Controller
             "Expires" => "0"
         ];
 
-        // Abre o "output" do arquivo CSV
-        $handle = fopen('php://output', 'w');
+        return response()->json(function () use ($lancamentos) {
+            // Abre o "output" do arquivo CSV
+            $handle = fopen('php://output', 'w');
 
-        // Cabeçalho do CSV
-        fputcsv($handle, ['Nº', 'Descrição', 'Data Vencimento', 'Valor', 'Data de Baixa', 'Valor Baixado']);
-
-        // Conteúdo dos lançamentos
-        foreach ($lancamentos as $lancamento) {
+            // Cabeçalho do CSV
             fputcsv($handle, [
-                $lancamento->id,
-                $lancamento->descricao,
-                $lancamento->data_venc ? date('d/m/Y', strtotime($lancamento->data_venc)) : '',
-                'R$ ' . number_format($lancamento->valor, 2, ",", "."),
-                $lancamento->data_baixa ? date('d/m/Y', strtotime($lancamento->data_baixa)) : '',
-                $lancamento->data_baixa ? 'R$ ' . number_format($lancamento->valor, 2, ",", ".") : ''
-            ]);
-        }
+                'Nº',
+                'Descrição',
+                'Data Vencimento',
+                'Valor',
+                'Fornecedor/Cliente',
+                'Categoria',
+                'Data de Baixa',
+                'Valor Baixado',
+                'Conta Bancária'
+            ], ";");
 
-        fclose($handle);
+            // Função auxiliar para formatar valores monetários
+            $formatMoney = function ($value) {
+                return $value !== null ? number_format($value, 2, ',', '.') : '';
+            };
 
-        // Retorna o arquivo CSV como resposta
-        return Response::make('', 200, $headers);
+            // Conteúdo dos lançamentos
+            foreach ($lancamentos as $lancamento) {
+                $fornecedorCliente = $lancamento->fornecedorCliente->nome ?? '';
+                $categoria = $lancamento->categoriaContas->descricao ?? '';
+                $dataBaixa = $lancamento->lancamentoBaixa->updated_at ?? null;
+                $valorBaixado = $lancamento->lancamentoBaixa->valor ?? null;
+                $contaBancaria = $lancamento->lancamentoBaixa->contaBancaria->nome ?? '';
+
+                // Formata os dados para o CSV
+                fputcsv($handle, [
+                    $lancamento->id,
+                    $lancamento->descricao,
+                    $lancamento->data_venc ? $lancamento->data_venc->format('d/m/Y') : '',
+                    $formatMoney($lancamento->valor),
+                    $fornecedorCliente,
+                    $categoria,
+                    $dataBaixa ? $dataBaixa->format('d/m/Y') : '',
+                    $formatMoney($valorBaixado),
+                    $contaBancaria
+                ], ";");
+            }
+
+            fclose($handle); // Fecha o ponteiro de escrita do arquivo CSV
+        }, 200, $headers);
     }
 }

@@ -59,4 +59,12 @@ class Lancamento extends Model
     {
         return $this->lancamentoBaixa ? $this->lancamentoBaixa->updated_at : null;
     }
+
+    // App\Models\Lancamento.php
+
+    public function fornecedorCliente()
+    {
+        return $this->belongsTo(FornecedorCliente::class, 'id_fornecedor_cliente');
+    }
+
 }
