@@ -89,7 +89,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{lancamento}/update', [LancamentoController::class, 'update'])->name('lancamentos.update');
         Route::get('/{lancamento}/baixa', [LancamentoController::class, 'deleteBaixa'])->name('lancamentos.baixa.delete');
 
-        Route::get('/lancamentos/export', [LancamentoController::class, 'export'])->name('lancamentos.export');
+        Route::get('export', [LancamentoController::class, 'export'])->name('lancamentos.export');
 
         Route::get('/{lancamento}/anexo-delet', [LancamentoController::class, 'deleteFileFromStorage'])->name('lancamentos.anexo.delete');
     });

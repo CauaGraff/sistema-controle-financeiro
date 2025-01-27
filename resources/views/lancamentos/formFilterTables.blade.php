@@ -2,7 +2,8 @@
 <div id="filter-side">
     <button class="close-btn" id="close-filter"><i class="fa-solid fa-xmark"></i></button>
     <form method="GET"
-        action="{{ $route == 'P' ? route('lancamentos.pagamentos.index') : route('lancamentos.recebimentos.index') }}">
+        action="{{ $route == 'P' ? route('lancamentos.pagamentos.index') : route('lancamentos.recebimentos.index') }}"
+        id="form-filter">
         <h4 class="mb-4">Filtros</h4>
         <div class="form-row">
             <div class="form-group col-md-12">

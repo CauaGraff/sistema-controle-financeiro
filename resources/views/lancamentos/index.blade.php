@@ -68,10 +68,9 @@
         <button id="filter-toggle" class="btn btn-outline-primary">
             <i class="fa-solid fa-filter"></i> Filtro
         </button>
-        <a href="{{ route('lancamentos.export') }}" class="btn btn-outline-primary">
+        <a href="{{ route('lancamentos.export') }}" class="btn btn-outline-primary" id="export">
             <i class="fa-solid fa-file-export"></i> Exportar
         </a>
-
     </div>
     @if (!$lancamentos)
         <p class="text-center">Nenhum {{$route == "P" ? "Pagamento" : "Recebimento"}} Cadastrado.</p>
@@ -176,27 +175,23 @@
             },
             scrollX: true
         });
-        // Filtrando os dados com base no intervalo de datas
-        $('#filter_button').on('click', function () {
-            // Obtendo as datas selecionadas
-            var startDate = $('#start_date').val();
-            var endDate = $('#end_date').val();
+        $("#export").on("click", function (e) {
+            e.preventDefault(); // Previne o comportamento padrão do link
 
-            // Filtrando as linhas da tabela com base nas datas
-            table.columns(1).search(
-                function (data, type, row) {
-                    // Converte as datas do DataTables para o formato YYYY-MM-DD
-                    var dataVenc = data.split('/').reverse().join('-'); // Ex: "2024-11-26"
+            var formData = $("#form-filter").serialize(); // Coleta os dados dos filtros do formulário
 
-                    // Verifica se a data de vencimento está dentro do intervalo
-                    if (startDate && endDate) {
-                        return (dataVenc >= startDate && dataVenc <= endDate);
-                    }
-                    return true;
+            $.ajax({
+                url: $(this).attr("href"), // A URL da rota de exportação
+                type: "GET",
+                data: formData,
+                success: function (data) {
+                    // Quando a requisição for bem-sucedida, o arquivo CSV será gerado e enviado para o cliente
+                    window.location.href = data.url; // A URL gerada no backend para iniciar o download
                 },
-                true, // regex
-                false // smart
-            ).draw();
+                error: function () {
+                    alert("Houve um erro ao gerar o arquivo para download.");
+                }
+            });
         });
     });
 </script>

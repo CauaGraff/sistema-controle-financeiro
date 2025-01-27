@@ -92,7 +92,7 @@ class LancamentoController extends Controller
     public function indexRecebimentos(Request $request)
     {
         $empresaId = session('empresa_id');
-        $query = Lancamento::where('id_empresa', $empresaId)->where('tipo', 'P');
+        $query = Lancamento::where('id_empresa', $empresaId)->where('tipo', 'R');
 
         // Definir o período como o mês atual, caso não fornecido
         $startDate = $request->has('data_inicio') && $request->data_inicio != ''
@@ -552,28 +552,30 @@ class LancamentoController extends Controller
     public function export(Request $request)
     {
         // Recupera os lançamentos conforme os filtros da requisição
-        $lancamentosQuery = Lancamento::with(['fornecedorCliente', 'categoriaContas', 'lancamentoBaixa.contaBancaria']);
-
+        $lancamentosQuery = Lancamento::with(['fornecedorCliente', 'categoriaContas', 'lancamentoBaixa.contaBancaria'])
+            ->where('id_empresa', session('empresa_id'))
+            ->where('tipo', $request->route);
+    
         // Filtros de pesquisa
-        if ($startDate = request('data_inicio')) {
+        if ($startDate = $request->data_inicio) {
             $lancamentosQuery->where('data_venc', '>=', Carbon::parse($startDate));
         }
-        if ($endDate = request('data_fim')) {
+        if ($endDate = $request->data_fim) {
             $lancamentosQuery->where('data_venc', '<=', Carbon::parse($endDate));
         }
-        if ($valorMin = request('valor_min')) {
+        if ($valorMin = $request->valor_min) {
             $lancamentosQuery->where('valor', '>=', $valorMin);
         }
-        if ($valorMax = request('valor_max')) {
+        if ($valorMax = $request->valor_max) {
             $lancamentosQuery->where('valor', '<=', $valorMax);
         }
-        if ($categoriaId = request('categoria_id')) {
+        if ($categoriaId = $request->categoria_id) {
             $lancamentosQuery->where('id_categoria', $categoriaId);
         }
-        if ($fornecedorClienteId = request('fornecedor_cliente_id')) {
+        if ($fornecedorClienteId = $request->fornecedor_cliente_id) {
             $lancamentosQuery->where('id_fornecedor_cliente', $fornecedorClienteId);
         }
-        if ($status = request('status')) {
+        if ($status = $request->status) {
             switch ($status) {
                 case 'pago':
                     $lancamentosQuery->whereNotNull('data_baixa');
@@ -586,69 +588,61 @@ class LancamentoController extends Controller
                     break;
             }
         }
-
+    
         // Recupera os lançamentos
         $lancamentos = $lancamentosQuery->get();
-
+    
         if ($lancamentos->isEmpty()) {
             // Se não houver lançamentos, retorna uma resposta de erro
             return response()->json(['message' => 'Nenhum lançamento encontrado para exportação.'], 404);
         }
-
-        // Cabeçalhos do arquivo CSV
+    
+        // Gerando o conteúdo CSV diretamente na memória
+        $csvContent = '';
+        $csvHeader = ['Nº', 'Descrição', 'Data Vencimento', 'Valor', 'Fornecedor/Cliente', 'Categoria', 'Data de Baixa', 'Valor Baixado', 'Conta Bancária'];
+    
+        // Cabeçalho CSV
+        $csvContent .= implode(';', $csvHeader) . "\n";
+    
+        // Função auxiliar para formatar valores monetários
+        $formatMoney = function ($value) {
+            return $value !== null ? number_format($value, 2, ',', '.') : '';
+        };
+    
+        // Conteúdo dos lançamentos
+        foreach ($lancamentos as $lancamento) {
+            $fornecedorCliente = $lancamento->fornecedorCliente->nome ?? '';
+            $categoria = $lancamento->categoriaContas->descricao ?? '';
+            $dataBaixa = $lancamento->lancamentoBaixa->updated_at ?? null;
+            $valorBaixado = $lancamento->lancamentoBaixa->valor ?? null;
+            $contaBancaria = $lancamento->lancamentoBaixa->contaBancaria->nome ?? '';
+    
+            // Formata os dados para o CSV
+            $csvContent .= implode(';', [
+                $lancamento->id,
+                $lancamento->descricao,
+                $lancamento->data_venc ? $lancamento->data_venc->format('d/m/Y') : '',
+                $formatMoney($lancamento->valor),
+                $fornecedorCliente,
+                $categoria,
+                $dataBaixa ? $dataBaixa->format('d/m/Y') : '',
+                $formatMoney($valorBaixado),
+                $contaBancaria
+            ]) . "\n";
+        }
+    
+        // Definir o cabeçalho para o download
         $headers = [
             "Content-type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=lancamentos.csv",
+            "Content-Disposition" => "attachment; filename=lancamentos_" . time() . ".csv",
             "Pragma" => "no-cache",
             "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
             "Expires" => "0"
         ];
-
-        return response()->json(function () use ($lancamentos) {
-            // Abre o "output" do arquivo CSV
-            $handle = fopen('php://output', 'w');
-
-            // Cabeçalho do CSV
-            fputcsv($handle, [
-                'Nº',
-                'Descrição',
-                'Data Vencimento',
-                'Valor',
-                'Fornecedor/Cliente',
-                'Categoria',
-                'Data de Baixa',
-                'Valor Baixado',
-                'Conta Bancária'
-            ], ";");
-
-            // Função auxiliar para formatar valores monetários
-            $formatMoney = function ($value) {
-                return $value !== null ? number_format($value, 2, ',', '.') : '';
-            };
-
-            // Conteúdo dos lançamentos
-            foreach ($lancamentos as $lancamento) {
-                $fornecedorCliente = $lancamento->fornecedorCliente->nome ?? '';
-                $categoria = $lancamento->categoriaContas->descricao ?? '';
-                $dataBaixa = $lancamento->lancamentoBaixa->updated_at ?? null;
-                $valorBaixado = $lancamento->lancamentoBaixa->valor ?? null;
-                $contaBancaria = $lancamento->lancamentoBaixa->contaBancaria->nome ?? '';
-
-                // Formata os dados para o CSV
-                fputcsv($handle, [
-                    $lancamento->id,
-                    $lancamento->descricao,
-                    $lancamento->data_venc ? $lancamento->data_venc->format('d/m/Y') : '',
-                    $formatMoney($lancamento->valor),
-                    $fornecedorCliente,
-                    $categoria,
-                    $dataBaixa ? $dataBaixa->format('d/m/Y') : '',
-                    $formatMoney($valorBaixado),
-                    $contaBancaria
-                ], ";");
-            }
-
-            fclose($handle); // Fecha o ponteiro de escrita do arquivo CSV
+    
+        // Retorna o conteúdo CSV como uma resposta para download
+        return response()->stream(function () use ($csvContent) {
+            echo $csvContent;
         }, 200, $headers);
-    }
+    }    
 }
