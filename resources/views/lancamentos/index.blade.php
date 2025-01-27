@@ -68,9 +68,9 @@
         <button id="filter-toggle" class="btn btn-outline-primary">
             <i class="fa-solid fa-filter"></i> Filtro
         </button>
-        <a href="{{ route('lancamentos.export') }}" class="btn btn-outline-primary" id="export">
+        <button class="btn btn-outline-primary" id="export">
             <i class="fa-solid fa-file-export"></i> Exportar
-        </a>
+        </button>
     </div>
     @if (!$lancamentos)
         <p class="text-center">Nenhum {{$route == "P" ? "Pagamento" : "Recebimento"}} Cadastrado.</p>
@@ -175,18 +175,23 @@
             },
             scrollX: true
         });
+
         $("#export").on("click", function (e) {
             e.preventDefault(); // Previne o comportamento padrão do link
 
             var formData = $("#form-filter").serialize(); // Coleta os dados dos filtros do formulário
+            var token = "{{ csrf_token() }}"; // Obtenha o token CSRF
 
             $.ajax({
-                url: $(this).attr("href"), // A URL da rota de exportação
-                type: "GET",
-                data: formData,
+                url: "{{route('lancamentos.export')}}", // A URL da rota de exportação
+                type: "POST",
+                data: formData + "&_token=" + token, // Concatenando o token com os dados do formulário
                 success: function (data) {
-                    // Quando a requisição for bem-sucedida, o arquivo CSV será gerado e enviado para o cliente
-                    window.location.href = data.url; // A URL gerada no backend para iniciar o download
+                    // A resposta retorna a URL do arquivo gerado
+                    if (data.file_url) {
+                        // Redireciona para o arquivo gerado, acionando o download
+                        window.location.href = data.file_url;
+                    }
                 },
                 error: function () {
                     alert("Houve um erro ao gerar o arquivo para download.");
