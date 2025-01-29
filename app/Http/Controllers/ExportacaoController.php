@@ -65,44 +65,45 @@ class ExportacaoController extends Controller
             ];
         }
 
-        // Define o diretório e cria se não existir
-        $storagePath = storage_path("app/public/exportacao");
-        if (!file_exists($storagePath)) {
-            mkdir($storagePath, 0777, true);
-        }
+        // Cria um arquivo temporário para o CSV
+        $csvHandle = fopen('php://temp', 'r+');
 
-        // Gera o CSV
-        $fileName = "exportacao_{$competenciaFormatada}.csv";
-        $filePath = "{$storagePath}/{$fileName}";
-
-        $file = fopen($filePath, 'w');
+        // Escreve os dados no CSV
         foreach ($csvData as $linha) {
-            fputcsv($file, $linha, ';');
+            fputcsv($csvHandle, $linha, ';');
         }
-        fclose($file);
 
-        // Verifica anexos para criar um ZIP
+        // Move o ponteiro para o início do arquivo
+        rewind($csvHandle);
+
+        // Cria um arquivo ZIP em memória
+        $zip = new \ZipArchive();
         $zipFileName = "exportacao_{$competenciaFormatada}.zip";
-        $zipFilePath = "{$storagePath}/{$zipFileName}";
+        $zipPath = tempnam(sys_get_temp_dir(), 'zip');
 
-        $zip = new ZipArchive;
-        if ($zip->open($zipFilePath, ZipArchive::CREATE) === TRUE) {
+        if ($zip->open($zipPath, \ZipArchive::CREATE) === TRUE) {
             // Adiciona o CSV ao ZIP
-            $zip->addFile($filePath, $fileName);
+            $csvContent = stream_get_contents($csvHandle);
+            $zip->addFromString("exportacao_{$competenciaFormatada}.csv", $csvContent);
 
             // Adiciona anexos ao ZIP
             foreach ($lancamentos as $lancamento) {
                 if ($lancamento->lancamentoBaixa && $lancamento->lancamentoBaixa->anexo) {
-                    $anexoPath = storage_path("app/public/{$lancamento->lancamentoBaixa->anexo}");
+                    $anexoPath = storage_path("app/public/anexos/{$lancamento->lancamentoBaixa->anexo}");
                     if (file_exists($anexoPath)) {
                         $zip->addFile($anexoPath, "anexos/{$lancamento->lancamentoBaixa->anexo}");
                     }
                 }
             }
+
             $zip->close();
         }
-        // Retorna o arquivo ZIP
-        return response()->download($zipFilePath)->deleteFileAfterSend(true);
+
+        // Fecha o CSV handle
+        fclose($csvHandle);
+
+        // Retorna o ZIP para download e remove o arquivo temporário após o envio
+        return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
     }
 }
 
