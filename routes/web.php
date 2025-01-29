@@ -9,6 +9,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EmpresasController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\ContaBancoController;
+use App\Http\Controllers\ExportacaoController;
 use App\Http\Controllers\FavorecidoController;
 use App\Http\Controllers\LancamentoController;
 use App\Http\Controllers\CategoriaContasController;
@@ -49,6 +50,11 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
             Route::post('/add-usuario/{id}', [EmpresasController::class, 'addUsuario'])->name('adm.empresas.addUsuario');
             Route::get('{idEmpresa}/remove-usuario/{idUser}', [EmpresasController::class, 'removeUsuario'])->name('adm.empresas.removeUsuario');
         });
+
+
+        Route::post('/exportar-contabilidade/{idEmpresa}', [ExportacaoController::class, 'exportarLancamentos'])->name('exportar.contabilidade');
+
+
     });
 });
 

@@ -3,95 +3,68 @@
 @section('title', 'Cadastro de Empresas')
 
 @section("css")
-<link rel="stylesheet" href="{{asset("css/dataTables.css")}}" />
+<link rel="stylesheet" href="{{ asset("css/dataTables.css") }}" />
 @endsection
-@section('content')
 
-<div class="container">
-    <h1>{{ $empresa->nome }}</h1>
-    <p>CNPJ/CPF: {{ $empresa->cnpj_cpf }}</p>
-    <p>Endereço: {{ $empresa->rua }}, {{ $empresa->bairro }}, {{ $empresa->cidade }} - {{ $empresa->cep }}</p>
-    <div class="container row">
-        <h2 class="text-center">Usuários com acesso</h2>
-        <div class="text-end">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                + Adcionar
-            </button>
-            <a type="submit" class="btn btn-success" href="{{ route('home') }}">
-                Acessar Controle Financeiro
-            </a>
+@section('content')
+<div class="container my-4">
+    <h1 class="text-center">{{ $empresa->nome }}</h1>
+    <p><strong>CNPJ/CPF:</strong> {{ $empresa->cnpj_cpf }}</p>
+    <p><strong>Endereço:</strong> {{ $empresa->rua }}, {{ $empresa->bairro }}, {{ $empresa->cidade }} -
+        {{ $empresa->cep }}
+    </p>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a class="btn btn-success" href="{{ route('home') }}">Acessar Controle Financeiro</a>
+    </div>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios-tab-pane"
+                type="button" role="tab" aria-controls="usuarios-tab-pane" aria-selected="true">Usuários</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="detalhes-tab" data-bs-toggle="tab" data-bs-target="#detalhes-tab-pane"
+                type="button" role="tab" aria-controls="detalhes-tab-pane" aria-selected="false">Exportação</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="config-tab" data-bs-toggle="tab" data-bs-target="#config-tab-pane"
+                type="button" role="tab" aria-controls="config-tab-pane" aria-selected="false">Configurações</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <!-- Tab: Usuários -->
+        <div class="tab-pane fade show active" id="usuarios-tab-pane" role="tabpanel" aria-labelledby="usuarios-tab"
+            tabindex="0">
+            @include('admin.empresas.tabelausuarios')
         </div>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-striped stripe row-border order-column" style="width:100%">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($usuarios as $usuario)
-                <tr>
-                    <td>{{ $usuario->id }}</td>
-                    <td>{{ $usuario->name }}</td>
-                    <td>{{ $usuario->email }}</td>
-                    <td>
-                        <a href="{{route("adm.usuarios.edit", [$usuario->id])}}" class="btn"><i
-                                class="fa-solid fa-pen-to-square"></i></a>
-                        <a href="{{route("adm.empresas.removeUsuario", ['idEmpresa' => $empresa->id, 'idUser' => $usuario->id])}}"
-                            class="btn"><i class="fa-solid fa-trash"></i></a>
-                        <a href="{{route("adm.usuarios.edit", [$usuario->id])}}" class="btn"><i
-                                class="fa-solid fa-eye"></i></a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">add user</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="{{ route('adm.empresas.addUsuario', $empresa->id) }}" method="POST">
-                    <div class="modal-body">
-                        @csrf
-                        <div class="form-group">
-                            <label for="user_id">Selecionar Usuário</label>
-                            <select name="user_id" id="user_id" class="form-control" data-live-search="true" required>
-                                <option value="">Selecione um usuário</option>
-                                @foreach ($allUsers as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->email }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                        <button type="submit" class="btn btn-primary">Adicionar Usuário</button>
-                </form>
+
+        <!-- Tab: Detalhes -->
+        <div class="tab-pane fade" id="detalhes-tab-pane" role="tabpanel" aria-labelledby="detalhes-tab" tabindex="0">
+            <!-- form exportação -->
+            @include('admin.empresas.formexportacao')
+        </div>
+
+        <!-- Tab: Configurações -->
+        <div class="tab-pane fade" id="config-tab-pane" role="tabpanel" aria-labelledby="config-tab" tabindex="0">
+            <div class="p-3">
+                <p>Configurações gerais da empresa podem ser gerenciadas aqui.</p>
+                <button class="btn btn-primary">Editar Configurações</button>
             </div>
         </div>
     </div>
 </div>
-
-</div>
 @endsection
 
-@section(section: 'js')
-<script src="{{asset("js/dataTables.js")}}"></script>
-<script src="{{asset("js/toastr.min.js")}}"></script>
-
+@section('js')
+<script src="{{ asset("js/dataTables.js") }}"></script>
 <script>
     $(".table").DataTable({
         language: {
-            url: '{{asset("js/json/data_Table_pt_br.json")}}'
-        }
+            url: '{{ asset("js/json/data_Table_pt_br.json") }}'
+        },
+        responsive: true,
+        autoWidth: false
     });
 </script>
 @endsection

@@ -186,15 +186,24 @@
                 url: "{{route('lancamentos.export')}}", // A URL da rota de exportação
                 type: "POST",
                 data: formData + "&_token=" + token, // Concatenando o token com os dados do formulário
-                success: function (data) {
-                    // A resposta retorna a URL do arquivo gerado
-                    if (data.file_url) {
-                        // Redireciona para o arquivo gerado, acionando o download
-                        window.location.href = data.file_url;
-                    }
+                xhrFields: {
+                    responseType: 'blob' // Receber o conteúdo como arquivo binário
+                },
+                success: function (data, status, xhr) {
+                    const filename = xhr.getResponseHeader('Content-Disposition')
+                        .split('filename=')[1]
+                        .replace(/["']/g, '');
+
+                    const blob = new Blob([data], { type: 'text/csv' });
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
                 },
                 error: function () {
-                    alert("Houve um erro ao gerar o arquivo para download.");
+                    alert('Erro ao gerar o arquivo.');
                 }
             });
         });

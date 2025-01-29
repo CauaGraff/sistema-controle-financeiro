@@ -65,7 +65,7 @@ class LancamentoController extends Controller
                 $query->whereDoesntHave('lancamentoBaixaFilter');
             } elseif ($status == 'vencido') {
                 // Lançamentos vencidos sem baixa registrada
-                $query->where('data_venc', '<', Carbon::now())
+                $query->where('data_venc', '<', Carbon::today())
                     ->whereDoesntHave('lancamentoBaixaFilter');
             }
         }
@@ -137,7 +137,7 @@ class LancamentoController extends Controller
                 $query->whereDoesntHave('lancamentoBaixaFilter');
             } elseif ($status == 'vencido') {
                 // Lançamentos vencidos sem baixa registrada
-                $query->where('data_venc', '<', Carbon::now())
+                $query->where('data_venc', '<', Carbon::today())
                     ->whereDoesntHave('lancamentoBaixaFilter');
             }
         }
@@ -551,12 +551,10 @@ class LancamentoController extends Controller
 
     public function export(Request $request)
     {
-        // Recupera os lançamentos conforme os filtros da requisição
         $lancamentosQuery = Lancamento::with(['fornecedorCliente', 'categoriaContas', 'lancamentoBaixa.contaBancaria'])
             ->where('id_empresa', session('empresa_id'))
             ->where('tipo', $request->route);
 
-        // Filtros de pesquisa
         if ($startDate = $request->data_inicio) {
             $lancamentosQuery->where('data_venc', '>=', Carbon::parse($startDate));
         }
@@ -575,54 +573,43 @@ class LancamentoController extends Controller
         if ($fornecedorClienteId = $request->fornecedor_cliente_id) {
             $lancamentosQuery->where('id_fornecedor_cliente', $fornecedorClienteId);
         }
-        // Filtro de Status (Pago, Em Aberto, Vencido)
         if ($request->has('status') && $request->status != '') {
             $status = $request->status;
 
             if ($status == 'pago') {
-                // Lançamentos pagos possuem uma baixa registrada
                 $lancamentosQuery->whereHas('lancamentoBaixaFilter', function ($query) {
                     $query->whereNotNull('id_lancamento');
                 });
             } elseif ($status == 'em_aberto') {
-                // Lançamentos em aberto não possuem uma baixa registrada
                 $lancamentosQuery->whereDoesntHave('lancamentoBaixaFilter');
             } elseif ($status == 'vencido') {
-                // Lançamentos vencidos sem baixa registrada
                 $lancamentosQuery->where('data_venc', '<', Carbon::now())
                     ->whereDoesntHave('lancamentoBaixaFilter');
             }
         }
 
-        // Recupera os lançamentos
         $lancamentos = $lancamentosQuery->get();
 
         if ($lancamentos->isEmpty()) {
-            // Se não houver lançamentos, retorna uma resposta de erro
             return response()->json(['message' => 'Nenhum lançamento encontrado para exportação.'], 404);
         }
 
-        // Gerando o conteúdo CSV diretamente na memória
         $csvContent = '';
-        $csvHeader = ['Nº', 'Descrição', 'Data Vencimento', 'Valor', 'Fornecedor/Cliente', 'Categoria', 'Data de Baixa', 'Valor Baixado', 'Conta Bancária'];
-
-        // Cabeçalho CSV
+        $csvHeader = ['Nº', 'Descrição', 'Data Vencimento', 'Valor', 'Fornecedor/Cliente', 'Categoria', 'Data de Baixa', 'Valor Baixado', 'Conta Bancária', 'Número do Documento'];
         $csvContent .= implode(';', $csvHeader) . "\n";
 
-        // Função auxiliar para formatar valores monetários
         $formatMoney = function ($value) {
             return $value !== null ? number_format($value, 2, ',', '.') : '';
         };
 
-        // Conteúdo dos lançamentos
         foreach ($lancamentos as $lancamento) {
             $fornecedorCliente = $lancamento->fornecedorCliente->nome ?? '';
             $categoria = $lancamento->categoriaContas->descricao ?? '';
             $dataBaixa = $lancamento->lancamentoBaixa->updated_at ?? null;
             $valorBaixado = $lancamento->lancamentoBaixa->valor ?? null;
             $contaBancaria = $lancamento->lancamentoBaixa->contaBancaria->nome ?? '';
+            $numeroDocumento = $lancamento->lancamentoBaixa->doc ?? '';
 
-            // Formata os dados para o CSV
             $csvContent .= implode(';', [
                 $lancamento->id,
                 $lancamento->descricao,
@@ -632,16 +619,18 @@ class LancamentoController extends Controller
                 $categoria,
                 $dataBaixa ? $dataBaixa->format('d/m/Y') : '',
                 $formatMoney($valorBaixado),
-                $contaBancaria
+                $contaBancaria,
+                $numeroDocumento
             ]) . "\n";
         }
 
-        // Salvar o CSV em um arquivo temporário no servidor
         $fileName = 'lancamentos_' . time() . '.csv';
-        $filePath = storage_path('app/public/' . $fileName);
-        file_put_contents($filePath, $csvContent);
 
-        // Retorna a URL do arquivo gerado
-        return response()->json(['file_url' => asset('storage/' . $fileName)]);
+        // Define os cabeçalhos para download
+        return response($csvContent)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+            ->header('Cache-Control', 'no-store, no-cache');
     }
+
 }

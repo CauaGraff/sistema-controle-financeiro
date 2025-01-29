@@ -25,6 +25,4 @@ class LancamentoBaixa extends Model
     {
         return $this->belongsTo(ContaBanco::class, 'id_contaBancaria');
     }
-
-
 }

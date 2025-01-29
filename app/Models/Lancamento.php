@@ -34,7 +34,7 @@ class Lancamento extends Model
     // Relacionamento com categoria
     public function categoriaContas()
     {
-        return $this->belongsTo(CategoriaContas::class, 'id_plano_contas');
+        return $this->belongsTo(CategoriaContas::class, 'id_categoria');
     }
 
     // Relacionamento com baixa de lançamento
@@ -60,11 +60,13 @@ class Lancamento extends Model
         return $this->lancamentoBaixa ? $this->lancamentoBaixa->updated_at : null;
     }
 
-    // App\Models\Lancamento.php
-
     public function fornecedorCliente()
     {
         return $this->belongsTo(FornecedorCliente::class, 'id_fornecedor_cliente');
     }
 
+    public function conta()
+    {
+        return $this->belongsTo(ContaBanco::class, 'id_conta_bancaria');
+    }
 }
