@@ -18,8 +18,8 @@
     @if ($users->isEmpty())
         <p class="text-center">Nenhum usuário cadastrado.</p>
     @else
-        <div class="table-responsive">
-            <table class="table table-striped">
+        <div class="">
+            <table class="table table-striped stripe row-border order-column" style="width:100%">
                 <thead class="table-dark">
                     <tr>
                         <th>ID</th>
@@ -27,7 +27,7 @@
                         <th>Email</th>
                         <th>Status</th>
                         <th>Data de Cadastro</th>
-                        <th></th>
+                        <th class="text-center">Ação</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -38,13 +38,13 @@
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->active == 1 ? "Ativo" : "Desativado" }}</td>
                             <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
-                            <td>
-                                <a href="{{route("adm.usuarios.edit", [$user->id])}}" class="btn"><i
-                                        class="fa-solid fa-pen-to-square"></i></a>
-                                <a href="{{route("adm.usuarios.delete", [$user->id])}}" class="btn"><i
-                                        class="fa-solid fa-trash"></i></a>
-                                <a href="{{route("adm.usuarios.edit", [$user->id])}}" class="btn"><i
-                                        class="fa-solid fa-eye"></i></a>
+                            <td class="text-center">
+                                <a href="{{route("adm.usuarios.edit", [$user->id])}}" class="btn btn-sm btn-warning"><i
+                                        class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
+                                <a href="{{route("adm.usuarios.delete", [$user->id])}}" class="btn btn-sm btn-danger"><i
+                                        class="fa-solid fa-trash" style="color: white;"></i></a>
+                                <a href="{{route("adm.usuarios.edit", [$user->id])}}" class="btn btn-sm btn-info"><i
+                                        class="fa-solid fa-eye" style="color: white;"></i></a>
                             </td>
                         </tr>
                     @endforeach
@@ -58,13 +58,18 @@
 
 @section(section: 'js')
 <script src="{{asset("js/dataTables.js")}}"></script>
-<script src="{{asset("js/toastr.min.js")}}"></script>
-
+<script src="{{asset("js/dataTables.fixedColumns.js")}}"></script>
+<script src="{{asset("js/fixedColumns.dataTables.js")}}"></script>
 <script>
     $(".table").DataTable({
         language: {
             url: '{{asset("js/json/data_Table_pt_br.json")}}'
-        }
+        },
+        fixedColumns: {
+            start: 0,
+            end: 1
+        },
+        scrollX: true
     });
 </script>
 @endsection

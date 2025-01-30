@@ -48,11 +48,17 @@ class ExportacaoController extends Controller
             // Define débito e crédito com base no tipo
             $debito = $lancamento->tipo === 'P'
                 ? ($lancamento->fornecedorCliente->cnpj_cpf ?? '---') // CNPJ do fornecedor no débito
-                : ($lancamento->conta->conta_bancaria ?? 'Conta bancária não definida'); // Conta bancária no débito para recebimento
+                : (($lancamento->lancamentoBaixa->contaBancaria->nome ?? '---') . '-' .
+                    ($lancamento->lancamentoBaixa->contaBancaria->agencia ?? '---') . ' / ' .
+                    ($lancamento->lancamentoBaixa->contaBancaria->conta ?? '---')
+                ); // Conta bancária no débito para recebimento
 
             $credito = $lancamento->tipo === 'R'
                 ? ($lancamento->fornecedorCliente->cnpj_cpf ?? '---') // CNPJ do cliente no crédito
-                : ($lancamento->conta->conta_bancaria ?? 'Conta bancária não definida'); // Conta bancária no crédito para pagamento
+                : (($lancamento->lancamentoBaixa->contaBancaria->nome ?? '---') . '-' .
+                    ($lancamento->lancamentoBaixa->contaBancaria->agencia ?? '---') . ' / ' .
+                    ($lancamento->lancamentoBaixa->contaBancaria->conta ?? '---')
+                ); // Conta bancária no crédito para pagamento
 
             $csvData[] = [
                 $lancamentoBaixa->updated_at->format('d/m/Y'),
@@ -61,7 +67,7 @@ class ExportacaoController extends Controller
                 $credito,
                 number_format($lancamentoBaixa->valor, 2, ',', '.'),
                 $historico,
-                $lancamento->descricao
+                ($lancamentoBaixa->doc ?? '---') . ' - ' . $lancamento->descricao . ' - ' . $lancamento->fornecedorCliente->nome . ' - ' . $lancamento->categoriaContas->descricao
             ];
         }
 
@@ -89,13 +95,12 @@ class ExportacaoController extends Controller
             // Adiciona anexos ao ZIP
             foreach ($lancamentos as $lancamento) {
                 if ($lancamento->lancamentoBaixa && $lancamento->lancamentoBaixa->anexo) {
-                    $anexoPath = storage_path("app/public/anexos/{$lancamento->lancamentoBaixa->anexo}");
+                    $anexoPath = storage_path("app/public/{$lancamento->lancamentoBaixa->anexo}");
                     if (file_exists($anexoPath)) {
-                        $zip->addFile($anexoPath, "anexos/{$lancamento->lancamentoBaixa->anexo}");
+                        $zip->addFile($anexoPath, "{$lancamento->lancamentoBaixa->anexo}");
                     }
                 }
             }
-
             $zip->close();
         }
 

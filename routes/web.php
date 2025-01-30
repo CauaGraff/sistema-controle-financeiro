@@ -37,6 +37,8 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
             Route::get('/{id}/edit', [UsersController::class, 'edit'])->name("adm.usuarios.edit");
             Route::put('/{id}/update', [UsersController::class, 'update'])->name("adm.usuarios.update");
             Route::get('/{id}/delete', [UsersController::class, "delete"])->name('adm.usuarios.delete');
+
+            Route::get('/consulta', [UsersController::class, 'searchByName'])->name('adm.usuarios.consulta');
         });
 
         Route::prefix('/empresas')->group(function () {

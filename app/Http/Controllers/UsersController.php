@@ -106,4 +106,11 @@ class UsersController extends Controller
         return redirect()
             ->back()->with('alert-danger', 'Erro ao deletar!');
     }
+
+    public function searchByName(Request $request)
+    {
+        $users = User::where('name', 'like', '%' . $request->name . '%')->get();
+
+        return response()->json($users);
+    }
 }

@@ -73,7 +73,9 @@
   <!-- Scripts do Bootstrap -->
   <script src="{{asset('js/bootstrap.bundle.min.js')}}"></script>
   <!-- Remover o jQuery, pois não é necessário com Bootstrap 5 -->
-  <script src="{{asset('js/jquery-3.7.1.min.js')}}"></script> <!-- Remover esta linha -->
+  <script src="{{asset('js/jquery-3.7.1.min.js')}}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
   <script src="{{asset('js/toastr.min.js')}}"></script>
   <script>
     toastr.options = {
@@ -96,11 +98,11 @@
 
     @if(Session::has('alert-success'))
     toastr.success("{{ Session::get('alert-success') }} ")
-    @elseif(Session::has('alert-warning'))
-    toastr.warning("{{ Session::get('alert-warning') }} ")
-    @elseif(Session::has('alert-danger'))
-    toastr.error("{{ Session::get('alert-danger') }} ")
-    @endif
+  @elseif(Session::has('alert-warning'))
+  toastr.warning("{{ Session::get('alert-warning') }} ")
+@elseif(Session::has('alert-danger'))
+  toastr.error("{{ Session::get('alert-danger') }} ")
+@endif
   </script>
 
   @yield("js")

@@ -8,63 +8,54 @@
 
 @section('content')
 <div class="container my-4">
-    <h1 class="text-center">{{ $empresa->nome }}</h1>
-    <p><strong>CNPJ/CPF:</strong> {{ $empresa->cnpj_cpf }}</p>
-    <p><strong>Endereço:</strong> {{ $empresa->rua }}, {{ $empresa->bairro }}, {{ $empresa->cidade }} -
-        {{ $empresa->cep }}
-    </p>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <a class="btn btn-success" href="{{ route('home') }}">Acessar Controle Financeiro</a>
-    </div>
-
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios-tab-pane"
-                type="button" role="tab" aria-controls="usuarios-tab-pane" aria-selected="true">Usuários</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="detalhes-tab" data-bs-toggle="tab" data-bs-target="#detalhes-tab-pane"
-                type="button" role="tab" aria-controls="detalhes-tab-pane" aria-selected="false">Exportação</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="config-tab" data-bs-toggle="tab" data-bs-target="#config-tab-pane"
-                type="button" role="tab" aria-controls="config-tab-pane" aria-selected="false">Configurações</button>
-        </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-        <!-- Tab: Usuários -->
-        <div class="tab-pane fade show active" id="usuarios-tab-pane" role="tabpanel" aria-labelledby="usuarios-tab"
-            tabindex="0">
-            @include('admin.empresas.tabelausuarios')
+    <div class="card shadow-lg p-4">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">{{ $empresa->nome }}</h2>
+            <p class="text-muted">Gerencie os dados e usuários vinculados a esta empresa.</p>
         </div>
-
-        <!-- Tab: Detalhes -->
-        <div class="tab-pane fade" id="detalhes-tab-pane" role="tabpanel" aria-labelledby="detalhes-tab" tabindex="0">
-            <!-- form exportação -->
-            @include('admin.empresas.formexportacao')
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>CNPJ/CPF:</strong> {{ $empresa->cnpj_cpf }}</p>
+                <p><strong>Endereço:</strong> {{ $empresa->rua }}, {{ $empresa->bairro }}, {{ $empresa->cidade }} -
+                    {{ $empresa->cep }}
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end text-center">
+                <a class="btn btn-success px-4 py-2" href="{{ route('home') }}">
+                    <i class="fas fa-chart-line"></i> Acessar Controle Financeiro
+                </a>
+            </div>
         </div>
-
-        <!-- Tab: Configurações -->
-        <div class="tab-pane fade" id="config-tab-pane" role="tabpanel" aria-labelledby="config-tab" tabindex="0">
-            <div class="p-3">
-                <p>Configurações gerais da empresa podem ser gerenciadas aqui.</p>
-                <button class="btn btn-primary">Editar Configurações</button>
+        <!-- Abas de Navegação -->
+        <ul class="nav nav-tabs mb-3" id="empresaTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios-pane"
+                    type="button" role="tab" aria-controls="usuarios-pane" aria-selected="true">
+                    <i class="fas fa-users"></i> Usuários
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="exportacao-tab" data-bs-toggle="tab" data-bs-target="#exportacao-pane"
+                    type="button" role="tab" aria-controls="exportacao-pane" aria-selected="false">
+                    <i class="fas fa-file-export"></i> Exportação
+                </button>
+            </li>
+        </ul>
+        <!-- Conteúdo das Abas -->
+        <div class="tab-content" id="empresaTabContent">
+            <!-- Tab: Usuários -->
+            <div class="tab-pane fade show active" id="usuarios-pane" role="tabpanel" aria-labelledby="usuarios-tab">
+                <div class="card shadow-sm p-3">
+                    @include('admin.empresas.tabelausuarios')
+                </div>
+            </div>
+            <!-- Tab: Exportação -->
+            <div class="tab-pane fade" id="exportacao-pane" role="tabpanel" aria-labelledby="exportacao-tab">
+                <div class="card shadow-sm p-3">
+                    @include('admin.empresas.formexportacao')
+                </div>
             </div>
         </div>
     </div>
 </div>
-@endsection
-
-@section('js')
-<script src="{{ asset("js/dataTables.js") }}"></script>
-<script>
-    $(".table").DataTable({
-        language: {
-            url: '{{ asset("js/json/data_Table_pt_br.json") }}'
-        },
-        responsive: true,
-        autoWidth: false
-    });
-</script>
 @endsection
