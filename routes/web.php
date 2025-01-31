@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use App\Http\Middleware\AdminIS;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdmController;
@@ -38,8 +39,8 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
             Route::put('/{id}/update', [UsersController::class, 'update'])->name("adm.usuarios.update");
             Route::get('/{id}/delete', [UsersController::class, "delete"])->name('adm.usuarios.delete');
 
-            Route::get('/consulta', [UsersController::class, 'searchByName'])->name('adm.usuarios.consulta');
         });
+        Route::get('/buscar-usuario', [UsersController::class, 'buscarUsuario'])->name('buscar.usuario');
 
         Route::prefix('/empresas')->group(function () {
             Route::get('/', [EmpresasController::class, 'index'])->name("adm.empresas");

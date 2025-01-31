@@ -7,7 +7,6 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Gerenciamento - @yield("title")</title>
   <link rel="shortcut icon" href="{{asset("imgs/icon.png")}}" type="image/x-icon">
-
   <link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" id="bootstrap-css">
   <link href="{{asset('css/app.css')}}" rel="stylesheet">
   <link href="{{asset('fontawesome/css/all.min.css')}}" rel="stylesheet">
@@ -74,8 +73,6 @@
   <script src="{{asset('js/bootstrap.bundle.min.js')}}"></script>
   <!-- Remover o jQuery, pois não é necessário com Bootstrap 5 -->
   <script src="{{asset('js/jquery-3.7.1.min.js')}}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-
   <script src="{{asset('js/toastr.min.js')}}"></script>
   <script>
     toastr.options = {

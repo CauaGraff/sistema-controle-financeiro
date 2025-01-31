@@ -107,9 +107,13 @@ class UsersController extends Controller
             ->back()->with('alert-danger', 'Erro ao deletar!');
     }
 
-    public function searchByName(Request $request)
+    public function buscarUsuario(Request $request)
     {
-        $users = User::where('name', 'like', '%' . $request->name . '%')->get();
+        $search = $request->input('q');
+        $users = User::where('name', 'like', "%{$search}%")
+            ->orWhere('email', 'like', "%{$search}%")
+            ->limit(10)
+            ->get(['id', 'name']);
 
         return response()->json($users);
     }

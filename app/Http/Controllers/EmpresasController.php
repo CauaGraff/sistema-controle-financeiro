@@ -74,16 +74,16 @@ class EmpresasController extends Controller
 
         return view('admin.empresas.view', compact('empresa', 'usuarios', 'allUsers'));
     }
-    public function addUsuario(Request $request, $id)
+    public function addUsuario(Request $request, $idEmpresa)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-        ]);
+        $empresa = Empresas::findOrFail($idEmpresa);
+        $usuariosIds = explode(',', $request->usuarios);
 
-        $empresa = Empresas::findOrFail($id);
-        $empresa->usuarios()->attach($request->user_id); // Adiciona o usuário à empresa
+        foreach ($usuariosIds as $usuarioId) {
+            $empresa->usuarios()->attach($usuarioId);
+        }
 
-        return redirect()->route('adm.empresas.show', $id)->with('success', 'Usuário adicionado com sucesso!');
+        return redirect()->back()->with('success', 'Usuários adicionados com sucesso!');
     }
     public function removeUsuario($idEmpersa, $idUser)
     {

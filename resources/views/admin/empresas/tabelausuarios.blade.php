@@ -1,119 +1,3 @@
-@section("css")
-<style>
-    .select-box {
-        position: relative;
-        display: flex;
-        width: 400px;
-        flex-direction: column;
-    }
-
-    .select-box .options-container {
-        background: #2f3640;
-        color: #f5f6fa;
-        max-height: 0;
-        width: 100%;
-        opacity: 0;
-        transition: all 0.4s;
-        border-radius: 8px;
-        overflow: hidden;
-
-        order: 1;
-    }
-
-    .selected {
-        background: #2f3640;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        color: #f5f6fa;
-        position: relative;
-
-        order: 0;
-    }
-
-    .selected::after {
-        content: "";
-        background: url("img/arrow-down.svg");
-        background-size: contain;
-        background-repeat: no-repeat;
-
-        position: absolute;
-        height: 100%;
-        width: 32px;
-        right: 10px;
-        top: 5px;
-
-        transition: all 0.4s;
-    }
-
-    .select-box .options-container.active {
-        max-height: 240px;
-        opacity: 1;
-        overflow-y: scroll;
-        margin-top: 54px;
-    }
-
-    .select-box .options-container.active+.selected::after {
-        transform: rotateX(180deg);
-        top: -6px;
-    }
-
-    .select-box .options-container::-webkit-scrollbar {
-        width: 8px;
-        background: #0d141f;
-        border-radius: 0 8px 8px 0;
-    }
-
-    .select-box .options-container::-webkit-scrollbar-thumb {
-        background: #525861;
-        border-radius: 0 8px 8px 0;
-    }
-
-    .select-box .option,
-    .selected {
-        padding: 12px 24px;
-        cursor: pointer;
-    }
-
-    .select-box .option:hover {
-        background: #414b57;
-    }
-
-    .select-box label {
-        cursor: pointer;
-    }
-
-    .select-box .option .radio {
-        display: none;
-    }
-
-    /* Searchbox */
-
-    .search-box input {
-        width: 100%;
-        padding: 12px 16px;
-        font-family: "Roboto", sans-serif;
-        font-size: 16px;
-        position: absolute;
-        border-radius: 8px 8px 0 0;
-        z-index: 100;
-        border: 8px solid #2f3640;
-
-        opacity: 0;
-        pointer-events: none;
-        transition: all 0.4s;
-    }
-
-    .search-box input:focus {
-        outline: none;
-    }
-
-    .select-box .options-container.active~.search-box input {
-        opacity: 1;
-        pointer-events: auto;
-    }
-</style>
-@endsection
-
 <h2 class="mb-3">Usuários com Acesso</h2>
 <div class="d-flex justify-content-between align-items-center mb-3">
     <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -160,74 +44,29 @@
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="exampleModalLabel">Adicionar Usuário</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('adm.empresas.addUsuario', $empresa->id) }}" method="POST">
                 @csrf
                 <div class="modal-body">
-                    <!-- Campo Selecionar Usuário -->
-                    <div class="form-group mb-3">
-                        <div class="select-box">
-                            <div class="options-container">
-                                <div class="option">
-                                    <input type="radio" class="radio" id="automobiles" name="category" />
-                                    <label for="automobiles">Automobiles</label>
-                                </div>
-
-                                <div class="option">
-                                    <input type="radio" class="radio" id="film" name="category" />
-                                    <label for="film">Film & Animation</label>
-                                </div>
-
-                                <div class="option">
-                                    <input type="radio" class="radio" id="science" name="category" />
-                                    <label for="science">Science & Technology</label>
-                                </div>
-
-                                <div class="option">
-                                    <input type="radio" class="radio" id="art" name="category" />
-                                    <label for="art">Art</label>
-                                </div>
-
-                                <div class="option">
-                                    <input type="radio" class="radio" id="music" name="category" />
-                                    <label for="music">Music</label>
-                                </div>
-
-                                <div class="option">
-                                    <input type="radio" class="radio" id="travel" name="category" />
-                                    <label for="travel">Travel & Events</label>
-                                </div>
-
-                                <div class="option">
-                                    <input type="radio" class="radio" id="sports" name="category" />
-                                    <label for="sports">Sports</label>
-                                </div>
-
-                                <div class="option">
-                                    <input type="radio" class="radio" id="news" name="category" />
-                                    <label for="news">News & Politics</label>
-                                </div>
-
-                                <div class="option">
-                                    <input type="radio" class="radio" id="tutorials" name="category" />
-                                    <label for="tutorials">Tutorials</label>
-                                </div>
-                            </div>
-
-                            <div class="selected">
-                                Select Video Category
-                            </div>
-
-                            <div class="search-box">
-                                <input type="text" placeholder="Start Typing..." />
-                            </div>
-                        </div>
+                    <div class="mb-3">
+                        <label for="buscarUsuario" class="form-label">Buscar Usuário</label>
+                        <input type="text" id="buscarUsuario" class="form-control" placeholder="Digite para buscar..."
+                            autocomplete="off">
                     </div>
+
+                    <div id="resultadosBusca" class="list-group mb-3"></div>
+
+                    <h6>Usuários Selecionados:</h6>
+                    <div id="usuariosSelecionados" class="border rounded p-3 bg-light">
+                        <p class="text-muted" id="nenhumUsuario">Nenhum usuário selecionado.</p>
+                    </div>
+
+                    <input type="hidden" name="usuarios" id="usuariosInput">
                 </div>
 
                 <div class="modal-footer">
@@ -249,6 +88,77 @@
             responsive: true,
             autoWidth: false
         });
+        var usuariosSelecionados = [];
+
+        $('#buscarUsuario').on('keyup', function () {
+            var termo = $(this).val();
+
+            if (termo.length > 2) {
+                $.ajax({
+                    url: '{{ route("buscar.usuario") }}',
+                    method: 'GET',
+                    data: { termo: termo },
+                    success: function (data) {
+                        var resultados = $('#resultadosBusca');
+                        resultados.empty();
+
+                        if (data.length > 0) {
+                            data.forEach(function (usuario) {
+                                if (!usuariosSelecionados.includes(usuario.id)) {
+                                    resultados.append('<button type="button" class="list-group-item list-group-item-action opcao-usuario" data-id="' + usuario.id + '" data-nome="' + usuario.name + '">' +
+                                        '<i class="fa-solid fa-user me-2"></i>' + usuario.name +
+                                        '</button>');
+                                }
+                            });
+                        } else {
+                            resultados.append('<p class="text-muted text-center">Nenhum usuário encontrado</p>');
+                        }
+                    }
+                });
+            } else {
+                $('#resultadosBusca').empty();
+            }
+        });
+
+        // Adicionar usuário selecionado à lista
+        $(document).on('click', '.opcao-usuario', function () {
+            var usuarioId = $(this).data('id');
+            var usuarioNome = $(this).data('nome');
+
+            if (!usuariosSelecionados.includes(usuarioId)) {
+                usuariosSelecionados.push(usuarioId);
+
+                $('#usuariosSelecionados').append('<div class="d-flex justify-content-between align-items-center p-2 mb-1 bg-white border rounded usuario-item" data-id="' + usuarioId + '">' +
+                    '<span><i class="fa-solid fa-user me-2"></i>' + usuarioNome + '</span>' +
+                    '<button type="button" class="btn btn-outline-danger btn-sm remove-usuario" data-id="' + usuarioId + '">' +
+                    '<i class="fa-solid fa-trash"></i>' +
+                    '</button>' +
+                    '</div>');
+
+                atualizarCampoUsuarios();
+                $('#nenhumUsuario').hide();
+            }
+
+            $('#resultadosBusca').empty();
+            $('#buscarUsuario').val('');
+        });
+
+        // Remover usuário da lista
+        $(document).on('click', '.remove-usuario', function () {
+            var usuarioId = $(this).data('id');
+            usuariosSelecionados = usuariosSelecionados.filter(id => id != usuarioId);
+            $(this).parent().remove();
+            atualizarCampoUsuarios();
+
+            if (usuariosSelecionados.length === 0) {
+                $('#nenhumUsuario').show();
+            }
+        });
+
+        // Atualizar campo oculto com IDs selecionados
+        function atualizarCampoUsuarios() {
+            $('#usuariosInput').val(usuariosSelecionados.join(','));
+        }
     });
 </script>
 @endsection
