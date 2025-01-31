@@ -10,7 +10,7 @@
         @csrf
         @method('PUT')
         @include('categorias.form') <!-- Inclui o formulário -->
-        <button type="submit" class="btn btn-primary">Atualizar</button>
+        <button type="submit" class="btn btn-success" style="width: 100%;">Atualizar</button>
     </form>
 </div>
 @endsection

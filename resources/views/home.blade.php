@@ -199,8 +199,7 @@
             <div class="col-md-4">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <h5 class="card-title"> Total Pagamentos
-                        </h5>
+                        <h5 class="card-title"> Total Pagamentos: </h5>
                         <div class="card-text">
                             <h5 id="totalPagamentos">R$ 0,00</h5>
                         </div>
@@ -212,7 +211,7 @@
             <div class="col-md-4">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <h5 class="card-title"> Total Recebimentos </h5>
+                        <h5 class="card-title"> Total Recebimentos: </h5>
                         <div class="card-text">
                             <h5 id="totalRecebimentos">R$ 0,00</h5>
                         </div>
@@ -224,7 +223,7 @@
             <div class="col-md-4">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <h5 class="card-title"> Total Recebimentos </h5>
+                        <h5 class="card-title"> Total:</h5>
                         <div class="card-text">
                             <h5 id="totalGeral">R$ 0,00</h5>
                         </div>
@@ -269,7 +268,7 @@
 <script src="{{asset('js/dataTables.fixedColumns.js')}}"></script>
 <script src="{{asset('js/fixedColumns.dataTables.js')}}"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $("main section").removeClass("container");
         let currentMonth = moment().month(); // Mês atual (0-11)
         let currentYear = moment().year(); // Ano atual
@@ -290,7 +289,7 @@
                     month: month + 1,
                     year: year
                 },
-                success: function(events) {
+                success: function (events) {
                     $('#calendar-body').empty();
 
                     // Atualizando o título do mês para português
@@ -344,7 +343,7 @@
                     year: year,
                     date: date // Envia a data caso tenha sido selecionada
                 },
-                success: function(data) {
+                success: function (data) {
 
                     // Atualizar os cards com os totais
                     $('#totalPagamentos').text('R$ ' + data.totais.pagamentos);
@@ -368,32 +367,32 @@
                         scrollX: true,
                         data: data.pagamentos,
                         columns: [{
-                                data: 'id',
-                                title: '#'
-                            },
-                            {
-                                data: 'descricao',
-                                title: 'Descrição'
-                            },
-                            {
-                                data: 'valor',
-                                title: 'Valor'
-                            },
-                            {
-                                data: 'data_venc',
-                                title: 'Vencimento'
-                            },
-                            {
-                                data: null,
-                                title: 'Ações',
-                                render: function(data, type, row) {
-                                    let editRoute = `{{ route('lancamentos.edit', ':id') }}`.replace(':id', row.id);
-                                    let deleteRoute = `{{ route('lancamentos.pagamentos.destroy', ':id') }}`.replace(':id', row.id);
-                                    let baixaRoute = `{{ route('lancamentos.pagamentos.baixa', ':id') }}`.replace(':id', row.id);
+                            data: 'id',
+                            title: '#'
+                        },
+                        {
+                            data: 'descricao',
+                            title: 'Descrição'
+                        },
+                        {
+                            data: 'valor',
+                            title: 'Valor'
+                        },
+                        {
+                            data: 'data_venc',
+                            title: 'Vencimento'
+                        },
+                        {
+                            data: null,
+                            title: 'Ações',
+                            render: function (data, type, row) {
+                                let editRoute = `{{ route('lancamentos.edit', ':id') }}`.replace(':id', row.id);
+                                let deleteRoute = `{{ route('lancamentos.pagamentos.destroy', ':id') }}`.replace(':id', row.id);
+                                let baixaRoute = `{{ route('lancamentos.pagamentos.baixa', ':id') }}`.replace(':id', row.id);
 
-                                    let disabled = row.status === 'pago' ? 'disabled' : '';
+                                let disabled = row.status === 'pago' ? 'disabled' : '';
 
-                                    return `
+                                return `
         <div class="btn-actions">
             <a href="${editRoute}" class="btn btn-sm btn-warning"><i class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
             <form action="${deleteRoute}" method="POST" class="d-inline">
@@ -404,11 +403,11 @@
             <a href="${baixaRoute}" class="btn btn-sm btn-success ${disabled}" ${disabled}><i class="fa-solid fa-dollar-sign"></i></a>
         </div>
     `;
-                                }
-
                             }
+
+                        }
                         ],
-                        createdRow: function(row, data) {
+                        createdRow: function (row, data) {
                             // Aplica cor de fundo nas linhas da tabela
                             if (data.status === 'vencido') {
                                 $(row).addClass('table-danger'); // Linha vermelha para vencido
@@ -418,7 +417,7 @@
                                 $(row).addClass('');
                             }
                         },
-                        headerCallback: function(thead, data, start, end, display) {
+                        headerCallback: function (thead, data, start, end, display) {
                             $(thead).addClass('table-dark');
                         }
                     });
@@ -441,32 +440,32 @@
                         scrollX: true,
                         data: data.recebimentos,
                         columns: [{
-                                data: 'id',
-                                title: '#'
-                            },
-                            {
-                                data: 'descricao',
-                                title: 'Descrição'
-                            },
-                            {
-                                data: 'valor',
-                                title: 'Valor'
-                            },
-                            {
-                                data: 'data_venc',
-                                title: 'Vencimento'
-                            },
-                            {
-                                data: null,
-                                title: 'Ações',
-                                render: function(data, type, row) {
-                                    let editRoute = `{{ route('lancamentos.edit', ':id') }}`.replace(':id', row.id);
-                                    let deleteRoute = `{{ route('lancamentos.recebimentos.destroy', ':id') }}`.replace(':id', row.id);
-                                    let baixaRoute = `{{ route('lancamentos.recebimentos.baixa', ':id') }}`.replace(':id', row.id);
+                            data: 'id',
+                            title: '#'
+                        },
+                        {
+                            data: 'descricao',
+                            title: 'Descrição'
+                        },
+                        {
+                            data: 'valor',
+                            title: 'Valor'
+                        },
+                        {
+                            data: 'data_venc',
+                            title: 'Vencimento'
+                        },
+                        {
+                            data: null,
+                            title: 'Ações',
+                            render: function (data, type, row) {
+                                let editRoute = `{{ route('lancamentos.edit', ':id') }}`.replace(':id', row.id);
+                                let deleteRoute = `{{ route('lancamentos.recebimentos.destroy', ':id') }}`.replace(':id', row.id);
+                                let baixaRoute = `{{ route('lancamentos.recebimentos.baixa', ':id') }}`.replace(':id', row.id);
 
-                                    let disabled = row.status === 'recebido' ? 'disabled' : '';
+                                let disabled = row.status === 'recebido' ? 'disabled' : '';
 
-                                    return `
+                                return `
         <div class="btn-actions">
             <a href="${editRoute}" class="btn btn-sm btn-warning"><i class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
             <form action="${deleteRoute}" method="POST" class="d-inline">
@@ -476,17 +475,17 @@
             </form>
                         <a href="${baixaRoute}" class="btn btn-sm btn-success ${disabled}" ${disabled}><i class="fa-solid fa-dollar-sign"></i></a>
         </div>`;
-                                }
                             }
+                        }
                         ],
-                        createdRow: function(row, data) {
+                        createdRow: function (row, data) {
                             if (data.status === 'vencido') {
                                 $(row).addClass('table-danger');
                             } else if (data.status === 'recebido') {
                                 $(row).addClass('table-success');
                             }
                         },
-                        headerCallback: function(thead, data, start, end, display) {
+                        headerCallback: function (thead, data, start, end, display) {
                             $(thead).addClass('table-dark');
                         }
                     });
@@ -498,7 +497,7 @@
         generateCalendar(currentMonth, currentYear);
 
         // Quando o usuário clica em uma data específica no calendário
-        $('#calendar-body').on('click', 'td[data-date]', function() {
+        $('#calendar-body').on('click', 'td[data-date]', function () {
             // Remove a seleção anterior
             $('#calendar-body td').removeClass('selected');
 
@@ -510,7 +509,7 @@
         });
 
         // Navegação entre meses
-        $('#prev-month').on('click', function() {
+        $('#prev-month').on('click', function () {
             currentMonth--;
             if (currentMonth < 0) {
                 currentMonth = 11;
@@ -519,7 +518,7 @@
             generateCalendar(currentMonth, currentYear);
         });
 
-        $('#next-month').on('click', function() {
+        $('#next-month').on('click', function () {
             currentMonth++;
             if (currentMonth > 11) {
                 currentMonth = 0;

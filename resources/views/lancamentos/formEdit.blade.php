@@ -189,8 +189,8 @@
         </div>
     @endif
     <!-- Botão Atualizar (exibido apenas uma vez, no final do formulário) -->
-    <div class="col-md-15 d-grid">
-        <button type="submit" class="btn btn-primary btn-lg">Atualizar</button>
+    <div class="col-md-15 d-grid mt-1">
+        <button type="submit" class="btn btn-success btn-lg">Atualizar</button>
     </div>
 </form>
 

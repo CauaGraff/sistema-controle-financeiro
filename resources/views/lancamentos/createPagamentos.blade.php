@@ -1,6 +1,8 @@
 @extends('_theme')
 
 @section('css')
+<link rel="stylesheet" href="{{asset("css/select2.min.css")}}">
+<link rel="stylesheet" href="{{asset("css/select2/select2-bootstrap-5-theme.min.css")}}">
 @endsection
 
 @section('content')
@@ -172,7 +174,7 @@
             <label for="categoria" class="col-sm-2 col-form-label">Categoria</label>
             <div class="col-sm-10">
                 <select class="form-select @error('categoria_id')is-invalid @enderror selectpicker" id="categoria"
-                    name="categoria_id" data-live-search="true">
+                    name="categoria_id" data-live-search="true" style="width: 100%;">
                     <option value="">Selecione uma categoria</option>
                     @foreach ($categoriasAgrupadas as $grupo)
                         @if (isset($grupo['categoria']))
@@ -197,7 +199,7 @@
             <label for="fornecedor_cliente" class="col-sm-2 col-form-label">Fornecedor/Cliente</label>
             <div class="col-sm-10">
                 <select class="form-select @error('fornecedor_cliente_id') is-invalid @enderror" id="fornecedor_cliente"
-                    name="fornecedor_cliente_id">
+                    name="fornecedor_cliente_id" style="width: 100%;">
                     <option value="">Selecione o Fornecedor/Cliente</option>
 
                     <!-- Grupo de Fornecedores -->
@@ -227,9 +229,16 @@
 @endsection
 
 @section('js')
+<script src="{{ asset('js/select2.full.min.js') }}"></script>
 <script src="{{asset("js/jquery.mask.min.js")}}"></script>
 <script>
     $(document).ready(function () {
+        $('#categoria').select2({
+            theme: "bootstrap-5",
+        });
+        $('#fornecedor_cliente').select2({
+            theme: "bootstrap-5",
+        });
         function selecionaCampos() {
             if ($("#tipo").val() == 0) {
                 $("#nenhumFields").show();

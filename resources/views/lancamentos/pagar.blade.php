@@ -39,8 +39,14 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="data_pagamento">Data do Pagamento:</label>
-                    <input type="date" class="form-control" name="data_pagamento" id="data_pagamento"
-                        value="{{$today = (new DateTime())->format('Y-m-d')}}" required>
+                    <input type="date" class="form-control {{ $errors->has('data_pagamento') ? 'is-invalid' : '' }}"
+                        name="data_pagamento" id="data_pagamento"
+                        value="{{ old('data_pagamento', (new DateTime())->format('Y-m-d')) }}" required>
+                    @error('data_pagamento')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
         </div>
@@ -98,13 +104,24 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="numero_documento">Número do Documento:</label>
-                    <input type="text" class="form-control" id="numero_documento" name="numero_documento">
+                    <input type="text" class="form-control {{ $errors->has('numero_documento') ? 'is-invalid' : '' }}"
+                        id="numero_documento" name="numero_documento" value="{{ old('numero_documento') }}">
+                    @error('numero_documento')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
             <div class="col-md-9">
                 <div class="form-group">
                     <label for="anexo">Anexar Documento:</label>
                     <input type="file" class="form-control" id="anexo" name="anexo" accept="application/pdf,image/*">
+                    @error('anexo')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
         </div>
@@ -121,6 +138,7 @@
 <script src="{{ asset('js/jquery.mask.min.js') }}"></script>
 <script>
     $(document).ready(function () {
+
         $('#multa, #juros, #desconto').css({
             "background-color": "var(--bs-secondary-bg)",
         });

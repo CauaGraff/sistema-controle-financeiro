@@ -36,7 +36,10 @@ class ExportacaoController extends Controller
             'Crédito',
             'Valor',
             'Histórico',
-            'Descrição Completa'
+            'Descrição Completa',
+            'Juros',      // Nova coluna para Juros
+            'Multa',      // Nova coluna para Multa
+            'Desconto'    // Nova coluna para Desconto
         ];
 
         foreach ($lancamentos as $lancamento) {
@@ -60,6 +63,11 @@ class ExportacaoController extends Controller
                     ($lancamento->lancamentoBaixa->contaBancaria->conta ?? '---')
                 ); // Conta bancária no crédito para pagamento
 
+            // Valores de Juros, Multa e Desconto
+            $juros = $lancamentoBaixa->juros ?? 0;  // Exemplo de como você pode pegar ou calcular o valor de juros
+            $multa = $lancamentoBaixa->multa ?? 0;  // Exemplo de como você pode pegar ou calcular o valor de multa
+            $desconto = $lancamentoBaixa->desconto ?? 0;  // Exemplo de como você pode pegar ou calcular o valor de desconto
+
             $csvData[] = [
                 $lancamentoBaixa->updated_at->format('d/m/Y'),
                 $lancamentoBaixa->doc ?? '---',
@@ -67,7 +75,10 @@ class ExportacaoController extends Controller
                 $credito,
                 number_format($lancamentoBaixa->valor, 2, ',', '.'),
                 $historico,
-                ($lancamentoBaixa->doc ?? '---') . ' - ' . $lancamento->descricao . ' - ' . $lancamento->fornecedorCliente->nome . ' - ' . $lancamento->categoriaContas->descricao
+                ($lancamentoBaixa->doc ?? '---') . ' - ' . $lancamento->descricao . ' - ' . $lancamento->fornecedorCliente->nome . ' - ' . $lancamento->categoriaContas->descricao,
+                number_format($juros, 2, ',', '.'),    // Formatação de juros
+                number_format($multa, 2, ',', '.'),    // Formatação de multa
+                number_format($desconto, 2, ',', '.')  // Formatação de desconto
             ];
         }
 
@@ -110,5 +121,6 @@ class ExportacaoController extends Controller
         // Retorna o ZIP para download e remove o arquivo temporário após o envio
         return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
     }
+
 }
 

@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->date('data_venc');
             $table->unsignedBigInteger('id_categoria');
             $table->unsignedBigInteger('id_empresa');
-            $table->unsignedBigInteger('id_fornecedor_cliente');
+            $table->unsignedBigInteger('id_fornecedor_cliente')->nullable();
             $table->timestamps();
             $table->foreign('id_categoria')->references('id')->on('categorias_de_contas');
             $table->foreign('id_empresa')->references('id')->on('empresas');

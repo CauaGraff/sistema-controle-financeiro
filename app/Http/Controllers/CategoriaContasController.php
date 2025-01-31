@@ -18,7 +18,7 @@ class CategoriaContasController extends Controller
     // Mostrar formulário de criação
     public function create()
     {
-        $categorias = CategoriaContas::whereNull('id_categoria_pai')->get(); // Categorias pai
+        $categorias = CategoriaContas::whereNull('id_categoria_pai')->where("id_empresa", "=", session("empresa_id"))->get();
         return view('categorias.create', compact('categorias'));
     }
 
@@ -42,7 +42,7 @@ class CategoriaContasController extends Controller
     public function edit(CategoriaContas $categoria)
     {
         $empresas = Empresas::all();
-        $categorias = CategoriaContas::whereNull('id_categoria_pai')->get(); // Categorias pai
+        $categorias = CategoriaContas::whereNull('id_categoria_pai')->where("id_empresa", "=", session("empresa_id"))->get();
         return view('categorias.edit', compact('categoria', 'empresas', 'categorias'));
     }
 

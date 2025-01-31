@@ -420,11 +420,12 @@ class LancamentoController extends Controller
     {
         // Verificar se o lançamento tem uma baixa associada
         if ($lancamento->lancamentoBaixa) {
-
-            // Verificar na pasta se exise o arquivo
-            if (Storage::disk('public')->exists($lancamento->lancamentoBaixa->anexo)) {
-                // Excluir o arquivo do sistema de arquivos
-                $this->deleteFileFromStorage($lancamento->lancamentoBaixa->id);
+            if ($lancamento->lancamentoBaixa->anexo) {
+                // Verificar na pasta se exise o arquivo
+                if (Storage::disk('public')->exists($lancamento->lancamentoBaixa->anexo)) {
+                    // Excluir o arquivo do sistema de arquivos
+                    $this->deleteFileFromStorage($lancamento->lancamentoBaixa->id);
+                }
             }
             $lancamento->lancamentoBaixa()->delete();
             return redirect()->route('lancamentos.edit', $lancamento->id)->with('alert-success', 'Baixa excluída com sucesso!');
@@ -487,10 +488,18 @@ class LancamentoController extends Controller
         }
         // Validação
         $validate = $request->validate([
-            'data_pagamento' => 'required',
+            'data_pagamento' => 'required|date',
             'contasBancarias' => 'required|exists:contas_banco,id',
-            'anexo' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048', // Validação para o arquivo (opcional)
+            'anexo' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048',
+        ], [
+            'data_pagamento.required' => 'A data do pagamento é obrigatória.',
+            'data_pagamento.date' => 'A data do pagamento deve estar em um formato válido.',
+            'contasBancarias.required' => 'É necessário selecionar uma conta bancária.',
+            'contasBancarias.exists' => 'A conta bancária selecionada não é válida.',
+            'anexo.mimes' => 'O arquivo deve ser um PDF ou imagem (JPEG, JPG, PNG).',
+            'anexo.max' => 'O arquivo não pode ultrapassar 2MB.',
         ]);
+
         // Tratar os valores que vêm com separadores de milhar e vírgula como separador decimal
         $valorPago = $this->formatarValor($request->valor_pago);
         $multa = $this->formatarValor($request->multa);
