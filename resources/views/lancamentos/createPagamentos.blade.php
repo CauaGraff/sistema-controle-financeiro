@@ -169,21 +169,36 @@
             </div>
         </div>
 
-        <!-- Campo de Categoria -->
         <div class="row mb-3">
             <label for="categoria" class="col-sm-2 col-form-label">Categoria</label>
             <div class="col-sm-10">
-                <select class="form-select @error('categoria_id')is-invalid @enderror selectpicker" id="categoria"
+                <select class="form-select @error('categoria_id') is-invalid @enderror selectpicker" id="categoria"
                     name="categoria_id" data-live-search="true" style="width: 100%;">
                     <option value="">Selecione uma categoria</option>
-                    @foreach ($categoriasAgrupadas as $grupo)
-                        @if (isset($grupo['categoria']))
-                            <optgroup label="{{ $grupo['categoria']->descricao }}">
-                                @foreach ($grupo['subcategorias'] as $subcategoria)
-                                    <option value="{{ $subcategoria->id }}" {{ old('categoria_id') == $subcategoria->id ? 'selected' : '' }}>{{ $subcategoria->descricao }}</option>
-                                @endforeach
-                            </optgroup>
-                        @endif
+                    @php
+                        $numeroCategoriaPai = 1; // Inicializa a numeração das categorias pai
+                    @endphp
+                    @foreach ($categorias as $categoria)
+                                        <!-- Categoria Pai -->
+                                        <option value="{{ $categoria->id }}">{{ $numeroCategoriaPai }} - {{ $categoria->descricao }}
+                                        </option>
+                                        <!-- Subcategorias -->
+                                        @if ($categoria->subcategorias->count() > 0)
+                                                        @php
+                                                            $numeroSubcategoria = 1; // Inicializa a numeração das subcategorias
+                                                        @endphp
+                                                        @foreach ($categoria->subcategorias as $subcategoria)
+                                                                    <option value="{{ $subcategoria->id }}">-- {{ $numeroCategoriaPai }}.{{ $numeroSubcategoria }} -
+                                                                        {{ $subcategoria->descricao }}
+                                                                    </option>
+                                                                    @php
+                                                                        $numeroSubcategoria++; // Incrementa o número da subcategoria
+                                                                    @endphp
+                                                        @endforeach
+                                        @endif
+                                        @php
+                                            $numeroCategoriaPai++; // Incrementa o número da categoria pai
+                                        @endphp
                     @endforeach
                 </select>
             </div>
@@ -193,7 +208,6 @@
                 </div>
             @enderror
         </div>
-
         <!-- Campo de Favorecido -->
         <div class="row mb-3">
             <label for="fornecedor_cliente" class="col-sm-2 col-form-label">Fornecedor/Cliente</label>

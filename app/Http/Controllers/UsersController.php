@@ -110,11 +110,16 @@ class UsersController extends Controller
     public function buscarUsuario(Request $request)
     {
         $search = $request->input('q');
-        $users = User::where('name', 'like', "%{$search}%")
-            ->orWhere('email', 'like', "%{$search}%")
-            ->limit(10)
-            ->get(['id', 'name']);
+
+        $users = User::where('id_typeuser', 3)
+            ->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->limit(10);
+            })
+            ->get(['id', 'name', 'email']);
 
         return response()->json($users);
+
     }
 }

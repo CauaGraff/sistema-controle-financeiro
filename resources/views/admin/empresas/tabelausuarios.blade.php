@@ -105,8 +105,8 @@
                         if (data.length > 0) {
                             data.forEach(function (usuario) {
                                 if (!usuariosSelecionados.includes(usuario.id)) {
-                                    resultados.append('<button type="button" class="list-group-item list-group-item-action opcao-usuario" data-id="' + usuario.id + '" data-nome="' + usuario.name + '">' +
-                                        '<i class="fa-solid fa-user me-2"></i>' + usuario.name +
+                                    resultados.append('<button type="button" class="list-group-item list-group-item-action opcao-usuario" data-id="' + usuario.id + '" data-nome="' + usuario.name + '" data-email="' + usuario.email + '">' +
+                                        '<i class="fa-solid fa-user me-2"></i>' + usuario.name + ' | ' + usuario.email +
                                         '</button>');
                                 }
                             });
@@ -124,12 +124,13 @@
         $(document).on('click', '.opcao-usuario', function () {
             var usuarioId = $(this).data('id');
             var usuarioNome = $(this).data('nome');
+            var usuarioEmail = $(this).data('email');
 
             if (!usuariosSelecionados.includes(usuarioId)) {
                 usuariosSelecionados.push(usuarioId);
 
                 $('#usuariosSelecionados').append('<div class="d-flex justify-content-between align-items-center p-2 mb-1 bg-white border rounded usuario-item" data-id="' + usuarioId + '">' +
-                    '<span><i class="fa-solid fa-user me-2"></i>' + usuarioNome + '</span>' +
+                    '<span><i class="fa-solid fa-user me-2"></i>' + usuarioNome + ' | ' + usuarioEmail + '</span>' +
                     '<button type="button" class="btn btn-outline-danger btn-sm remove-usuario" data-id="' + usuarioId + '">' +
                     '<i class="fa-solid fa-trash"></i>' +
                     '</button>' +

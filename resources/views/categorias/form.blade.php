@@ -1,7 +1,7 @@
 <div class="mb-4">
     <label for="descricao" class="form-label">Descrição</label>
     <input type="text" class="form-control @error('descricao') is-invalid @enderror" id="descricao" name="descricao"
-        value="{{ old('descricao', $categoria->descricao) }}" placeholder="Digite a descrição do lançamento">
+        value="{{ old('descricao', $categoria->descricao ?? '') }}" placeholder="Digite a descrição do lançamento">
     @error('descricao')
         <div class="invalid-feedback">
             {{ $message }}

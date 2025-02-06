@@ -166,26 +166,15 @@ class LancamentoController extends Controller
     {
         $empresaId = session('empresa_id');
         // Obtém os dados necessários para o formulário
-        $categorias = CategoriaContas::where("id_empresa", $empresaId)->get(); // Supondo que você tenha um modelo de CategoriaContas
-        // Agrupar categorias por pai
-        $categoriasAgrupadas = [];
-        // Primeiro, organize categorias em um array por ID
-        foreach ($categorias as $categoria) {
-            if ($categoria->id_categoria_pai) {
-                // Se a categoria tem um pai, adicione-a à lista do pai correspondente
-                $categoriasAgrupadas[$categoria->id_categoria_pai]['subcategorias'][] = $categoria;
-            } else {
-                // Se a categoria não tem pai, é uma categoria principal
-                $categoriasAgrupadas[$categoria->id]['categoria'] = $categoria;
-            }
-        }
+        $categorias = CategoriaContas::whereNull('id_categoria_pai')->with('subcategorias')->where("id_empresa", "=", session("empresa_id"))->get();
+
         $fornecedores = FornecedorCliente::where("id_empresa", $empresaId)->where("tipo", "F")->get();
         $clientes = FornecedorCliente::where("id_empresa", $empresaId)->where("tipo", "C")->get();
 
         if ($request->path() == "lancamentos/pagamentos/create") {
-            return view('lancamentos.createPagamentos', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
+            return view('lancamentos.createPagamentos', compact('categorias', 'fornecedores', 'clientes'));
         } else {
-            return view('lancamentos.formCreateRec', compact('categoriasAgrupadas', 'fornecedores', 'clientes'));
+            return view('lancamentos.formCreateRec', compact('categorias', 'fornecedores', 'clientes'));
         }
     }
 

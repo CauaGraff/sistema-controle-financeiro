@@ -18,7 +18,7 @@ class CategoriaContasController extends Controller
     // Mostrar formulário de criação
     public function create()
     {
-        $categorias = CategoriaContas::whereNull('id_categoria_pai')->where("id_empresa", "=", session("empresa_id"))->get();
+        $categorias = CategoriaContas::where("id_empresa", "=", session("empresa_id"))->get();
         return view('categorias.create', compact('categorias'));
     }
 
