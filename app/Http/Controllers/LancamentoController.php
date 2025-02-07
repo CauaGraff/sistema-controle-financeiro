@@ -269,7 +269,6 @@ class LancamentoController extends Controller
                 'data_fim' => 'nullable|after_or_equal:data',
                 'valor' => 'required',
                 'categoria_id' => 'required|exists:categorias_de_contas,id',
-                'fornecedor_cliente_id' => 'required|exists:fornecedor_cliente,id',
             ]);
             // Criar configuração de recorrência
             $recorrencia = LancamentoRecorrenciaConfig::create([
@@ -515,7 +514,7 @@ class LancamentoController extends Controller
             'anexo' => $anexoPath, // Caminho do arquivo armazenado
         ]);
         // Redirecionamento ou resposta após a criação
-        return redirect()->route($lancamento->tipo = 'P' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')
+        return redirect()->route($lancamento->tipo == 'P' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')
             ->with('success', 'Lançamento baixado com sucesso!');
     }
 

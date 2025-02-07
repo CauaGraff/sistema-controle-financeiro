@@ -311,8 +311,14 @@
                                 // Certificando que a data é passada no formato ISO
                                 let currentDate = moment(`${year}-${month + 1}-${day}`, 'YYYY-MM-DD');
                                 let event = events.filter(event => event.date === currentDate.format('YYYY-MM-DD'));
+                                let statusClass = '';
+                                event.forEach(e => {
+                                    if (e.statusClass) {
+                                        statusClass = e.statusClass;
+                                    }
+                                });
                                 if (event.length > 0) {
-                                    calendarHTML += `<td class="text-center position-relative ${event[0].statusClass}" data-date="${currentDate.format('YYYY-MM-DD')}">`;
+                                    calendarHTML += `<td class="text-center position-relative ${statusClass}" data-date="${currentDate.format('YYYY-MM-DD')}">`;
                                 } else {
                                     calendarHTML += `<td class="text-center" data-date="${currentDate.format('YYYY-MM-DD')}">`;
                                 }
@@ -411,7 +417,7 @@
                             // Aplica cor de fundo nas linhas da tabela
                             if (data.status === 'vencido') {
                                 $(row).addClass('table-danger'); // Linha vermelha para vencido
-                            } else if (data.status === 'pago') {
+                            } else if (data.status === 'recebido') {
                                 $(row).addClass('table-success'); // Linha verde para pago
                             } else if (data.status === 'pendente') {
                                 $(row).addClass('');
@@ -480,9 +486,11 @@
                         ],
                         createdRow: function (row, data) {
                             if (data.status === 'vencido') {
-                                $(row).addClass('table-danger');
+                                $(row).addClass('table-danger'); // Linha vermelha para vencido
                             } else if (data.status === 'recebido') {
-                                $(row).addClass('table-success');
+                                $(row).addClass('table-success'); // Linha verde para pago
+                            } else if (data.status === 'pendente') {
+                                $(row).addClass('');
                             }
                         },
                         headerCallback: function (thead, data, start, end, display) {

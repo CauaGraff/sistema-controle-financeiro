@@ -9,7 +9,7 @@
     <h2 class="text-center">Baixar Lançamento</h2>
     <!-- Formulário para Baixar Lançamento -->
     <form
-        action="{{$lancamento->tipo = 'P' ? route('lancamentos.pagamentos.baixa.store', $lancamento->id) : route('lancamentos.recebimento.baixa.store', $lancamento->id)}}"
+        action="{{$lancamento->tipo == 'P' ? route('lancamentos.pagamentos.baixa.store', $lancamento->id) : route('lancamentos.recebimentos.baixa.store', $lancamento->id)}}"
         method="POST" enctype="multipart/form-data">
         @csrf
         <!-- Linha para Descrição e Valor a Pagar -->
@@ -33,7 +33,8 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="data_venc">Data de Vencimento:</label>
-                    <input type="date" class="form-control" id="data_venc" value="{{$lancamento->data_venc}}" disabled>
+                    <input type="date" class="form-control" id="data_venc"
+                        value="{{$lancamento->data_venc->format('Y-m-d')}}" disabled>
                 </div>
             </div>
             <div class="col-md-6">

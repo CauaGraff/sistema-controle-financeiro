@@ -1,5 +1,10 @@
 @extends('_theme')
 
+@section('css')
+<link rel="stylesheet" href="{{asset("css/select2.min.css")}}">
+<link rel="stylesheet" href="{{asset("css/select2/select2-bootstrap-5-theme.min.css")}}">
+@endsection
+
 @section('content')
 <div class="container mt-5">
     <h1>Cadastrar Recebimentos</h1>
@@ -10,8 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('lancamentos.recebimentos.store') }}" method="POST">
-        @csrf
+    <form action="{{ route('lancamentos.recebimentos.store') }}" method="POST" id="formPagamento">
         @csrf
         <!-- Campo de Descrição -->
         <div class="row mb-3">
@@ -25,11 +29,11 @@
                     </div>
                 @enderror
             </div>
-
         </div>
+
         <!-- Campo de tipo do cadastro -->
         <div class="row mb-3">
-            <label for="tipo" class="col-sm-2 col-form-label">Tipo do Recebimento</label>
+            <label for="tipo" class="col-sm-2 col-form-label">Tipo Pagamento</label>
             <div class="col-sm-10">
                 <select class="form-select @error('tipo')is-invalid @enderror" id="tipo" name="tipo">
                     <option value="0" {{ old('tipo') == 0 ? 'selected' : '' }}>Padrão</option>
@@ -43,6 +47,7 @@
                 @enderror
             </div>
         </div>
+
         <!-- Campos normal -->
         <div id="nenhumFields">
             <!-- Campo de Valor -->
@@ -108,9 +113,9 @@
 
         <!-- Campos adicionais para lançamentos Parcelas -->
         <div id="parcelasFields" style="display: none;">
-            <!-- Campo de Valor -->
+            <!-- Campo de Valor Total -->
             <div class="row mb-3">
-                <label for="valor" class="col-sm-2 col-form-label" id="labelValor">Valor Total</label>
+                <label for="valorTotal" class="col-sm-2 col-form-label" id="labelValor">Valor Total</label>
                 <div class="col-sm-10">
                     <input type="text" class="form-control @error('valorTotal')is-invalid @enderror" id="valorTotal"
                         name="valorTotal" value="{{ old('valorTotal') }}">
@@ -121,7 +126,7 @@
                     @enderror
                 </div>
             </div>
-            <!-- Campo de Data de Vencimento -->
+            <!-- Campo de 1º Data de Vencimento -->
             <div class="row mb-3">
                 <label for="dataVencPar" class="col-sm-2 col-form-label" id="labelDataVenc">1º Data de
                     Vencimento</label>
@@ -136,11 +141,11 @@
                 </div>
             </div>
             <!-- Campo de Entrada -->
-            <div class=" row mb-3">
+            <div class="row mb-3">
                 <label for="valorEntrada" class="col-sm-2 col-form-label" id="labelEntrada">Valor Entrada</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control @error('valorEntrada')is-invalid @enderror" id="
-                        valorEntrada" name="valorEntrada" value="{{ old('valorEntrada') }}">
+                    <input type="text" class="form-control @error('valorEntrada')is-invalid @enderror" id="valorEntrada"
+                        name="valorEntrada" value="{{ old('valorEntrada') }}">
                     @error('valorEntrada')
                         <div class="invalid-feedback">
                             {{ $message }}
@@ -150,11 +155,11 @@
             </div>
             <!-- Campo de qtd parcelas -->
             <div class="row mb-3">
-                <label for="qtdParcelas" class="col-sm-2 col-form-label" id="labelDataVenc">Quantidade
+                <label for="qtdParcelas" class="col-sm-2 col-form-label" id="labelQtdParcelas">Quantidade
                     Parcelas</label>
                 <div class="col-sm-10">
-                    <input type="number" class="form-control @error('valorEntrada')is-invalid @enderror"
-                        id="qtdParcelas" name="qtdParcelas" value="{{ old('qtdParcelas') }}">
+                    <input type="number" class="form-control @error('qtdParcelas')is-invalid @enderror" id="qtdParcelas"
+                        name="qtdParcelas" value="{{ old('qtdParcelas') }}">
                     @error('qtdParcelas')
                         <div class="invalid-feedback">
                             {{ $message }}
@@ -163,21 +168,37 @@
                 </div>
             </div>
         </div>
-        <!-- Campo de Categoria -->
+
         <div class="row mb-3">
             <label for="categoria" class="col-sm-2 col-form-label">Categoria</label>
             <div class="col-sm-10">
-                <select class="form-select @error('categoria_id')is-invalid @enderror" id="categoria"
-                    name="categoria_id">
+                <select class="form-select @error('categoria_id') is-invalid @enderror selectpicker" id="categoria"
+                    name="categoria_id" data-live-search="true" style="width: 100%;">
                     <option value="">Selecione uma categoria</option>
-                    @foreach ($categoriasAgrupadas as $grupo)
-                        @if (isset($grupo['categoria']))
-                            <optgroup label="{{ $grupo['categoria']->descricao }}">
-                                @foreach ($grupo['subcategorias'] as $subcategoria)
-                                    <option value="{{ $subcategoria->id }}" {{ old('categoria_id') == $subcategoria->id ? 'selected' : '' }}>{{ $subcategoria->descricao }}</option>
-                                @endforeach
-                            </optgroup>
-                        @endif
+                    @php
+                        $numeroCategoriaPai = 1; // Inicializa a numeração das categorias pai
+                    @endphp
+                    @foreach ($categorias as $categoria)
+                                        <!-- Categoria Pai -->
+                                        <option value="{{ $categoria->id }}">{{ $numeroCategoriaPai }} - {{ $categoria->descricao }}
+                                        </option>
+                                        <!-- Subcategorias -->
+                                        @if ($categoria->subcategorias->count() > 0)
+                                                        @php
+                                                            $numeroSubcategoria = 1; // Inicializa a numeração das subcategorias
+                                                        @endphp
+                                                        @foreach ($categoria->subcategorias as $subcategoria)
+                                                                    <option value="{{ $subcategoria->id }}">-- {{ $numeroCategoriaPai }}.{{ $numeroSubcategoria }} -
+                                                                        {{ $subcategoria->descricao }}
+                                                                    </option>
+                                                                    @php
+                                                                        $numeroSubcategoria++; // Incrementa o número da subcategoria
+                                                                    @endphp
+                                                        @endforeach
+                                        @endif
+                                        @php
+                                            $numeroCategoriaPai++; // Incrementa o número da categoria pai
+                                        @endphp
                     @endforeach
                 </select>
             </div>
@@ -192,24 +213,20 @@
             <label for="fornecedor_cliente" class="col-sm-2 col-form-label">Fornecedor/Cliente</label>
             <div class="col-sm-10">
                 <select class="form-select @error('fornecedor_cliente_id') is-invalid @enderror" id="fornecedor_cliente"
-                    name="fornecedor_cliente_id">
+                    name="fornecedor_cliente_id" style="width: 100%;">
                     <option value="">Selecione o Fornecedor/Cliente</option>
 
                     <!-- Grupo de Fornecedores -->
                     <optgroup label="Fornecedores">
                         @foreach ($fornecedores as $fornecedor)
-                            <option value="{{ $fornecedor->id }}" {{ old('fornecedor_cliente_id') == $fornecedor->id ? 'selected' : '' }}>
-                                {{ $fornecedor->nome }}
-                            </option>
+                            <option value="{{ $fornecedor->id }}" {{ old('fornecedor_cliente_id') == $fornecedor->id ? 'selected' : '' }}>{{ $fornecedor->nome }}</option>
                         @endforeach
                     </optgroup>
 
                     <!-- Grupo de Clientes -->
                     <optgroup label="Clientes">
                         @foreach ($clientes as $cliente)
-                            <option value="{{ $cliente->id }}" {{ old('fornecedor_cliente_id') == $cliente->id ? 'selected' : '' }}>
-                                {{ $cliente->nome }}
-                            </option>
+                            <option value="{{ $cliente->id }}" {{ old('fornecedor_cliente_id') == $cliente->id ? 'selected' : '' }}>{{ $cliente->nome }}</option>
                         @endforeach
                     </optgroup>
                 </select>
@@ -226,25 +243,40 @@
 @endsection
 
 @section('js')
+<script src="{{ asset('js/select2.full.min.js') }}"></script>
 <script src="{{asset("js/jquery.mask.min.js")}}"></script>
 <script>
     $(document).ready(function () {
+        $('#categoria').select2({
+            theme: "bootstrap-5",
+        });
+        $('#fornecedor_cliente').select2({
+            theme: "bootstrap-5",
+        });
         function selecionaCampos() {
             if ($("#tipo").val() == 0) {
-                $("#nenhumFields").show()
-                $("#recorrenteFields").hide()
-                $("#parcelasFields").hide()
+                $("#nenhumFields").show();
+                $("#recorrenteFields").hide();
+                $("#parcelasFields").hide();
+                // Resetando campos recorrentes e parcelas
+                $('#frequencia').val('');
+                $('#data_fim').val('');
             } else if ($("#tipo").val() == 1) {
-                $("#nenhumFields").hide()
-                $("#recorrenteFields").hide()
-                $("#parcelasFields").show()
+                $("#nenhumFields").hide();
+                $("#recorrenteFields").hide();
+                $("#parcelasFields").show();
+                // Resetando campos recorrentes
+                $('#frequencia').val('');
+                $('#data_fim').val('');
             } else if ($("#tipo").val() == 2) {
-                $("#nenhumFields").show()
-                $("#recorrenteFields").show()
-                $("#parcelasFields").hide()
+                $("#nenhumFields").show();
+                $("#recorrenteFields").show();
+                $("#parcelasFields").hide();
             }
         }
+
         selecionaCampos();
+
         $('#valor').mask('000.000.000.000.000,00', {
             reverse: true
         });
@@ -254,9 +286,10 @@
         $('#valorEntrada').mask('000.000.000.000.000,00', {
             reverse: true
         });
+
         $("#tipo").change(function () {
             selecionaCampos();
-        })
-    })
+        });
+    });
 </script>
 @endsection

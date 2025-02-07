@@ -75,7 +75,7 @@ class ExportacaoController extends Controller
                 $credito,
                 number_format($lancamentoBaixa->valor, 2, ',', '.'),
                 $historico,
-                ($lancamentoBaixa->doc ?? '---') . ' - ' . $lancamento->descricao . ' - ' . $lancamento->fornecedorCliente->nome . ' - ' . $lancamento->categoriaContas->descricao,
+                ($lancamentoBaixa->doc ?? '---') . ' - ' . $lancamento->descricao . ' - ' . ($lancamento->fornecedorCliente->nome ?? '---') . ' - ' . ($lancamento->categoriaContas->descricao ?? '---'),
                 number_format($juros, 2, ',', '.'),    // Formatação de juros
                 number_format($multa, 2, ',', '.'),    // Formatação de multa
                 number_format($desconto, 2, ',', '.')  // Formatação de desconto

@@ -30,7 +30,9 @@ class CalendarioController extends Controller
         $endOfMonth = Carbon::createFromDate($year, $month, 1)->endOfMonth()->endOfDay();
 
         // Recupera os lançamentos do mês
-        $lancamentos = Lancamento::whereBetween('data_venc', [$startOfMonth, $endOfMonth])->where('id_empresa', session('empresa_id'))->get();
+        $lancamentos = Lancamento::whereBetween('data_venc', [$startOfMonth, $endOfMonth])
+            ->where('id_empresa', session('empresa_id'))
+            ->get();
 
         // Organize os lançamentos para retornar no formato adequado
         $events = [];
@@ -137,14 +139,14 @@ class CalendarioController extends Controller
                 // Verifica se a data de vencimento é igual à data atual (ou seja, está vencendo hoje)
                 $vencido = Carbon::parse($lancamento->data_venc)->lt(Carbon::now());
                 $hoje = Carbon::parse($lancamento->data_venc)->isToday(); // Verifica se a data é hoje
-
+    
                 // Se a data de vencimento for igual a hoje ou se não tiver status (não pago ainda), marca como 'warning' (pendente)
-                if ($hoje) {
-                    $status = 'warning'; // 'warning' é a cor para mostrar que é algo "pendente" e importante
-                } elseif ($vencido && !$lancamento->isPago()) {
+                if ($lancamento->isPago()) {
+                    $status = 'recebido'; // Se já tiver sido recebido, marca como 'recebido'
+                } elseif ($hoje) {
+                    $status = 'warning'; // 'warning' para mostrar que está vencendo hoje
+                } elseif ($vencido) {
                     $status = 'vencido'; // Caso esteja vencido e não pago, marca como 'vencido'
-                } elseif ($lancamento->isPago()) {
-                    $status = 'pago'; // Se já estiver pago, marca como 'pago'
                 }
 
                 return [
@@ -162,16 +164,15 @@ class CalendarioController extends Controller
                 // Verifica se a data de vencimento é igual à data atual (ou seja, está vencendo hoje)
                 $vencido = Carbon::parse($lancamento->data_venc)->lt(Carbon::now());
                 $hoje = Carbon::parse($lancamento->data_venc)->isToday(); // Verifica se a data é hoje
-
+    
                 // Se a data de vencimento for igual a hoje ou se não tiver status (não pago ainda), marca como 'warning' (pendente)
-                if ($hoje) {
-                    $status = 'warning'; // 'warning' para mostrar que está vencendo hoje
-                } elseif ($vencido && !$lancamento->isPago()) {
-                    $status = 'vencido'; // Caso esteja vencido e não pago, marca como 'vencido'
-                } elseif ($lancamento->isPago()) {
+                if ($lancamento->isPago()) {
                     $status = 'recebido'; // Se já tiver sido recebido, marca como 'recebido'
+                } elseif ($hoje) {
+                    $status = 'warning'; // 'warning' para mostrar que está vencendo hoje
+                } elseif ($vencido) {
+                    $status = 'vencido'; // Caso esteja vencido e não pago, marca como 'vencido'
                 }
-
                 return [
                     'id' => $lancamento->id,
                     'descricao' => $lancamento->descricao,
