@@ -34,12 +34,21 @@
                     @foreach ($categoriasAgrupadas as $grupo)
                         @if (isset($grupo['categoria']))
                             <optgroup label="{{ $grupo['categoria']->descricao }}">
+                                <!-- Adiciona a categoria pai como a primeira opção -->
+                                <option value="{{ $grupo['categoria']->id }}" {{ old('categoria_id') == $grupo['categoria']->id ? 'selected' : '' }}>
+                                    {{ $grupo['categoria']->descricao }}
+                                </option>
+
+                                <!-- Depois, adiciona as subcategorias -->
                                 @foreach ($grupo['subcategorias'] as $subcategoria)
-                                    <option value="{{ $subcategoria->id }}" {{ old('categoria_id') == $subcategoria->id ? 'selected' : '' }}>{{ $subcategoria->descricao }}</option>
+                                    <option value="{{ $subcategoria->id }}" {{ old('categoria_id') == $subcategoria->id ? 'selected' : '' }}>
+                                        {{ $subcategoria->descricao }}
+                                    </option>
                                 @endforeach
                             </optgroup>
                         @endif
                     @endforeach
+
                 </select>
             </div>
             <div class="form-group col-md-12 mt-1">

@@ -75,15 +75,13 @@ class LancamentoController extends Controller
 
         // Recupera categorias e fornecedores/clientes para exibição
         $route = "P";
-        $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))->get();
-        $categoriasAgrupadas = [];
-        foreach ($categorias as $categoria) {
-            if ($categoria->id_categoria_pai) {
-                $categoriasAgrupadas[$categoria->id_categoria_pai]['subcategorias'][] = $categoria;
-            } else {
-                $categoriasAgrupadas[$categoria->id]['categoria'] = $categoria;
-            }
-        }
+        $categoriasAgrupadas = CategoriaContas::with('subcategorias')->whereNull('id_categoria_pai')->get()->map(function ($categoria) {
+            return [
+                'categoria' => $categoria,
+                'subcategorias' => $categoria->subcategorias
+            ];
+        });
+
         $fornecedoresClientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
 
         return view('lancamentos.index', compact('lancamentos', 'categoriasAgrupadas', 'route', 'fornecedoresClientes'));

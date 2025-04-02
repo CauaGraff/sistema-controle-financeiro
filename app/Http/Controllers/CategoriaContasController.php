@@ -9,9 +9,13 @@ use Illuminate\Http\Request;
 class CategoriaContasController extends Controller
 {
     // Listar todas as categorias
+    // Listar todas as categorias, incluindo subcategorias em todos os níveis
     public function index()
     {
-        $categorias = CategoriaContas::whereNull('id_categoria_pai')->with('subcategorias')->where("id_empresa", "=", session("empresa_id"))->get();
+        $categorias = CategoriaContas::where("id_empresa", "=", session("empresa_id"))
+            ->with('subcategorias') // Carrega todas as subcategorias
+            ->whereNull('id_categoria_pai')
+            ->get();
         return view('categorias.index', compact('categorias'));
     }
 
