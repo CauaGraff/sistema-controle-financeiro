@@ -13,8 +13,8 @@ return new class extends Migration {
         Schema::create('contas_banco', function (Blueprint $table) {
             $table->id();
             $table->string("nome");
-            $table->integer("agencia")->nullable();
-            $table->integer("conta")->nullable();
+            $table->string("agencia")->nullable();
+            $table->string("conta")->nullable();
             $table->unsignedBigInteger('id_empresa');
             $table->timestamps();
             $table->foreign('id_empresa')->references('id')->on('empresas');
