@@ -21,7 +21,9 @@ class EmpresasSeeder extends Seeder
                 'cidade' => 'Cidade Exemplo',
                 'bairro' => 'Bairro Exemplo',
                 'rua' => 'Rua Exemplo 123',
-                'active' => 1
+                'active' => 1,
+                'created_at' => now(),
+                'updated_at' => now()
             ]
         ]);
 
@@ -29,6 +31,8 @@ class EmpresasSeeder extends Seeder
             [
                 'id_user' => 2,
                 'id_empresas' => 1,
+                'created_at' => now(),
+                'updated_at' => now()
             ]
         ]);
     }

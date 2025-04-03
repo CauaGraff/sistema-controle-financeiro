@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UserTypeSeeder::class,
             UserSeeder::class,
             EmpresasSeeder::class,
+            ParametrosCalculoSeeder::class,
         ]);
 
     }
