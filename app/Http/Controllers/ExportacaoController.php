@@ -21,11 +21,12 @@ class ExportacaoController extends Controller
 
         $empresa = Empresas::findOrFail($idEmpresa);
 
-        // Busca os lançamentos da competência
+        // Busca os lançamentos da competência pela data_baixa
         $lancamentos = Lancamento::with(['categoriaContas', 'fornecedorCliente', 'lancamentoBaixa', 'conta'])
             ->where('id_empresa', $idEmpresa)
-            ->whereBetween('data_venc', [$dataInicio, $dataFim])
-            ->whereHas('lancamentoBaixa') // Apenas lançamentos com baixa
+            ->whereHas('lancamentoBaixa', function ($query) use ($dataInicio, $dataFim) {
+                $query->whereBetween('data_baixa', [$dataInicio, $dataFim]); // Filtra pela data_baixa
+            })
             ->get();
 
         $csvData = [];
@@ -50,35 +51,35 @@ class ExportacaoController extends Controller
 
             // Define débito e crédito com base no tipo
             $debito = $lancamento->tipo === 'P'
-                ? ($lancamento->fornecedorCliente->cnpj_cpf ?? '---') // CNPJ do fornecedor no débito
+                ? $this->formatarCnpjCpf($lancamento->fornecedorCliente->cnpj_cpf ?? '') // Formata o CNPJ ou CPF
                 : (($lancamento->lancamentoBaixa->contaBancaria->nome ?? '---') . '-' .
                     ($lancamento->lancamentoBaixa->contaBancaria->agencia ?? '---') . ' / ' .
                     ($lancamento->lancamentoBaixa->contaBancaria->conta ?? '---')
-                ); // Conta bancária no débito para recebimento
+                );
 
             $credito = $lancamento->tipo === 'R'
-                ? ($lancamento->fornecedorCliente->cnpj_cpf ?? '---') // CNPJ do cliente no crédito
+                ? $this->formatarCnpjCpf($lancamento->fornecedorCliente->cnpj_cpf ?? '') // Formata o CNPJ ou CPF
                 : (($lancamento->lancamentoBaixa->contaBancaria->nome ?? '---') . '-' .
                     ($lancamento->lancamentoBaixa->contaBancaria->agencia ?? '---') . ' / ' .
                     ($lancamento->lancamentoBaixa->contaBancaria->conta ?? '---')
-                ); // Conta bancária no crédito para pagamento
+                );
 
             // Valores de Juros, Multa e Desconto
-            $juros = $lancamentoBaixa->juros ?? 0;  // Exemplo de como você pode pegar ou calcular o valor de juros
-            $multa = $lancamentoBaixa->multa ?? 0;  // Exemplo de como você pode pegar ou calcular o valor de multa
-            $desconto = $lancamentoBaixa->desconto ?? 0;  // Exemplo de como você pode pegar ou calcular o valor de desconto
+            $juros = $lancamentoBaixa->juros ?? 0;
+            $multa = $lancamentoBaixa->multa ?? 0;
+            $desconto = $lancamentoBaixa->desconto ?? 0;
 
             $csvData[] = [
-                $lancamentoBaixa->updated_at->format('d/m/Y'),
-                $lancamentoBaixa->doc ?? '---',
+                Carbon::parse($lancamentoBaixa->data_baixa)->format('d/m/Y'), // Converte data_baixa para Carbon antes de formatar
+                $lancamentoBaixa->doc ?? '',
                 $debito,
                 $credito,
                 number_format($lancamentoBaixa->valor, 2, ',', '.'),
                 $historico,
-                ($lancamentoBaixa->doc ?? '---') . ' - ' . $lancamento->descricao . ' - ' . ($lancamento->fornecedorCliente->nome ?? '---') . ' - ' . ($lancamento->categoriaContas->descricao ?? '---'),
-                number_format($juros, 2, ',', '.'),    // Formatação de juros
-                number_format($multa, 2, ',', '.'),    // Formatação de multa
-                number_format($desconto, 2, ',', '.')  // Formatação de desconto
+                ($lancamentoBaixa->doc ?? '') . ' - ' . $lancamento->descricao . ' - ' . ($lancamento->fornecedorCliente->nome ?? '') . ' - ' . ($lancamento->categoriaContas->descricao ?? ''),
+                number_format($juros, 2, ',', '.'),
+                number_format($multa, 2, ',', '.'),
+                number_format($desconto, 2, ',', '.')
             ];
         }
 
@@ -122,5 +123,28 @@ class ExportacaoController extends Controller
         return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
     }
 
-}
+    /**
+     * Formata um CNPJ ou CPF.
+     *
+     * @param string|null $documento
+     * @return string
+     */
+    private function formatarCnpjCpf(?string $documento): string
+    {
+        if (!$documento) {
+            return '---'; // Retorna um valor padrão caso o documento seja nulo
+        }
 
+        $documento = preg_replace('/\D/', '', $documento); // Remove caracteres não numéricos
+
+        if (strlen($documento) === 11) {
+            // Formata como CPF: 000.000.000-00
+            return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $documento);
+        } elseif (strlen($documento) === 14) {
+            // Formata como CNPJ: 00.000.000/0000-00
+            return preg_replace('/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/', '$1.$2.$3/$4-$5', $documento);
+        }
+
+        return $documento; // Retorna o documento sem formatação se não for CPF nem CNPJ
+    }
+}
