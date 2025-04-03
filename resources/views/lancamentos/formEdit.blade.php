@@ -209,7 +209,13 @@
         @endif
         <!-- Botão Atualizar (exibido apenas uma vez, no final do formulário) -->
         <div class="col-md-15 d-grid mt-1">
-            <button type="submit" class="btn btn-success btn-lg">Atualizar</button>
+            <button type="submit" class="btn btn-warning btn-lg">Atualizar</button>
+            @if (!$lancamentoBaixa)
+                <a href="{{ $lancamento->tipo == 'P' ? route('lancamentos.pagamentos.baixa', $lancamento->id) : route('lancamentos.recebimentos.baixa', $lancamento->id) }}"
+                    class="btn btn-success btn-lg mt-2">
+                    Voltar
+                </a>
+            @endif
         </div>
     </form>
 

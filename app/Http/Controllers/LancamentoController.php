@@ -501,7 +501,8 @@ class LancamentoController extends Controller
             'multa' => $multa,
             'desconto' => $desconto,
             'doc' => $request->numero_documento,
-            'anexo' => $anexoPath, // Caminho do arquivo armazenado
+            'anexo' => $anexoPath,
+            'data_baixa' => $request->data_pagamento,
         ]);
         // Redirecionamento ou resposta após a criação
         return redirect()->route($lancamento->tipo == 'P' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')

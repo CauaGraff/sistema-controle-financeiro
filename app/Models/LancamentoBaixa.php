@@ -19,7 +19,8 @@ class LancamentoBaixa extends Model
         'multa',
         'desconto',
         'doc',
-        'anexo'
+        'anexo',
+        'data_baixa'
     ];
     public function contaBancaria()
     {

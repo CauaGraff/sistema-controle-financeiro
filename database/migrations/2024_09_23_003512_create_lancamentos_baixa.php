@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->decimal('desconto', 10, 2)->default('0.00');
             $table->string('doc')->nullable();
             $table->string('anexo')->nullable();
+            $table->date('data_baixa');
             $table->timestamps();
             $table->foreign(columns: 'id_lancamento')->references('id')->on('lancamentos');
             $table->foreign(columns: 'id_contaBancaria')->references('id')->on('contas_banco');
