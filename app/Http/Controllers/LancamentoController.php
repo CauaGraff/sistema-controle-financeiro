@@ -367,7 +367,7 @@ class LancamentoController extends Controller
         $lancamento->save();
 
         // Retorna para a página de edição com uma mensagem de sucesso
-        return redirect()->route($lancamento->tipo = 'P' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')
+        return redirect()->route($lancamento->tipo == 'P' ? 'lancamentos.pagamentos.index' : 'lancamentos.recebimentos.index')
             ->with('success', 'Lançamento atualizado com sucesso!');
     }
     public function destroy(Lancamento $lancamento)
