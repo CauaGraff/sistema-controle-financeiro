@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use App\Models\LancamentoRecorrenciaConfig;
 use App\Models\CategoriaContas; // Modelo de Plano de Contas
+use App\Http\Controllers\CategoriaContasController;
 
 class LancamentoController extends Controller
 {
@@ -285,15 +286,18 @@ class LancamentoController extends Controller
         // Verificar se o lançamento está baixado
         $lancamentoBaixa = $lancamento->lancamentoBaixa;
 
+        // Carregar categorias e subcategorias de forma hierárquica
         $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))
-            ->whereNull('id_categoria_pai') // Apenas categorias raiz
-            ->with('subcategorias') // Carrega subcategorias automaticamente
+            ->whereNull('id_categoria_pai') // Carregar apenas categorias raiz
+            ->with('subcategorias') // Carregar as subcategorias
             ->get();
+
         $fornecedores = FornecedorCliente::where("id_empresa", session('empresa_id'))->get();
         $clientes = FornecedorCliente::where("id_empresa", session('empresa_id'))->get();
 
         return view('lancamentos.formEdit', compact('lancamento', 'categorias', 'fornecedores', 'clientes', 'lancamentoBaixa'));
     }
+
     // Função para atualizar um lançamento
     public function update(Request $request, $id)
     {

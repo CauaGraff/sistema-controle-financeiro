@@ -63,6 +63,7 @@
                 @enderror
             </div>
         </div>
+        <!-- Campo de Categoria -->
         <div class="row mb-3">
             <label for="categoria" class="col-sm-2 col-form-label">Categoria</label>
             <div class="col-sm-10">
@@ -70,16 +71,21 @@
                     style="width: 100%;">
                     <option value="">Selecione uma categoria</option>
                     @php
-                        function listarCategorias($categorias, $prefixo = '', $nivel = 0)
+                        function listarCategorias($categorias, $prefixo = '', $nivel = 0, $categoriaSelecionada = null)
                         {
                             $contador = 1;
                             foreach ($categorias as $categoria) {
                                 // Número hierárquico da categoria
                                 $numAtual = $prefixo ? "$prefixo.$contador" : (string) $contador;
-                                echo '<option value="' . $categoria->id . '">' . $numAtual . ' - ' . $categoria->descricao . '</option>';
+
+                                // Verifica se essa categoria é a que está selecionada
+                                $selected = $categoriaSelecionada == $categoria->id ? 'selected' : '';
+
+                                echo '<option value="' . $categoria->id . '" ' . $selected . '>' . $numAtual . ' - ' . $categoria->descricao . '</option>';
+
                                 // Chama a função recursiva apenas se houver subcategorias
                                 if ($categoria->subcategorias->isNotEmpty()) {
-                                    listarCategorias($categoria->subcategorias, $numAtual, $nivel + 1);
+                                    listarCategorias($categoria->subcategorias, $numAtual, $nivel + 1, $categoriaSelecionada);
                                 }
                                 $contador++;
                             }
@@ -87,7 +93,11 @@
 
                         // Buscar apenas categorias principais (onde id_categoria_pai é NULL)
                         $categoriasPrincipais = $categorias->whereNull('id_categoria_pai');
-                        listarCategorias($categoriasPrincipais);
+
+                        // Pegando a categoria previamente cadastrada
+                        $categoriaSelecionada = old('categoria_id', $pagamento->categoria_id ?? null);
+
+                        listarCategorias($categoriasPrincipais, '', 0, $lancamento->id_categoria);
                     @endphp
                 </select>
             </div>
@@ -97,11 +107,6 @@
                 </div>
             @enderror
         </div>
-        @error('categoria_id')
-            <div class="invalid-feedback">
-                {{ $message }}
-            </div>
-        @enderror
         <!-- Campo de Fornecedor/Cliente -->
         <div class="row mb-3">
             <label for="fornecedor_cliente" class="col-sm-2 col-form-label">Fornecedor/Cliente</label>
@@ -211,24 +216,9 @@
 @endsection
 
 @section('js')
-    <script src="{{ asset('js/select2.full.min.js') }}"></script>
     <script src="{{ asset('js/jquery.mask.min.js') }}"></script>
     <script>
         $(document).ready(function () {
-            // Remover qualquer Select2 existente antes de inicializar
-            $('.select2').select2('destroy').select2({
-                theme: "bootstrap-5",
-                width: '100%',
-                placeholder: "Selecione uma opção",
-                allowClear: true
-            });
-
-            // Ajuste para corrigir sobreposição
-            $('.select2').on('select2:open', function () {
-                $('.select2-container--open').css('z-index', 9999);
-            });
-
-            // Máscaras para os campos numéricos
             $('#valor, #multa, #juros, #desconto, #valor_pago').mask('000.000.000.000.000,00', { reverse: true });
         });
     </script>
