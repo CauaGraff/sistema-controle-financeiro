@@ -27,29 +27,39 @@
                     value="{{ request('valor_max') }}">
             </div>
             <div class="form-group col-md-12 mt-1">
-                <label for="categoria_id">Categoria</label>
-                <select class="form-select @error('categoria_id')is-invalid @enderror selectpicker" id="categoria_id"
-                    name="categoria_id" data-live-search="true">
+                <label for="categoria">Categoria:</label>
+                <select class="form-select selectpicker" id="categoria" name="categoria_id" data-live-search="true"
+                    style="width: 100%;">
                     <option value="">Selecione uma categoria</option>
-                    @foreach ($categoriasAgrupadas as $grupo)
-                        @if (isset($grupo['categoria']))
-                            <optgroup label="{{ $grupo['categoria']->descricao }}">
-                                <!-- Adiciona a categoria pai como a primeira opção -->
-                                <option value="{{ $grupo['categoria']->id }}" {{ old('categoria_id') == $grupo['categoria']->id ? 'selected' : '' }}>
-                                    {{ $grupo['categoria']->descricao }}
-                                </option>
 
-                                <!-- Depois, adiciona as subcategorias -->
-                                @foreach ($grupo['subcategorias'] as $subcategoria)
-                                    <option value="{{ $subcategoria->id }}" {{ old('categoria_id') == $subcategoria->id ? 'selected' : '' }}>
-                                        {{ $subcategoria->descricao }}
-                                    </option>
-                                @endforeach
-                            </optgroup>
-                        @endif
-                    @endforeach
+                    @php
+                        function listarCategorias($categorias, $prefixo = '', $nivel = 0)
+                        {
+                            $contador = 1;
+                            foreach ($categorias as $categoria) {
+                                // Número hierárquico da categoria
+                                $numAtual = $prefixo ? "$prefixo.$contador" : (string) $contador;
 
+                                echo '<option value="' . $categoria->id . '">' . $numAtual . ' - ' . $categoria->descricao . '</option>';
+
+                                // Chama a função recursiva apenas se houver subcategorias
+                                if ($categoria->subcategorias->isNotEmpty()) {
+                                    listarCategorias($categoria->subcategorias, $numAtual, $nivel + 1);
+                                }
+
+                                $contador++;
+                            }
+                        }
+
+                        // Buscar apenas categorias principais (onde id_categoria_pai é NULL)
+                        $categoriasPrincipais = $categorias->whereNull('id_categoria_pai');
+                        listarCategorias($categoriasPrincipais);
+                    @endphp
                 </select>
+
+                @error('categoria_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             <div class="form-group col-md-12 mt-1">
                 <label for="fornecedor_cliente_id">Fornecedor/Cliente</label>

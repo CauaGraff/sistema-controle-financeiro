@@ -17,6 +17,7 @@ use App\Models\CategoriaContas; // Modelo de Plano de Contas
 class LancamentoController extends Controller
 {
     // Método para listar todos os lançamentos (pagamentos)
+    // Método para listar todos os lançamentos (pagamentos)
     public function indexPagamentos(Request $request)
     {
         $empresaId = session('empresa_id');
@@ -75,16 +76,14 @@ class LancamentoController extends Controller
 
         // Recupera categorias e fornecedores/clientes para exibição
         $route = "P";
-        $categoriasAgrupadas = CategoriaContas::with('subcategorias')->whereNull('id_categoria_pai')->get()->map(function ($categoria) {
-            return [
-                'categoria' => $categoria,
-                'subcategorias' => $categoria->subcategorias
-            ];
-        });
+        $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))
+            ->whereNull('id_categoria_pai') // Apenas categorias raiz
+            ->with('subcategorias') // Carrega subcategorias automaticamente
+            ->get();
 
         $fornecedoresClientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
 
-        return view('lancamentos.index', compact('lancamentos', 'categoriasAgrupadas', 'route', 'fornecedoresClientes'));
+        return view('lancamentos.index', compact('lancamentos', 'categorias', 'route', 'fornecedoresClientes'));
     }
 
     public function indexRecebimentos(Request $request)
@@ -145,20 +144,15 @@ class LancamentoController extends Controller
 
         // Recupera categorias e fornecedores/clientes para exibição
         $route = "R";
-        $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))->get();
-        $categoriasAgrupadas = [];
-        foreach ($categorias as $categoria) {
-            if ($categoria->id_categoria_pai) {
-                $categoriasAgrupadas[$categoria->id_categoria_pai]['subcategorias'][] = $categoria;
-            } else {
-                $categoriasAgrupadas[$categoria->id]['categoria'] = $categoria;
-            }
-        }
+        $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))
+            ->whereNull('id_categoria_pai') // Apenas categorias raiz
+            ->with('subcategorias') // Carrega subcategorias automaticamente
+            ->get();
+
         $fornecedoresClientes = FornecedorCliente::where("id_empresa", $empresaId)->get();
 
-        return view('lancamentos.index', compact('lancamentos', 'categoriasAgrupadas', 'route', 'fornecedoresClientes'));
+        return view('lancamentos.index', compact('lancamentos', 'categorias', 'route', 'fornecedoresClientes'));
     }
-
 
     public function create(Request $request)
     {
@@ -291,20 +285,14 @@ class LancamentoController extends Controller
         // Verificar se o lançamento está baixado
         $lancamentoBaixa = $lancamento->lancamentoBaixa;
 
-        // Outros dados necessários
-        $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))->get();
-        $categoriasAgrupadas = [];
-        foreach ($categorias as $categoria) {
-            if ($categoria->id_categoria_pai) {
-                $categoriasAgrupadas[$categoria->id_categoria_pai]['subcategorias'][] = $categoria;
-            } else {
-                $categoriasAgrupadas[$categoria->id]['categoria'] = $categoria;
-            }
-        }
+        $categorias = CategoriaContas::where("id_empresa", session('empresa_id'))
+            ->whereNull('id_categoria_pai') // Apenas categorias raiz
+            ->with('subcategorias') // Carrega subcategorias automaticamente
+            ->get();
         $fornecedores = FornecedorCliente::where("id_empresa", session('empresa_id'))->get();
         $clientes = FornecedorCliente::where("id_empresa", session('empresa_id'))->get();
 
-        return view('lancamentos.formEdit', compact('lancamento', 'categoriasAgrupadas', 'fornecedores', 'clientes', 'lancamentoBaixa'));
+        return view('lancamentos.formEdit', compact('lancamento', 'categorias', 'fornecedores', 'clientes', 'lancamentoBaixa'));
     }
     // Função para atualizar um lançamento
     public function update(Request $request, $id)

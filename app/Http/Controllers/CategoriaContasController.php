@@ -9,13 +9,9 @@ use Illuminate\Http\Request;
 class CategoriaContasController extends Controller
 {
     // Listar todas as categorias
-    // Listar todas as categorias, incluindo subcategorias em todos os níveis
     public function index()
     {
-        $categorias = CategoriaContas::where("id_empresa", "=", session("empresa_id"))
-            ->with('subcategorias') // Carrega todas as subcategorias
-            ->whereNull('id_categoria_pai')
-            ->get();
+        $categorias = CategoriaContas::whereNull('id_categoria_pai')->with('subcategorias')->where("id_empresa", "=", session("empresa_id"))->get();
         return view('categorias.index', compact('categorias'));
     }
 
@@ -45,9 +41,9 @@ class CategoriaContasController extends Controller
     // Mostrar formulário de edição
     public function edit(CategoriaContas $categoria)
     {
-        $empresas = Empresas::all();
-        $categorias = CategoriaContas::whereNull('id_categoria_pai')->where("id_empresa", "=", session("empresa_id"))->get();
-        return view('categorias.edit', compact('categoria', 'empresas', 'categorias'));
+
+        $categorias = CategoriaContas::where("id_empresa", "=", session("empresa_id"))->get();
+        return view('categorias.edit', compact("categoria", 'categorias'));
     }
 
     // Atualizar categoria
