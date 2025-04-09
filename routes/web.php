@@ -71,10 +71,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/selecionar/{id}', [EmpresasController::class, 'definirEmpresa'])->name('empresa.definir');
     });
 
-    Route::prefix('/empresas')->group(function () {
-        Route::get('/selecionar/{id}', [EmpresasController::class, 'definirEmpresa'])->name('empresa.definir');
-    });
-
     /**LANCAMENTOS CAIXA */
     Route::prefix('lancamentos')->group(function () {
         Route::get('pagamentos', [LancamentoController::class, 'indexPagamentos'])->name('lancamentos.pagamentos.index');
