@@ -17,7 +17,7 @@ class AdminIS
     public function handle(Request $request, Closure $next, $tipos = [1, 2]): Response
     {
         // Verifica se o tipo do usuário corresponde ao tipo esperado
-        if (Auth::user()->isAdmim()) {
+        if (Auth::user()->isAdmim() || Auth::user()->isEscritorio()) {
             return $next($request);
         }
         return redirect()->route("login");

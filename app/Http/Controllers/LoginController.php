@@ -37,7 +37,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             // Redireciona de acordo com o tipo de usuário (admin ou usuário comum)
-            if (Auth::user()->isAdmim()) {
+            if (Auth::user()->isAdmim() || Auth::user()->isEscritorio()) {
                 return redirect()->route('home.adm');
             } else {
                 // Selecionar a primeira empresa associada ao usuário
