@@ -10,6 +10,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EmpresasController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\ContaBancoController;
+use App\Http\Controllers\EscritorioController;
 use App\Http\Controllers\ExportacaoController;
 use App\Http\Controllers\FavorecidoController;
 use App\Http\Controllers\LancamentoController;
@@ -54,9 +55,19 @@ Route::middleware(['auth', AdminIS::class])->group(function () {
             Route::get('{idEmpresa}/remove-usuario/{idUser}', [EmpresasController::class, 'removeUsuario'])->name('adm.empresas.removeUsuario');
         });
 
-
         Route::post('/exportar-contabilidade/{idEmpresa}', [ExportacaoController::class, 'exportarLancamentos'])->name('exportar.contabilidade');
 
+        Route::resource('escritorios', EscritorioController::class)
+            ->names([
+                'index' => 'escritorios.index',
+                'create' => 'escritorios.create',
+                'store' => 'escritorios.store',
+                'show' => 'escritorios.show',
+                'edit' => 'escritorios.edit',
+                'update' => 'escritorios.update',
+                'destroy' => 'escritorios.destroy',
+            ]);
+        ;
 
     });
 });
@@ -88,7 +99,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('recebimentos/{lancamento}/pagar', [LancamentoController::class, 'formbaixa'])->name('lancamentos.recebimentos.baixa');
         Route::post('recebimentos/{lancamento}/baixa', [LancamentoController::class, 'baixaStore'])->name('lancamentos.recebimentos.baixa.store');
         Route::get('lancamentos', [LancamentoController::class, 'index'])->name('lancamentos.index');
-
 
         Route::get('/{lancamento}/edit', [LancamentoController::class, 'edit'])->name('lancamentos.edit');
         Route::put('/{lancamento}/update', [LancamentoController::class, 'update'])->name('lancamentos.update');
