@@ -42,17 +42,11 @@
             <li class="nav-item">
               <a class="nav-link mx-2" href="{{route('adm.empresas')}}">Empresas</a>
             </li>
-            <!-- <li class="nav-item dropdown">
-              <a class="nav-link mx-2 dropdown-toggle" href="#" id="dropdownMenuButton" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fa-solid fa-gear"></i>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end w-auto" aria-labelledby="dropdownMenuButton">
-                <li>
-                  <a class="dropdown-item select-company" href="{{route("categorias.index")}}">Logo</a>
-                </li>
-              </ul>
-            </li> -->
+            @if (auth()->user()->isAdmim())
+        <li class="nav-item">
+          <a class="nav-link mx-2" href="{{route('adm.empresas')}}">Escritorios</a>
+        </li>
+      @endif
           </ul>
           <ul class="navbar-nav ms-auto d-lg-inline-flex">
             <li class="nav-item mx-2">

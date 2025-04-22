@@ -14,9 +14,9 @@ class UserTypeSeeder extends Seeder
     public function run(): void
     {
         DB::table("typeusers")->insert([
-            ['id' => 1, 'type' => 'adm', 'created_at' => null, 'updated_at' => null],
-            ['id' => 2, 'type' => 'escritorio', 'created_at' => null, 'updated_at' => null],
-            ['id' => 3, 'type' => 'cliente', 'created_at' => null, 'updated_at' => null],
+            ['id' => 1, 'type' => 'adm', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 2, 'type' => 'escritorio', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 3, 'type' => 'cliente', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

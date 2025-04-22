@@ -20,6 +20,7 @@ class UserSeeder extends Seeder
                 'email' => 'adm@adm.com',
                 'password' => bcrypt('masterkey'),
                 'id_typeuser' => 1,
+                'id_escritorio' => null,
                 'active' => true,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -30,6 +31,7 @@ class UserSeeder extends Seeder
                 'email' => 'cliente@teste.com',
                 'password' => bcrypt('masterkey'),
                 'id_typeuser' => 3,
+                'id_escritorio' => 2,
                 'active' => true,
                 'created_at' => now(),
                 'updated_at' => now()

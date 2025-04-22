@@ -50,7 +50,17 @@ class User extends Authenticatable
 
     public function isAdmim(): bool
     {
-        return in_array($this->id_typeuser, ['1', '2']);
+        return in_array($this->id_typeuser, ['1']);
+    }
+
+    public function isEscritorio(): bool
+    {
+        return in_array($this->id_typeuser, ['2']);
+    }
+
+    public function isCliente(): bool
+    {
+        return in_array($this->id_typeuser, ['3']);
     }
 
     public function empresas()

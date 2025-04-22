@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             UserTypeSeeder::class,
+            EscritoriosSeeder::class,
             UserSeeder::class,
             EmpresasSeeder::class,
             ParametrosCalculoSeeder::class,
