@@ -24,7 +24,7 @@ class EscritorioController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'cnpj' => 'nullable|string|max:20',
-            'cep' => 'nullable|string|size:8',
+            'cep' => 'nullable|string|size:9',
             'rua' => 'nullable|string|max:255',
             'bairro' => 'nullable|string|max:255',
             'cidade' => 'nullable|string|max:255',
@@ -33,6 +33,10 @@ class EscritorioController extends Controller
             'obs' => 'nullable|string',
             'active' => 'boolean',
         ]);
+
+        // Limpa os caracteres de CNPJ e CEP
+        $data['cnpj'] = isset($data['cnpj']) ? preg_replace('/\D/', '', $data['cnpj']) : null;
+        $data['cep'] = isset($data['cep']) ? preg_replace('/\D/', '', $data['cep']) : null;
 
         Escritorio::create($data);
 
@@ -55,7 +59,7 @@ class EscritorioController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'cnpj' => 'nullable|string|max:20',
-            'cep' => 'nullable|string|size:8',
+            'cep' => 'nullable|string|size:9',
             'rua' => 'nullable|string|max:255',
             'bairro' => 'nullable|string|max:255',
             'cidade' => 'nullable|string|max:255',
@@ -64,6 +68,10 @@ class EscritorioController extends Controller
             'obs' => 'nullable|string',
             'active' => 'boolean',
         ]);
+
+        // Limpa os caracteres de CNPJ e CEP
+        $data['cnpj'] = isset($data['cnpj']) ? preg_replace('/\D/', '', $data['cnpj']) : null;
+        $data['cep'] = isset($data['cep']) ? preg_replace('/\D/', '', $data['cep']) : null;
 
         $escritorio->update($data);
 

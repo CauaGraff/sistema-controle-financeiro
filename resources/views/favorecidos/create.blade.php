@@ -194,36 +194,6 @@
             // Máscara para CEP e Telefone
             $('#cep').mask('00000-000');
             $('#telefone').mask('(00) 00000-0000');
-
-            // Auto preencher os campos de endereço com o CEP
-            $("#cep").change(function () {
-                var cep = $(this).val().replace(/\D/g, ''); // Remove tudo que não é número
-                if (cep.length === 8) {
-                    $.ajax({
-                        url: 'https://viacep.com.br/ws/' + cep + '/json/',
-                        method: 'GET',
-                        dataType: 'json',
-                        success: function (data) {
-                            if (!data.erro) {
-                                $('#rua').val(data.logradouro);
-                                $('#bairro').val(data.bairro);
-                                $('#cidade').val(data.localidade);
-                                $('#uf').val(data.uf);
-
-                                // Deixe os campos habilitados caso o usuário queira editar
-                                $('#rua, #bairro, #cidade, #uf').prop('disabled', false);
-                            } else {
-                                alert('CEP não encontrado!');
-                            }
-                        },
-                        error: function () {
-                            alert('Erro ao buscar o CEP!');
-                        }
-                    });
-                } else {
-                    alert('Por favor, digite um CEP válido.');
-                }
-            });
         })
     </script>
 @endsection

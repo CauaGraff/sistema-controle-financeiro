@@ -6,12 +6,14 @@ use App\Models\User;
 use App\Models\Empresas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class EmpresasController extends Controller
 {
     public function index()
     {
-        $empresas = Empresas::all();
+        $empresas = Empresas::where('id_escritorio', Auth::user()->id_escritorio)
+            ->get();
         return view('admin.empresas.index', compact('empresas'));
     }
 
@@ -35,7 +37,6 @@ class EmpresasController extends Controller
         // Remover os caracteres especiais (., -, /) do CNPJ/CPF e CEP
         $cnpj_cpf = preg_replace('/[^0-9]/', '', $request->cnpj_cpf);
         $cep = preg_replace('/[^0-9]/', '', $request->cep);
-
         // Criar a nova empresa (empresa)
         Empresas::create([
             'nome' => $request->nome,
@@ -44,6 +45,7 @@ class EmpresasController extends Controller
             'cidade' => $request->cidade,
             'bairro' => $request->bairro,
             'rua' => $request->rua,
+            'id_escritorio' => Auth::user()->id_escritorio,
             'active' => 1 // Supondo que '1' significa que a empresa está ativa
         ]);
 
@@ -51,9 +53,9 @@ class EmpresasController extends Controller
         return redirect()->route('adm.empresas')->with('alert-success', 'Empresa Cadastrada com sucesso!');
     }
 
-
     public function delete(int $id)
     {
+        Gate::authorize('dele', Empresas::find($id));
         if (Empresas::find($id)->delete()) {
             return redirect()
                 ->back()->with('alert-success', 'Deletado com sucesso!');
@@ -65,6 +67,7 @@ class EmpresasController extends Controller
     public function show($id)
     {
         $empresa = Empresas::findOrFail($id);
+        Gate::authorize('view', $empresa);
         $usuarios = $empresa->usuarios; // Assumindo que a relação está configurada no modelo Empresa
         $allUsers = User::whereNotIn('id', $usuarios->pluck('id'))->where('id_typeuser', 3)->get();
         session([
@@ -74,6 +77,7 @@ class EmpresasController extends Controller
 
         return view('admin.empresas.view', compact('empresa', 'usuarios', 'allUsers'));
     }
+
     public function addUsuario(Request $request, $idEmpresa)
     {
         $empresa = Empresas::findOrFail($idEmpresa);
@@ -85,6 +89,7 @@ class EmpresasController extends Controller
 
         return redirect()->back()->with('success', 'Usuários adicionados com sucesso!');
     }
+
     public function removeUsuario($idEmpersa, $idUser)
     {
         $empresa = Empresas::findOrFail($idEmpersa);
@@ -130,8 +135,10 @@ class EmpresasController extends Controller
     public function edit($id)
     {
         $empresa = Empresas::findOrFail($id);
+        Gate::authorize('update', $empresa);
         return view('admin.empresas.formupdate', compact('empresa'));
     }
+
     public function update(Request $request, $id)
     {
         // Validação dos dados

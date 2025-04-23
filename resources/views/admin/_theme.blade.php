@@ -44,7 +44,7 @@
             </li>
             @if (auth()->user()->isAdmim())
         <li class="nav-item">
-          <a class="nav-link mx-2" href="{{route('adm.empresas')}}">Escritorios</a>
+          <a class="nav-link mx-2" href="{{route('escritorios.index')}}">Escritorios</a>
         </li>
       @endif
           </ul>

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Escritorio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
@@ -11,10 +13,10 @@ class UsersController extends Controller
     public function index(string $type)
     {
         if ($type != "cliente" && $type == "escritorio") {
-            $users = User::where("id_typeuser", 2)->get();
+            $users = User::where("id_typeuser", 2)->where('id_escritorio', Auth::user()->id_escritorio)->get();
             $type = "escritorio";
         } else {
-            $users = User::where("id_typeuser", 3)->get();
+            $users = User::where("id_typeuser", 3)->where('id_escritorio', Auth::user()->id_escritorio)->get();
             $type = "cliente";
         }
         return view('admin.users.index', compact('users', 'type'));
@@ -44,6 +46,7 @@ class UsersController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'id_typeuser' => $request->typeuser,
+            'id_escritorio' => Auth::user()->id_escritorio,
             'active' => 1
         ]);
 
@@ -116,10 +119,8 @@ class UsersController extends Controller
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->limit(10);
-            })
+            })->where('id_escritorio', Auth::user()->id_escritorio)
             ->get(['id', 'name', 'email']);
-
         return response()->json($users);
-
     }
 }

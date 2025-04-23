@@ -16,7 +16,8 @@ class Empresas extends Model
         'cidade',
         'bairro',
         'rua',
-        'active'
+        'active',
+        'id_escritorio',
     ];
 
     public function usuarios()

@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'id_typeuser',
+        'id_escritorio',
         'active'
     ];
 

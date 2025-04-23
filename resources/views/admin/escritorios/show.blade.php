@@ -17,7 +17,7 @@
             <li class="list-group-item"><strong>Criado em:</strong> {{ $escritorio->created_at->format('d/m/Y H:i') }}</li>
         </ul>
         <div class="mt-3">
-            <a href="{{ route('adm.escritorios.index') }}" class="btn btn-secondary">Voltar</a>
+            <a href="{{ route('escritorios.index') }}" class="btn btn-secondary">Voltar</a>
         </div>
     </div>
 @endsection

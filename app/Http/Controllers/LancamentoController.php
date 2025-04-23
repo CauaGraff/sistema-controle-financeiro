@@ -304,27 +304,6 @@ class LancamentoController extends Controller
         // Verifica se o lançamento foi baixado
         $lancamento = Lancamento::findOrFail($id);
         $lancamentoBaixa = $lancamento->lancamentoBaixa;
-        // Definir as regras de validação com base no estado de "baixado"
-        // if ($lancamentoBaixa) {
-        //     // Se já foi baixado, somente permita editar a descrição, categoria, fornecedor/cliente, número do documento e anexo
-        //     $validated = $request->validate([
-        //         'descricao' => 'required|string|max:255',
-        //         'categoria_id' => 'required|exists:categorias_de_contas,id',
-        //         'fornecedor_cliente_id' => 'required|exists:fornecedor_cliente,id',
-        //         'anexo' => 'mimes:pdf,jpeg,png,jpg|max:2048',
-        //     ]);
-        // } else {
-        //     // Se não foi baixado, permite editar todos os campos
-        //     $validated = $request->validate([
-        //         'descricao' => 'required|string|max:255',
-        //         'valor' => 'required|min:0',
-        //         'data' => 'required|date',
-        //         'categoria_id' => 'required|exists:categorias_de_contas,id',
-        //         'fornecedor_cliente_id' => 'required|exists:fornecedor_cliente,id',
-        //         'numero_documento' => 'nullable|string|max:255',
-        //         'anexo' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:2048',
-        //     ]);
-        // }
 
         // Atualiza os dados principais do lançamento
         $lancamento->descricao = $request->descricao;

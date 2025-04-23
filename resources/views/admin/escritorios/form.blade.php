@@ -67,19 +67,16 @@
             @error('cidade') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
     </div>
-
+    <div class="form-check form-switch mb-3">
+        <input type="checkbox" id="active" name="active" value="1" class="form-check-input" {{ old('active', $escritorio->active ?? true) ? 'checked' : '' }}>
+        <label class="form-check-label" for="active">Ativo</label>
+    </div>
     <div class="mb-3">
         <label class="form-label" for="obs">Observações</label>
         <textarea id="obs" name="obs" rows="3"
             class="form-control @error('obs') is-invalid @enderror">{{ old('obs', $escritorio->obs ?? '') }}</textarea>
         @error('obs') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
-
-    <div class="form-check mb-3">
-        <input type="checkbox" id="active" name="active" value="1" class="form-check-input" {{ old('active', $escritorio->active ?? true) ? 'checked' : '' }}>
-        <label class="form-check-label" for="active">Ativo</label>
-    </div>
-
     <button class="btn btn-primary w-100">
         {{ $isEdit ? 'Atualizar Escritório' : 'Cadastrar Escritório' }}
     </button>
@@ -97,50 +94,42 @@
         </div>
     </div>
 </div>
-
 @section('js')
     <script src="{{ asset('js/jquery.mask.min.js') }}"></script>
     <script>
         $(document).ready(function () {
             $('#cep').mask('00000-000');
+            $('#cnpj').mask('00.000.000/0000-00');
 
-            // Desabilita os campos de endereço até o CEP ser validado
-            $('#rua, #bairro, #cidade, #uf').prop('disabled', true);
-
-            // Preenchimento via ViaCEP
-            $("#cep").on('change', function () {
+            $('#cep').change(function () {
                 var cep = $(this).val().replace(/\D/g, '');
-                if (cep.length !== 8) {
-                    alert('Por favor, digite um CEP válido.');
-                    return;
-                }
-
-                // Exibe modal de carregamento
-                $("#modalLoading").modal('show');
-
-                $.getJSON('https://viacep.com.br/ws/' + cep + '/json/', function (data) {
-                    if (data.erro) {
-                        alert('CEP não encontrado!');
-                        $("#modalLoading").modal('hide'); // Fecha o modal em caso de erro
-                        return;
-                    }
-
-                    // Preenche campos
-                    $('#rua').val(data.logradouro);
-                    $('#bairro').val(data.bairro);
-                    $('#cidade').val(data.localidade);
-                    $('#uf').val(data.uf);
-
-                    // Habilita para edição caso necessário
-                    $('#rua, #bairro, #cidade, #uf').prop('disabled', false);
-
-                    // Fecha o modal após o sucesso
-                    $("#modalLoading").modal('hide');
-                })
-                    .fail(function () {
-                        $("#modalLoading").modal('hide'); // Fecha o modal em caso de falha
-                        alert('Erro ao buscar o CEP!');
+                if (cep.length === 8) {
+                    $('#modalLoading').modal('show');
+                    $.ajax({
+                        url: 'https://viacep.com.br/ws/' + cep + '/json/',
+                        method: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            $('#modalLoading').modal('hide');
+                            if (!data.erro) {
+                                $('#cidade').val(data.localidade);
+                                $('#uf').val(data.uf);
+                                $('#bairro').val(data.bairro);
+                                $('#rua').val(data.logradouro);
+                                // Força o fechamento do modal após preenchimento
+                                setTimeout(function () {
+                                    $("#modalLoading").modal('hide');
+                                }, 500);
+                            } else {
+                                alert('CEP não encontrado!');
+                            }
+                        },
+                        error: function () {
+                            $('#modalLoading').modal('hide');
+                            alert('Erro ao buscar o CEP!');
+                        }
                     });
+                }
             });
         });
     </script>
