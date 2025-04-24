@@ -19,7 +19,6 @@ class Lancamento extends Model
         'id_fornecedor_cliente'
     ];
 
-
     // Adiciona o cast para data_venc
     protected $casts = [
         'data_venc' => 'datetime', // Garante que data_venc seja uma instância de Carbon
@@ -42,7 +41,6 @@ class Lancamento extends Model
     {
         return $this->hasOne(LancamentoBaixa::class, 'id_lancamento');
     }
-
 
     public function lancamentoBaixaFilter()
     {

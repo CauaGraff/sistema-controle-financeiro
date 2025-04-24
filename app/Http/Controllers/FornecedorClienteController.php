@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Favorecido;
-use App\Models\FornecedorCliente;
 use Illuminate\Http\Request;
+use App\Models\FornecedorCliente;
+use Illuminate\Support\Facades\Gate;
 
 class FornecedorClienteController extends Controller
 {

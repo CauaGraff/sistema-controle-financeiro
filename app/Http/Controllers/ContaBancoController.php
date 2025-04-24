@@ -6,6 +6,7 @@ use App\Models\Empresa;
 use App\Models\Empresas;
 use App\Models\ContaBanco;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ContaBancoController extends Controller
 {
@@ -40,6 +41,7 @@ class ContaBancoController extends Controller
     public function edit($id)
     {
         $conta = ContaBanco::findOrFail($id);
+        Gate::authorize('update', $conta);
         return view('contaBanco.edit', compact('conta'));
     }
 

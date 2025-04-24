@@ -18,7 +18,7 @@
   <header class="border-bottom" style="background-color: #fff;">
     <nav class="navbar navbar-expand-lg navbar-light p-3">
       <div class="container-fluid">
-        @if (Auth::user()->isAdmim())
+        @if (Auth::user()->isAdmim() || Auth::user()->isEscritorio())
       <a class="navbar-brand" href="{{route('adm.empresas.show', session('empresa_id'))}}">
         <img src="{{asset("imgs/banner.png")}}" alt="Logo" style="width: 140px;">
       </a>

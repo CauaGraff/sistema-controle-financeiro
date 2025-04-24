@@ -9,11 +9,12 @@ use Illuminate\Http\Request;
 use App\Models\LancamentoBaixa;
 use App\Models\FornecedorCliente;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use App\Models\LancamentoRecorrenciaConfig;
-use App\Models\CategoriaContas; // Modelo de Plano de Contas
 use App\Http\Controllers\CategoriaContasController;
+use App\Models\CategoriaContas; // Modelo de Plano de Contas
 
 class LancamentoController extends Controller
 {
@@ -283,6 +284,7 @@ class LancamentoController extends Controller
     }
     public function edit(Lancamento $lancamento)
     {
+        Gate::authorize('update', $lancamento);
         // Verificar se o lançamento está baixado
         $lancamentoBaixa = $lancamento->lancamentoBaixa;
 
@@ -301,8 +303,10 @@ class LancamentoController extends Controller
     // Função para atualizar um lançamento
     public function update(Request $request, $id)
     {
+
         // Verifica se o lançamento foi baixado
         $lancamento = Lancamento::findOrFail($id);
+        Gate::authorize('update', $lancamento);
         $lancamentoBaixa = $lancamento->lancamentoBaixa;
 
         // Atualiza os dados principais do lançamento
@@ -351,6 +355,7 @@ class LancamentoController extends Controller
     }
     public function destroy(Lancamento $lancamento)
     {
+        Gate::authorize('update', $lancamento);
         // Buscar o lançamento e suas baixas associadas
         $lancamento = Lancamento::findOrFail($lancamento->id);
         // Buscar as baixas associadas a esse lançamento
@@ -375,6 +380,7 @@ class LancamentoController extends Controller
 
     public function deleteBaixa(Lancamento $lancamento)
     {
+        Gate::authorize('update', $lancamento);
         // Verificar se o lançamento tem uma baixa associada
         if ($lancamento->lancamentoBaixa) {
             if ($lancamento->lancamentoBaixa->anexo) {
@@ -392,6 +398,7 @@ class LancamentoController extends Controller
     }
     public function formbaixa(Lancamento $lancamento)
     {
+        Gate::authorize('update', $lancamento);
         // Recupera os parâmetros de cálculo
         $parametros = \App\Models\ParametrosCalculo::all();
 
@@ -436,6 +443,7 @@ class LancamentoController extends Controller
 
     public function baixaStore(Request $request, Lancamento $lancamento)
     {
+        Gate::authorize('update', $lancamento);
         // Verificar se o lançamento já foi baixado (se já existe um registro na tabela LancamentoBaixa com o mesmo id_lancamento)
         $existeBaixa = LancamentoBaixa::where('id_lancamento', $lancamento->id)->exists();
         // Se o lançamento já foi baixado, retornar um erro ou mensagem de aviso

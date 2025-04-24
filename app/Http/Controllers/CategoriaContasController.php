@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CategoriaContas;
 use App\Models\Empresas;
 use Illuminate\Http\Request;
+use App\Models\CategoriaContas;
+use Illuminate\Support\Facades\Gate;
 
 class CategoriaContasController extends Controller
 {
@@ -41,7 +42,7 @@ class CategoriaContasController extends Controller
     // Mostrar formulário de edição
     public function edit(CategoriaContas $categoria)
     {
-
+        Gate::authorize('update', $categoria);
         $categorias = CategoriaContas::where("id_empresa", "=", session("empresa_id"))->get();
         return view('categorias.edit', compact("categoria", 'categorias'));
     }
@@ -61,6 +62,7 @@ class CategoriaContasController extends Controller
     // Excluir categoria
     public function destroy(CategoriaContas $categoria)
     {
+
         $categoria->delete();
         return redirect()->route('categorias.index')->with('alert-success', 'Categoria excluída com sucesso!');
     }
