@@ -60,6 +60,7 @@ class FornecedorClienteController extends Controller
 
     public function edit(FornecedorCliente $favorecido)
     {
+        Gate::authorize('update', $favorecido);
         return view('favorecidos.edit', compact('favorecido'));
     }
 
@@ -104,6 +105,7 @@ class FornecedorClienteController extends Controller
 
     public function destroy(FornecedorCliente $favorecido)
     {
+        Gate::authorize('update', $favorecido);
         $favorecido->delete();
         return redirect()->route('favorecidos.index')->with('alert-success', 'Favorecido excluído com sucesso!');
     }

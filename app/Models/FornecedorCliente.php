@@ -48,4 +48,8 @@ class FornecedorCliente extends Model
 
         return false; // Retorna false se o documento não for válido
     }
+    public function empresa()
+    {
+        return $this->belongsTo(Empresas::class, 'id_empresa');
+    }
 }
