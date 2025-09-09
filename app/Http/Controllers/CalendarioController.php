@@ -12,6 +12,9 @@ class CalendarioController extends Controller
     // Exibe o calendário
     public function index()
     {
+        if (!session()->has('empresa_id') || !session()->has('empresa_nome')) {
+            return redirect()->route('login');
+        }
         return view('home');
     }
 
